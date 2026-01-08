@@ -139,7 +139,6 @@
                 padding: 15px;
             }
             .nome-cell::before { display: none; }
-            .admin-only[data-label]::before { content: attr(data-label); }
         }
 
         @media print { .action-buttons, .top-controls, .btn-settings, .admin-only { display: none; } }
@@ -184,7 +183,7 @@
                     <th>Categoria</th>
                     <th>Partecipo</th>
                     <th>Non Partecipo</th>
-                    <th class="admin-only">Reset</th>
+                    <th>Reset</th>
                     <th class="admin-only">Blocco</th>
                 </tr>
             </thead>
@@ -280,7 +279,7 @@
                 <td data-label="Non Partecipo">
                     <input type="radio" name="p_${p.id}" ${p.stato === 'no' ? 'checked' : ''} ${p.bloccato ? 'disabled' : ''} onclick="salva('${p.id}', 'no')">
                 </td>
-                <td data-label="Reset" class="admin-only" style="display: ${isAdmin ? 'table-cell' : 'none'}">
+                <td data-label="Reset">
                     <button onclick="confermaResetSingolo('${p.id}', '${p.nome.replace(/'/g, "\\'")}')" style="background:none; border:none; font-size:1.2rem; cursor:pointer;" ${p.bloccato ? 'disabled' : ''}>🔄</button>
                 </td>
                 <td data-label="Blocco" class="admin-only" style="display: ${isAdmin ? 'table-cell' : 'none'}">
