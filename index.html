@@ -17,76 +17,99 @@
             --table-header: #2c3e50; 
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px 10px; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 10px; overflow-y: auto; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
         
         .logo-container { text-align: center; margin-bottom: 15px; position: relative; }
-        .logo-container img { width: 250px; height: auto; filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.15)); }
+        .logo-container img { width: 250px; max-width: 80%; height: auto; filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.15)); }
         
-        /* Tasto impostazioni discreto */
         .btn-settings { position: absolute; top: 0; right: 0; background: none; border: none; font-size: 1.2rem; cursor: pointer; opacity: 0.3; }
-        .btn-settings:hover { opacity: 1; }
 
-        h2 { text-align: center; color: var(--primary); margin: 0 0 20px 0; font-size: 1.6rem; text-transform: uppercase; letter-spacing: 1px; }
+        h2 { text-align: center; color: var(--primary); margin: 0 0 20px 0; font-size: 1.5rem; text-transform: uppercase; }
+
+        /* Tabella Responsiva */
+        .table-container { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; min-width: 600px; }
+        thead th { position: sticky; top: 0; background-color: var(--table-header); color: white; padding: 12px; z-index: 10; font-size: 11px; text-transform: uppercase; }
+        td { border-bottom: 1px solid #eee; padding: 12px; text-align: center; font-size: 14px; }
 
         .row-locked { opacity: 0.6; background-color: #f9f9f9; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        thead th { position: sticky; top: 0; background-color: var(--table-header); color: white; padding: 12px; z-index: 10; font-size: 11px; }
-        td { border-bottom: 1px solid #eee; padding: 10px; text-align: center; }
-
         .nome-cell { text-align: left; font-weight: bold; padding-left: 10px !important; }
-        .bg-si { background-color: #d4edda !important; }
-        .bg-no { background-color: #f8d7da !important; }
+        .bg-si { background-color: #d4edda !important; color: #155724 !important; }
+        .bg-no { background-color: #f8d7da !important; color: #721c24 !important; }
 
-        .action-buttons { display: flex; gap: 10px; justify-content: center; padding: 20px 0; border-top: 2px solid #f0f2f5; flex-wrap: wrap; }
-        .btn { padding: 12px 18px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; font-size: 0.85rem; }
+        .action-buttons { display: flex; gap: 8px; justify-content: center; padding: 20px 0; border-top: 2px solid #f0f2f5; flex-wrap: wrap; }
+        .btn { padding: 12px 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; font-size: 0.85rem; flex-grow: 1; max-width: 200px; }
         
         .btn-bulk { background: var(--purple); }
         .btn-unlock-all { background: var(--orange); }
         .btn-reset-all { background: var(--danger); }
         .btn-excel { background: var(--success); }
 
-        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+        input[type="checkbox"], input[type="radio"] { width: 22px; height: 22px; cursor: pointer; }
 
-        @media print { .action-buttons, .search-box-container, .select-col, .btn-settings { display: none; } }
+        /* --- MEDIA QUERY PER MOBILE --- */
+        @media screen and (max-width: 768px) {
+            table, thead, tbody, th, td, tr { display: block; }
+            thead { display: none; } /* Nascondi intestazione su mobile */
+            
+            tr { border: 1px solid #ddd; margin-bottom: 15px; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+            
+            td { display: flex; justify-content: space-between; align-items: center; text-align: right; padding: 12px 15px; border-bottom: 1px solid #f1f1f1; position: relative; }
+            
+            td::before { content: attr(data-label); font-weight: bold; text-transform: uppercase; font-size: 10px; color: #888; text-align: left; }
+            
+            .nome-cell { background: #f8f9fa; justify-content: center; font-size: 1.1rem; border-bottom: 2px solid #eee; }
+            .nome-cell::before { display: none; }
+            
+            .select-col { background: #f0f4ff; }
+            
+            .action-buttons { gap: 10px; }
+            .btn { max-width: 100%; flex-basis: 45%; } /* Due bottoni per riga su mobile */
+        }
+
+        @media print { .action-buttons, .search-box-container, .btn-settings, .select-col { display: none; } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="logo-container">
-        <button class="btn-settings" onclick="cambiaTitolo()" title="Cambia Titolo">⚙️</button>
-        <img src="logo.png" alt="Logo Vesmaco" onerror="this.src='https://via.placeholder.com/250x100?text=Logo+Vesmaco'">
+        <button class="btn-settings" onclick="cambiaTitolo()">⚙️</button>
+        <img src="logo.png" alt="Logo" onerror="this.src='https://via.placeholder.com/250x100?text=Logo+Vesmaco'">
     </div>
 
     <h2 id="mainTitle">CARICAMENTO...</h2>
     
-    <div class="search-box-container" style="display: flex; gap: 10px; margin-bottom: 15px;">
-        <input type="text" id="searchInput" style="flex-grow: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd;" onkeyup="filterTable()" placeholder="Cerca atleta...">
-        <button class="btn" style="background: #5f6368;" onclick="toggleSelectAll()">Seleziona Tutti</button>
+    <div class="search-box-container" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;">
+        <input type="text" id="searchInput" style="padding: 14px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px;" onkeyup="filterTable()" placeholder="Cerca atleta...">
+        <button class="btn" style="background: #5f6368; max-width: 100%;" onclick="toggleSelectAll()">Seleziona / Deseleziona Tutti</button>
     </div>
 
-    <table id="targetTable">
-        <thead>
-            <tr>
-                <th style="width: 40px;" class="select-col">Sel.</th>
-                <th>Atleta</th>
-                <th>Categoria</th>
-                <th>Partecipo</th>
-                <th>No</th>
-                <th>Reset</th>
-                <th>Stato</th>
-            </tr>
-        </thead>
-        <tbody id="tabella-body"></tbody>
-    </table>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;">Sel.</th>
+                    <th>Atleta</th>
+                    <th>Categoria</th>
+                    <th>Partecipo</th>
+                    <th>No</th>
+                    <th>Reset</th>
+                    <th>Stato</th>
+                </tr>
+            </thead>
+            <tbody id="tabella-body"></tbody>
+        </table>
+    </div>
 
     <div class="action-buttons">
-        <button class="btn btn-bulk" onclick="bulkAction(true)">🔒 Blocca Selezionati</button>
-        <button class="btn btn-bulk" style="background: #9c27b0;" onclick="bulkAction(false)">🔓 Sblocca Selezionati</button>
+        <button class="btn btn-bulk" onclick="bulkAction(true)">🔒 Blocca Sel.</button>
+        <button class="btn btn-bulk" style="background: #9c27b0;" onclick="bulkAction(false)">🔓 Sblocca Sel.</button>
         <button class="btn btn-unlock-all" onclick="unlockEverything()">🔓 Sblocca Tutto</button>
-        <button class="btn btn-excel" onclick="exportToExcel()">Esporta Excel</button>
+        <button class="btn btn-excel" onclick="exportToExcel()">Excel</button>
         <button class="btn btn-reset-all" onclick="resetTutti()">Reset Scelte</button>
+        <button class="btn" style="background: #3c4043;" onclick="window.print()">Stampa</button>
     </div>
 </div>
 
@@ -94,14 +117,9 @@
     const SUPABASE_URL = 'https://jnfnfszekfstuoiemkgf.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuZm5mc3pla2ZzdHVvaWVta2dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODkzOTEsImV4cCI6MjA4MzQ2NTM5MX0.lh7eRFlg7nnI7kEzVPBL9kNyZWX-XFeWQxVbvmzRlvA';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    
-    const ADMIN_PASS = "juvenilia1179";
+    const ADMIN_PASS = "vesmaco2024";
 
-    // CARICA TITOLO E TABELLA ALL'AVVIO
-    async function init() {
-        caricaTitolo();
-        caricaTabella();
-    }
+    async function init() { caricaTitolo(); caricaTabella(); }
 
     async function caricaTitolo() {
         const { data } = await _supabase.from('configurazione').select('valore').eq('chiave', 'titolo_gara').single();
@@ -112,11 +130,10 @@
     }
 
     async function cambiaTitolo() {
-        const pass = prompt("Password Amministratore:");
-        if (pass === ADMIN_PASS) {
-            const nuovoTitolo = prompt("Inserisci il nuovo titolo per la gara:");
-            if (nuovoTitolo) {
-                await _supabase.from('configurazione').update({ valore: nuovoTitolo }).eq('chiave', 'titolo_gara');
+        if (prompt("Password:") === ADMIN_PASS) {
+            const nuovo = prompt("Nuovo Titolo:");
+            if (nuovo) {
+                await _supabase.from('configurazione').update({ valore: nuovo }).eq('id', 1);
                 caricaTitolo();
             }
         }
@@ -131,14 +148,15 @@
             const tr = document.createElement('tr');
             if(p.bloccato) tr.classList.add('row-locked');
             const cl = p.stato === 'si' ? 'bg-si' : (p.stato === 'no' ? 'bg-no' : '');
+            
             tr.innerHTML = `
-                <td class="select-col"><input type="checkbox" class="atleta-checkbox" value="${p.id}"></td>
+                <td data-label="Seleziona" class="select-col"><input type="checkbox" class="atleta-checkbox" value="${p.id}"></td>
                 <td class="nome-cell ${cl}">${p.nome}</td>
-                <td>${p.categoria}</td>
-                <td><input type="radio" name="p_${p.id}" ${p.stato === 'si' ? 'checked' : ''} ${p.bloccato ? 'disabled' : ''} onclick="salva('${p.id}', 'si')"></td>
-                <td><input type="radio" name="p_${p.id}" ${p.stato === 'no' ? 'checked' : ''} ${p.bloccato ? 'disabled' : ''} onclick="salva('${p.id}', 'no')"></td>
-                <td><button onclick="confermaResetSingolo('${p.id}', '${p.nome}')" style="background:none; border:none; cursor:pointer;" ${p.bloccato ? 'disabled' : ''}>🔄</button></td>
-                <td><button onclick="checkAuthAndToggle('${p.id}', ${p.bloccato})" style="background:none; border:none; cursor:pointer;">${p.bloccato ? '🔒' : '🔓'}</button></td>
+                <td data-label="Categoria">${p.categoria}</td>
+                <td data-label="Partecipo"><input type="radio" name="p_${p.id}" ${p.stato === 'si' ? 'checked' : ''} ${p.bloccato ? 'disabled' : ''} onclick="salva('${p.id}', 'si')"></td>
+                <td data-label="Non Partecipo"><input type="radio" name="p_${p.id}" ${p.stato === 'no' ? 'checked' : ''} ${p.bloccato ? 'disabled' : ''} onclick="salva('${p.id}', 'no')"></td>
+                <td data-label="Reset"><button onclick="confermaResetSingolo('${p.id}', '${p.nome}')" style="background:none; border:none; font-size:1.2rem;" ${p.bloccato ? 'disabled' : ''}>🔄</button></td>
+                <td data-label="Blocco"><button onclick="checkAuthAndToggle('${p.id}', ${p.bloccato})" style="background:none; border:none; font-size:1.2rem;">${p.bloccato ? '🔒' : '🔓'}</button></td>
             `;
             tbody.appendChild(tr);
         });
@@ -146,7 +164,7 @@
 
     async function bulkAction(deveBloccare) {
         const selezionati = Array.from(document.querySelectorAll('.atleta-checkbox:checked')).map(cb => cb.value);
-        if (selezionati.length === 0) return alert("Seleziona degli atleti!");
+        if (selezionati.length === 0) return alert("Seleziona almeno un atleta!");
         if (prompt("Password:") === ADMIN_PASS) {
             await _supabase.from('presenze').update({ bloccato: deveBloccare }).in('id', selezionati);
         }
@@ -158,9 +176,7 @@
         }
     }
 
-    async function salva(id, valore) {
-        await _supabase.from('presenze').update({ stato: valore }).eq('id', id);
-    }
+    async function salva(id, valore) { await _supabase.from('presenze').update({ stato: valore }).eq('id', id); }
 
     async function checkAuthAndToggle(id, statoAttuale) {
         if (prompt("Password:") === ADMIN_PASS) {
@@ -169,15 +185,15 @@
     }
 
     async function resetTutti() {
-        if (prompt("Password Reset:") === ADMIN_PASS) {
-            await _supabase.from('presenze').update({ stato: 'vuoto' }).neq('id', 0);
+        if (prompt("Password Reset Totale:") === ADMIN_PASS) {
+            if(confirm("Azzerare tutto?")) await _supabase.from('presenze').update({ stato: 'vuoto' }).neq('id', 0);
         }
     }
 
     function toggleSelectAll() {
         const checkboxes = document.querySelectorAll('.atleta-checkbox');
-        const someUnchecked = Array.from(checkboxes).some(cb => !cb.checked);
-        checkboxes.forEach(cb => cb.checked = someUnchecked);
+        const anyUnchecked = Array.from(checkboxes).some(cb => !cb.checked);
+        checkboxes.forEach(cb => cb.checked = anyUnchecked);
     }
 
     function filterTable() {
@@ -186,11 +202,8 @@
         for (let row of rows) row.style.display = row.innerText.toUpperCase().includes(input) ? "" : "none";
     }
 
-    // LISTENER TEMPO REALE
-    _supabase.channel('custom-all-channel')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'presenze' }, () => caricaTabella())
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'configurazione' }, () => caricaTitolo())
-    .subscribe();
+    _supabase.channel('db-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'presenze' }, () => caricaTabella()).subscribe();
+    _supabase.channel('config-changes').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'configurazione' }, () => caricaTitolo()).subscribe();
 
     init();
 </script>
