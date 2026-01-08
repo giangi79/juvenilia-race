@@ -17,7 +17,6 @@
             --table-header: #2c3e50; 
         }
 
-        /* Blocco totale scroll orizzontale */
         html, body { 
             overflow-x: hidden; 
             width: 100%;
@@ -38,16 +37,33 @@
 
         .logo-container { text-align: center; margin-bottom: 15px; position: relative; }
         .logo-container img { width: 220px; max-width: 100%; height: auto; }
-        
         .btn-settings { position: absolute; top: 0; right: 0; background: none; border: none; font-size: 1.2rem; cursor: pointer; opacity: 0.2; }
 
-        h2 { text-align: center; color: var(--primary); font-size: 1.4rem; text-transform: uppercase; margin: 10px 0 20px 0; line-height: 1.2; }
+        h2 { text-align: center; color: var(--primary); font-size: 1.4rem; text-transform: uppercase; margin: 10px 0 20px 0; }
 
-        /* Input Cerca e Seleziona Tutto */
+        /* --- STATISTICHE --- */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 10px; 
+            margin-bottom: 20px; 
+        }
+        .stat-card { 
+            padding: 12px; 
+            border-radius: 10px; 
+            text-align: center; 
+            color: white; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-presenti { background-color: var(--success); }
+        .stat-assenti { background-color: var(--danger); }
+        .stat-totali { background-color: var(--primary); }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; display: block; margin-bottom: 2px; font-weight: bold; }
+        .stat-value { font-size: 1.3rem; font-weight: bold; }
+
         .top-controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
         .search-box { width: 100%; padding: 14px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
 
-        /* Desktop Table */
         .table-wrapper { width: 100%; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed; }
         thead th { background-color: var(--table-header); color: white; padding: 12px 5px; font-size: 11px; text-transform: uppercase; }
@@ -58,7 +74,6 @@
         .bg-no { background-color: #f8d7da !important; color: #721c24 !important; }
         .row-locked { opacity: 0.6; background-color: #f9f9f9; }
 
-        /* Bottoni Azione */
         .action-buttons { 
             display: grid; 
             grid-template-columns: repeat(2, 1fr); 
@@ -76,7 +91,6 @@
             cursor: pointer;
             text-align: center;
         }
-        
         .btn-bulk { background: var(--purple); }
         .btn-unlock-all { background: var(--orange); }
         .btn-reset-all { background: var(--danger); }
@@ -85,12 +99,11 @@
 
         input[type="checkbox"], input[type="radio"] { width: 22px; height: 22px; cursor: pointer; vertical-align: middle; }
 
-        /* --- STILE MOBILE VERTICALE --- */
+        /* --- MOBILE RESPONSIVE --- */
         @media screen and (max-width: 768px) {
-            thead { display: none; } /* Nascondi testata tabella */
-            
+            .stats-grid { grid-template-columns: 1fr; } /* Statistiche verticali su mobile */
+            thead { display: none; }
             table, tbody, tr, td { display: block; width: 100%; }
-            
             tr { 
                 margin-bottom: 15px; 
                 border: 1px solid #ddd; 
@@ -98,7 +111,6 @@
                 box-shadow: 0 2px 8px rgba(0,0,0,0.05);
                 overflow: hidden;
             }
-
             td { 
                 display: flex; 
                 justify-content: space-between; 
@@ -107,8 +119,6 @@
                 border-bottom: 1px solid #f0f0f0; 
                 box-sizing: border-box;
             }
-
-            /* Inserimento etichette Partecipo / Non Partecipo ecc. */
             td::before { 
                 content: attr(data-label); 
                 font-weight: bold; 
@@ -118,7 +128,6 @@
                 flex: 1;
                 text-align: left;
             }
-
             .nome-cell { 
                 background: #f8f9fa; 
                 justify-content: center; 
@@ -128,7 +137,6 @@
                 padding: 15px;
             }
             .nome-cell::before { display: none; }
-
             .select-col { background-color: #f0f4ff; }
             .action-buttons { grid-template-columns: 1fr 1fr; }
         }
@@ -145,6 +153,21 @@
     </div>
 
     <h2 id="mainTitle">CARICAMENTO...</h2>
+
+    <div class="stats-grid">
+        <div class="stat-card stat-presenti">
+            <span class="stat-label">Partecipo</span>
+            <div id="count-si" class="stat-value">0</div>
+        </div>
+        <div class="stat-card stat-assenti">
+            <span class="stat-label">Non Partecipo</span>
+            <div id="count-no" class="stat-value">0</div>
+        </div>
+        <div class="stat-card stat-totali">
+            <span class="stat-label">Iscritti Totali</span>
+            <div id="count-tot" class="stat-value">0</div>
+        </div>
+    </div>
     
     <div class="top-controls">
         <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="Cerca atleta o categoria...">
@@ -152,7 +175,7 @@
     </div>
 
     <div class="table-wrapper">
-        <table>
+        <table id="targetTable">
             <thead>
                 <tr>
                     <th style="width: 50px;">Sel.</th>
@@ -195,8 +218,7 @@
     }
 
     async function cambiaTitolo() {
-        const pass = prompt("Password Amministratore:");
-        if (pass === ADMIN_PASS) {
+        if (prompt("Password Amministratore:") === ADMIN_PASS) {
             const nuovo = prompt("Nuovo Titolo:");
             if (nuovo) { 
                 await _supabase.from('configurazione').update({ valore: nuovo }).eq('chiave', 'titolo_gara');
@@ -210,8 +232,13 @@
         if (error) return;
         const tbody = document.getElementById('tabella-body');
         tbody.innerHTML = '';
+        
+        let cSi = 0, cNo = 0;
 
         data.forEach(p => {
+            if(p.stato === 'si') cSi++;
+            if(p.stato === 'no') cNo++;
+
             const tr = document.createElement('tr');
             if(p.bloccato) tr.classList.add('row-locked');
             const cl = p.stato === 'si' ? 'bg-si' : (p.stato === 'no' ? 'bg-no' : '');
@@ -227,6 +254,11 @@
             `;
             tbody.appendChild(tr);
         });
+
+        // Aggiorna contatori statistiche
+        document.getElementById('count-si').innerText = cSi;
+        document.getElementById('count-no').innerText = cNo;
+        document.getElementById('count-tot').innerText = data.length;
     }
 
     async function salva(id, valore) { await _supabase.from('presenze').update({ stato: valore }).eq('id', id); }
@@ -271,7 +303,7 @@
         XLSX.writeFile(wb, "Vesmaco_Race_Report.xlsx");
     }
 
-    // Realtime Sync
+    // Sync in tempo reale
     _supabase.channel('any').on('postgres_changes', { event: '*', schema: 'public', table: 'presenze' }, () => caricaTabella()).subscribe();
     _supabase.channel('config').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'configurazione' }, () => caricaTitolo()).subscribe();
 
