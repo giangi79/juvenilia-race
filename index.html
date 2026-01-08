@@ -18,85 +18,103 @@
             --table-header: #2c3e50; 
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 10px; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        /* Pagina a scorrimento naturale */
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #f0f2f5; 
+            margin: 0; 
+            padding: 20px 10px; 
+            display: block; /* Rimosso flex per scorrimento naturale */
+            overflow-y: auto; 
+        }
         
         .container { 
             max-width: 950px; 
-            width: 95%;
             margin: auto; 
             background: white; 
-            padding: 20px; 
+            padding: 25px; 
             border-radius: 15px; 
             box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            max-height: 95vh;
         }
-        
-        h2 { text-align: center; color: var(--primary); margin: 0 0 15px 0; font-size: 1.5rem; text-transform: uppercase; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; flex-shrink: 0; }
-        .stat-card { padding: 10px; border-radius: 8px; text-align: center; color: white; }
+        .logo-container { text-align: center; margin-bottom: 15px; }
+        .logo-container img { width: 250px; height: auto; object-fit: contain; filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.15)); }
+        
+        h2 { text-align: center; color: var(--primary); margin: 0 0 20px 0; font-size: 1.6rem; text-transform: uppercase; letter-spacing: 2px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .stat-card { padding: 12px; border-radius: 10px; text-align: center; color: white; }
         .stat-presenti { background-color: var(--success); }
         .stat-assenti { background-color: var(--danger); }
         .stat-totali { background-color: var(--primary); }
-        .stat-label { font-size: 0.7rem; text-transform: uppercase; display: block; }
-        .stat-value { font-size: 1.3rem; font-weight: bold; }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        .stat-value { font-size: 1.4rem; font-weight: bold; }
 
-        .search-box { width: 100%; padding: 12px; margin-bottom: 10px; border: 2px solid #dfe1e5; border-radius: 8px; outline: none; flex-shrink: 0; }
+        .search-box { width: 100%; padding: 14px; margin-bottom: 20px; border: 2px solid #dfe1e5; border-radius: 10px; outline: none; box-sizing: border-box; font-size: 16px; }
 
-        .table-wrapper {
-            overflow-y: auto;
-            flex-grow: 1;
-            border: 1px solid #eee;
-            border-radius: 8px;
-        }
-
-        table { width: 100%; border-collapse: collapse; }
+        /* Tabella senza wrapper per scorrere con la pagina */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
         
         thead th { 
             position: sticky; 
-            top: 0; 
+            top: 0; /* L'intestazione ti segue comunque mentre scorri i nomi */
             background-color: var(--table-header); 
             color: white; 
             padding: 15px; 
             z-index: 10; 
-            font-size: 12px;
-            text-transform: uppercase;
+            font-size: 12px; 
+            text-transform: uppercase; 
         }
 
-        td { border-bottom: 1px solid #eee; padding: 12px; text-align: center; }
+        td { border-bottom: 1px solid #eee; padding: 12px; text-align: center; font-size: 15px; }
 
-        .nome-cell { text-align: left; font-weight: bold; padding-left: 15px !important; transition: all 0.2s; }
+        .nome-cell { text-align: left; font-weight: bold; padding-left: 15px !important; }
         .bg-si { background-color: var(--bg-success) !important; color: #155724 !important; }
         .bg-no { background-color: var(--bg-danger) !important; color: #721c24 !important; }
 
-        input[type="radio"] { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary); }
-        .btn-reset-row { background: none; border: none; cursor: pointer; font-size: 1.2rem; opacity: 0.5; }
+        input[type="radio"] { width: 24px; height: 24px; cursor: pointer; accent-color: var(--primary); }
+        .btn-reset-row { background: none; border: none; cursor: pointer; font-size: 1.2rem; opacity: 0.4; }
         .btn-reset-row:hover { opacity: 1; }
 
-        .action-buttons { display: flex; gap: 8px; justify-content: center; margin-top: 15px; flex-shrink: 0; }
-        .btn { padding: 10px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; font-size: 0.9rem; }
+        /* Pulsanti a fine tabella */
+        .action-buttons { 
+            display: flex; 
+            gap: 15px; 
+            justify-content: center; 
+            padding: 20px 0;
+            border-top: 2px solid #f0f2f5;
+            flex-wrap: wrap;
+        }
+        
+        .btn { padding: 14px 25px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; font-size: 1rem; transition: background 0.2s; }
         .btn-print { background: #3c4043; }
         .btn-excel { background: #1d6f42; }
         .btn-reset-all { background: #ea4335; }
+        .btn:hover { filter: brightness(1.1); }
+
+        #status { font-size: 11px; text-align: center; color: var(--gray); margin-top: 10px; padding-bottom: 20px; }
 
         @media screen and (max-width: 650px) {
-            .table-wrapper { overflow-y: visible; }
-            body { overflow: auto; height: auto; }
-            .container { max-height: none; }
             thead { display: none; }
-            tr { display: block; border: 1px solid #ddd; margin-bottom: 10px; border-radius: 10px; }
-            td { display: flex; justify-content: space-between; align-items: center; padding: 10px; }
+            tr { display: block; border: 1px solid #ddd; margin-bottom: 15px; border-radius: 12px; overflow: hidden; }
+            td { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f1f1f1; }
             td::before { content: attr(data-label); font-weight: bold; color: #888; font-size: 10px; }
-            .nome-cell { justify-content: center; background: #f8f9fa; }
+            .nome-cell { justify-content: center; background: #f8f9fa; font-size: 1.1rem; border-bottom: 2px solid #eee; }
             .nome-cell::before { content: ""; }
+            .logo-container img { width: 200px; }
+            .btn { width: 100%; } /* Pulsanti a tutta larghezza su mobile */
         }
+
+        @media print { .action-buttons, .search-box, .btn-reset-row, #status { display: none; } }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <div class="logo-container">
+        <img src="logo.png" alt="Logo Vesmaco" onerror="this.src='https://via.placeholder.com/250x100?text=Logo+Vesmaco'">
+    </div>
+
     <h2>INTERNATIONAL VESMACO RACE</h2>
     
     <div class="stats-grid">
@@ -105,7 +123,7 @@
             <div id="count-si" class="stat-value">0</div>
         </div>
         <div class="stat-card stat-assenti">
-            <span class="stat-label">No</span>
+            <span class="stat-label">Non Partecipano</span>
             <div id="count-no" class="stat-value">0</div>
         </div>
         <div class="stat-card stat-totali">
@@ -114,29 +132,28 @@
         </div>
     </div>
     
-    <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="Cerca atleta...">
+    <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="Cerca atleta o categoria...">
 
-    <div class="table-wrapper">
-        <table id="targetTable">
-            <thead>
-                <tr>
-                    <th>Atleta</th>
-                    <th>Categoria</th>
-                    <th>Partecipo</th>
-                    <th>Non partecipo</th>
-                    <th>Reset</th>
-                </tr>
-            </thead>
-            <tbody id="tabella-body"></tbody>
-        </table>
-    </div>
+    <table id="targetTable">
+        <thead>
+            <tr>
+                <th>Atleta</th>
+                <th>Categoria</th>
+                <th>Partecipo</th>
+                <th>Non Partecipo</th>
+                <th>Reset</th>
+            </tr>
+        </thead>
+        <tbody id="tabella-body"></tbody>
+    </table>
 
     <div class="action-buttons">
-        <button class="btn btn-print" onclick="window.print()">Stampa</button>
-        <button class="btn btn-excel" onclick="exportToExcel()">Excel</button>
+        <button class="btn btn-print" onclick="window.print()">Stampa Report</button>
+        <button class="btn btn-excel" onclick="exportToExcel()">Esporta Excel</button>
         <button class="btn btn-reset-all" onclick="resetTutti()">Reset Globale</button>
     </div>
-    <div id="status" style="font-size: 10px; text-align: center; color: gray; margin-top: 5px;">Sincronizzazione...</div>
+    
+    <div id="status">Sincronizzazione in tempo reale...</div>
 </div>
 
 <script>
@@ -160,9 +177,9 @@
             const cl = p.stato === 'si' ? 'bg-si' : (p.stato === 'no' ? 'bg-no' : '');
             tr.innerHTML = `
                 <td class="nome-cell ${cl}">${p.nome}</td>
-                <td data-label="Cat.">${p.categoria}</td>
-                <td data-label="Sì"><input type="radio" name="p_${p.id}" ${p.stato === 'si' ? 'checked' : ''} onclick="salva('${p.id}', 'si')"></td>
-                <td data-label="No"><input type="radio" name="p_${p.id}" ${p.stato === 'no' ? 'checked' : ''} onclick="salva('${p.id}', 'no')"></td>
+                <td data-label="Categoria">${p.categoria}</td>
+                <td data-label="Partecipo"><input type="radio" name="p_${p.id}" ${p.stato === 'si' ? 'checked' : ''} onclick="salva('${p.id}', 'si')"></td>
+                <td data-label="Non Partecipo"><input type="radio" name="p_${p.id}" ${p.stato === 'no' ? 'checked' : ''} onclick="salva('${p.id}', 'no')"></td>
                 <td data-label="Reset"><button class="btn-reset-row" onclick="confermaResetSingolo('${p.id}', '${p.nome.replace(/'/g, "\\'")}')">🔄</button></td>
             `;
             tbody.appendChild(tr);
@@ -170,14 +187,13 @@
         document.getElementById('count-si').innerText = cSi;
         document.getElementById('count-no').innerText = cNo;
         document.getElementById('count-tot').innerText = data.length;
-        document.getElementById('status').innerText = "Ultimo agg: " + new Date().toLocaleTimeString();
+        document.getElementById('status').innerText = "Ultimo aggiornamento: " + new Date().toLocaleTimeString();
     }
 
     async function salva(id, valore) {
         await _supabase.from('presenze').update({ stato: valore }).eq('id', id);
     }
 
-    // Nuova funzione per la conferma del reset singolo
     async function confermaResetSingolo(id, nomeAtleta) {
         if(confirm(`Vuoi azzerare la scelta per ${nomeAtleta}?`)) {
             await salva(id, 'vuoto');
@@ -185,16 +201,16 @@
     }
 
     async function resetTutti() {
-        if(confirm("ATTENZIONE: Azzerare TUTTE le scelte del registro?")) {
+        if(confirm("Azzerare TUTTE le scelte del registro?")) {
             await _supabase.from('presenze').update({ stato: 'vuoto' }).neq('id', 0);
         }
     }
 
     function exportToExcel() {
-        const ws = XLSX.utils.json_to_sheet(datiAttuali.map(p => ({ Atleta: p.nome, Categoria: p.categoria, Stato: p.stato })));
+        const ws = XLSX.utils.json_to_sheet(datiAttuali.map(p => ({ Atleta: p.nome, Categoria: p.categoria, Stato: p.stato === 'si' ? 'PARTECIPA' : (p.stato === 'no' ? 'NON PARTECIPA' : '-') })));
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Gara");
-        XLSX.writeFile(wb, "Vesmaco_Race.xlsx");
+        XLSX.utils.book_append_sheet(wb, ws, "Registro Gara");
+        XLSX.writeFile(wb, "International_Vesmaco_Race.xlsx");
     }
 
     function filterTable() {
@@ -208,4 +224,3 @@
 </script>
 </body>
 </html>
-
