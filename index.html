@@ -120,9 +120,9 @@
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="nome-cell">${p.nome}</td>
-                <td data-label="Cat.">${p.categoria}</td>
-                <td data-label="Sì"><input type="radio" name="p_${p.id}" ${p.stato === 'si' ? 'checked' : ''} onclick="salva('${p.id}', 'si')"></td>
-                <td data-label="No"><input type="radio" name="p_${p.id}" ${p.stato === 'no' ? 'checked' : ''} onclick="salva('${p.id}', 'no')"></td>
+                <td data-label="Categoria">${p.categoria}</td>
+                <td data-label="Partecipo"><input type="radio" name="p_${p.id}" ${p.stato === 'si' ? 'checked' : ''} onclick="salva('${p.id}', 'si')"></td>
+                <td data-label="Non Partecipo"><input type="radio" name="p_${p.id}" ${p.stato === 'no' ? 'checked' : ''} onclick="salva('${p.id}', 'no')"></td>
             `;
             tbody.appendChild(tr);
         });
@@ -147,5 +147,6 @@
 </body>
 
 </html>
+
 
 
