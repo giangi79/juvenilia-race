@@ -23,7 +23,6 @@
         body { margin: 0; padding: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', sans-serif; transition: 0.3s; }
         .container { max-width: 1000px; margin: 0 auto; padding: 15px; background: var(--bg-card); min-height: 100vh; }
 
-        /* MODIFICA DIMENSIONE LOGO */
         .logo-container { text-align: center; margin-bottom: 20px; position: relative; min-height: 120px; display: flex; justify-content: center; align-items: center; }
         .logo-container img { width: 220px; height: auto; border-radius: 8px; transition: 0.3s; }
         
@@ -35,36 +34,12 @@
 
         .countdown-container { text-align: center; margin: 10px 0; padding: 15px; border-radius: 12px; background: var(--timer-bg); border: 2px solid var(--primary); transition: 0.5s; min-height: 60px; display: flex; align-items: center; justify-content: center; }
         .timer { font-family: 'Courier New', monospace; font-size: 1.3rem; font-weight: bold; color: var(--primary); }
-        .timer-warning { background: #fff3e0; border-color: #ff9800; }
-        .timer-urgent { background: #ffebee; border-color: #dc3545; animation: pulse 2s infinite; }
 
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.8; } 100% { opacity: 1; } }
-
-        /* Effetto Flash per conferma salvataggio */
-        .row-flash-success { animation: flashSuccess 2s ease-out; }
-        @keyframes flashSuccess {
-            0% { background-color: transparent; }
-            20% { background-color: rgba(40, 167, 69, 0.2); }
-            100% { background-color: transparent; }
-        }
-
-        /* Pulsantoni Badge Touch-Friendly */
         input[type="radio"] { display: none; }
         .badge-btn {
-            display: inline-block;
-            padding: 10px 12px;
-            border-radius: 20px;
-            border: 2px solid #ddd;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.75rem;
-            transition: 0.2s;
-            user-select: none;
-            width: 100%;
-            box-sizing: border-box;
-            text-align: center;
-            background: white;
-            color: #555;
+            display: inline-block; padding: 10px 12px; border-radius: 20px; border: 2px solid #ddd;
+            cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.2s;
+            user-select: none; width: 100%; box-sizing: border-box; text-align: center; background: white; color: #555;
         }
         [data-theme="dark"] .badge-btn { background: #333; color: #bbb; border-color: #444; }
 
@@ -72,9 +47,9 @@
         input[value="no"]:checked + .badge-no { background-color: var(--danger); color: white; border-color: #bd2130; }
 
         #addAtletaBox { background: rgba(26, 115, 232, 0.08); border: 2px solid var(--primary); border-radius: 12px; padding: 20px; margin-bottom: 20px; display: none; flex-direction: column; gap: 15px; }
-        .admin-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .admin-row input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 6px; min-width: 180px; font-size: 14px; }
-        .admin-row button { padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; }
+        .admin-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .admin-row input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; min-width: 150px; font-size: 14px; }
+        .admin-row button { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; }
 
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .stat-card { padding: 12px; border-radius: 8px; text-align: center; color: white; font-weight: bold; }
@@ -93,6 +68,13 @@
         td { padding: 10px 2px; border-bottom: 1px solid #eee; text-align: center; }
         .nome-cell { text-align: left; font-weight: bold; padding-left: 10px !important; }
         
+        .date-label { font-size: 0.65rem; color: var(--primary); display: block; font-weight: bold; margin-top: 2px; }
+        [data-theme="dark"] .date-label { color: #8ab4f8; }
+
+        .date-assign-btns { margin-top: 5px; display: flex; gap: 5px; }
+        .btn-date-small { padding: 4px 10px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer; font-weight: bold; color: #333; }
+        .btn-date-small.active { background: var(--primary); color: white; border-color: var(--primary); }
+
         .bg-si { background-color: rgba(40, 167, 69, 0.05) !important; }
         .bg-no { background-color: rgba(220, 53, 69, 0.05) !important; }
 
@@ -108,9 +90,9 @@
             thead { display: none; }
             td { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 15px; }
             td::before { content: attr(data-label); font-weight: bold; font-size: 0.70rem; color: #777; }
-            .nome-cell { background: rgba(0,0,0,0.03); justify-content: center; font-size: 1.0rem; }
+            .nome-cell { background: rgba(0,0,0,0.03); justify-content: center; font-size: 1.0rem; flex-direction: column; }
             .nome-cell::before { display: none; }
-            .logo-container img { width: 180px; } /* Leggermente più piccolo solo su mobile molto stretto */
+            .logo-container img { width: 180px; }
         }
     </style>
 </head>
@@ -136,22 +118,30 @@
 
     <div id="addAtletaBox">
         <div class="admin-row">
-            <input type="text" id="editTitleInput" placeholder="Nome della gara...">
+            <input type="text" id="editTitleInput" placeholder="Titolo della gara...">
             <button onclick="salvaTitolo()" style="background:var(--purple);">Aggiorna Titolo</button>
         </div>
+        
+        <div style="font-size: 11px; font-weight: bold; color: var(--primary);">📅 ETICHETTE DATE (A / B / C):</div>
         <div class="admin-row">
-            <input type="text" id="newNome" placeholder="Cognome e Nome Atleta">
+            <input type="text" id="dateA_Label" placeholder="Data A">
+            <input type="text" id="dateB_Label" placeholder="Data B">
+            <input type="text" id="dateC_Label" placeholder="Data C">
+            <button onclick="salvaEtichetteDate()" style="background:var(--orange);">Salva Etichette</button>
+        </div>
+
+        <div class="admin-row">
+            <input type="text" id="newNome" placeholder="Cognome e Nome">
             <input type="text" id="newCat" placeholder="Categoria">
-            <button onclick="aggiungiAtleta()" style="background:var(--primary);">+ Aggiungi Atleta</button>
+            <button onclick="aggiungiAtleta()" style="background:var(--primary);">+ Aggiungi</button>
+            <button onclick="toggleSort()" style="background:var(--table-header);">↕️ Ordina: <span id="sortLabel">Nome</span></button>
         </div>
+        
         <div class="admin-row">
-            <div style="font-size: 14px; font-weight: bold;">Scadenza Iscrizioni:</div>
+            <div style="font-size: 12px; font-weight: bold;">SCADENZA:</div>
             <input type="datetime-local" id="deadlineInput">
-            <button onclick="confermaScadenzaDB()" style="background:var(--success);">CONFERMA SCADENZA</button>
-            <button onclick="resetScadenzaDB()" style="background:var(--danger);">RESET SCADENZA</button>
-        </div>
-        <div class="admin-row">
-            <button onclick="ordinaPerCategoria()" style="background:var(--table-header); width:100%;">📊 Ordina Tabella per Categoria Custom</button>
+            <button onclick="confermaScadenzaDB()" style="background:var(--success);">CONFERMA</button>
+            <button onclick="resetScadenzaDB()" style="background:var(--danger);">RESET</button>
         </div>
     </div>
 
@@ -161,11 +151,11 @@
     </div>
 
     <div id="confirmedList" style="display:none;">
-        <div style="font-weight:bold; font-size:0.8rem; color:#555;">👥 PARTECIPANTI PER CATEGORIA:</div>
+        <div style="font-weight:bold; font-size:0.8rem; color:#555; margin-bottom:5px;">👥 PARTECIPANTI PER CATEGORIA:</div>
         <div id="listContent"></div>
     </div>
     
-    <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="🔍 Cerca il tuo nome per votare...">
+    <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="🔍 Cerca il tuo nome...">
 
     <div class="table-wrapper">
         <table>
@@ -201,124 +191,115 @@
     
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const ADMIN_PASS = "juvenilia1179";
-    let isAdmin = false, isExpired = false, currentData = [], currentConfig = {}, timerInterval, refreshInterval;
-    let sortByCat = false;
+    
+    // Tabelle database
+    const T_DATA = 'presenze'; 
+    const T_CONF = 'configurazione';
+
+    let isAdmin = false, isExpired = false, currentData = [], timerInterval;
+    let labelA = "", labelB = "", labelC = "";
+    let sortBy = 'nome'; 
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
     async function init() {
         if(localStorage.getItem('theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
         await fullLoad();
-        refreshInterval = setInterval(async () => { await fullLoad(); }, 3000);
+        setInterval(fullLoad, 5000);
     }
 
-    async function fullLoad() { await caricaConfig(); await caricaTabella(); }
+    async function fullLoad() {
+        await caricaConfig();
+        await caricaTabella();
+    }
 
     async function caricaConfig() {
-        try {
-            const { data, error } = await _supabase.from('configurazione').select('*');
-            if(error) return;
-            if(JSON.stringify(currentConfig) === JSON.stringify(data)) return;
-            currentConfig = data;
-            const titoloObj = data.find(c => c.chiave === 'titolo_gara');
-            const scadenzaObj = data.find(c => c.chiave === 'scadenza_adesioni');
-            document.getElementById('mainTitle').innerText = titoloObj?.valore || "Gara Juvenilia";
-            document.getElementById('editTitleInput').value = titoloObj?.valore || "Gara Juvenilia";
-            if (scadenzaObj && scadenzaObj.valore) {
-                const scadString = scadenzaObj.valore;
-                document.getElementById('deadlineInput').value = scadString;
-                const diff = new Date(scadString).getTime() - new Date().getTime();
-                if (diff <= 0) { isExpired = true; mostraStatoTimer("ISCRIZIONI CHIUSE", "var(--danger)"); } 
-                else { isExpired = false; startCountdown(scadString); }
-            } else { isExpired = false; mostraStatoTimer("TERMINE DA DEFINIRE", "var(--primary)"); }
-        } catch (e) { console.log(e); }
-    }
+        const { data } = await _supabase.from(T_CONF).select('*');
+        if(!data) return;
+        const tit = data.find(c => c.chiave === 'titolo_gara');
+        const sca = data.find(c => c.chiave === 'scadenza_adesioni');
+        const d1 = data.find(c => c.chiave === 'data_label_a');
+        const d2 = data.find(c => c.chiave === 'data_label_b');
+        const d3 = data.find(c => c.chiave === 'data_label_c');
 
-    function mostraStatoTimer(testo, colore) {
-        if(timerInterval) clearInterval(timerInterval);
-        const display = document.getElementById('timerDisplay');
-        display.innerText = testo; display.style.color = colore;
-        document.getElementById('countdownBox').className = "countdown-container";
-    }
+        document.getElementById('mainTitle').innerText = tit?.valore || "Gara Juvenilia";
+        labelA = d1?.valore || "";
+        labelB = d2?.valore || "";
+        labelC = d3?.valore || "";
 
-    function startCountdown(endTime) {
-        if(timerInterval) clearInterval(timerInterval);
-        const box = document.getElementById('countdownBox');
-        const display = document.getElementById('timerDisplay');
-        timerInterval = setInterval(() => {
-            const now = new Date().getTime();
-            const distance = new Date(endTime).getTime() - now;
-            if (distance <= 0) {
-                clearInterval(timerInterval);
-                isExpired = true;
-                display.innerText = "ISCRIZIONI CHIUSE";
-                display.style.color = "var(--danger)";
-                return;
-            }
-            const d = Math.floor(distance / 86400000), h = Math.floor((distance % 86400000) / 3600000), m = Math.floor((distance % 3600000) / 60000), s = Math.floor((distance % 60000) / 1000);
-            display.innerText = `SCADENZA: ${d}g ${h}h ${m}m ${s}s`;
-            if (distance < 10800000) box.className = "countdown-container timer-urgent";
-            else if (distance < 86400000) box.className = "countdown-container timer-warning";
-        }, 1000);
+        if(sca?.valore) {
+            const diff = new Date(sca.valore).getTime() - new Date().getTime();
+            if(diff <= 0) { isExpired = true; mostraTimerChiuso(); }
+            else { isExpired = false; startCountdown(sca.valore); }
+        } else {
+            isExpired = false;
+            if(timerInterval) clearInterval(timerInterval);
+            document.getElementById('timerDisplay').innerText = "TERMINE DA DEFINIRE";
+        }
     }
 
     async function caricaTabella() {
-        const { data } = await _supabase.from('presenze').select('*').order('nome');
-        if(!data || JSON.stringify(currentData) === JSON.stringify(data)) return;
-        currentData = data;
+        const { data } = await _supabase.from(T_DATA).select('*');
+        if(data) { currentData = data; renderData(); }
+    }
+
+    function toggleSort() {
+        sortBy = sortBy === 'nome' ? 'categoria' : 'nome';
+        document.getElementById('sortLabel').innerText = sortBy === 'nome' ? 'Nome' : 'Categoria';
         renderData();
     }
 
     function renderData() {
         const tbody = document.getElementById('tabella-body');
         const listContent = document.getElementById('listContent');
-        const scrollBox = document.querySelector('.table-wrapper');
-        const currentScroll = scrollBox.scrollTop;
         tbody.innerHTML = ''; listContent.innerHTML = '';
-        let cSi = 0, cNo = 0, partecipantiPerCat = {};
+        let cSi = 0, cNo = 0, partPerCat = {};
 
-        let displayData = [...currentData];
-        if (sortByCat) {
-            displayData.sort((a, b) => {
+        let sorted = [...currentData].sort((a,b) => {
+            if (sortBy === 'categoria') {
                 const orderA = customCatOrder[a.categoria.toUpperCase()] || 999;
                 const orderB = customCatOrder[b.categoria.toUpperCase()] || 999;
                 if (orderA !== orderB) return orderA - orderB;
-                return a.nome.localeCompare(b.nome);
-            });
-        }
+            }
+            return a.nome.localeCompare(b.nome);
+        });
 
-        displayData.forEach(p => {
+        sorted.forEach(p => {
             if (p.bloccato && !isAdmin) return;
+            
+            let dataUf = p.note === 'B' ? labelB : (p.note === 'C' ? labelC : labelA);
             if(p.stato === 'si') {
                 cSi++;
-                if(!partecipantiPerCat[p.categoria]) partecipantiPerCat[p.categoria] = [];
-                partecipantiPerCat[p.categoria].push(p.nome);
+                if(!partPerCat[p.categoria]) partPerCat[p.categoria] = [];
+                partPerCat[p.categoria].push({nome: p.nome, data: dataUf});
             }
             if(p.stato === 'no') cNo++;
 
             const tr = document.createElement('tr');
-            tr.id = `row-${p.id}`;
             if(p.stato === 'si') tr.className = 'bg-si';
             if(p.stato === 'no') tr.className = 'bg-no';
             
             const disabled = isExpired && !isAdmin ? 'disabled' : '';
             const displayAdmin = isAdmin ? 'table-cell' : 'none';
+            const labelHtml = dataUf ? `<span class="date-label">${dataUf}</span>` : "";
 
             tr.innerHTML = `
                 <td class="col-admin" style="display:${displayAdmin}"><input type="checkbox" class="bulk-cb" value="${p.id}"></td>
-                <td class="nome-cell">${p.nome}${p.bloccato ? ' 🔒' : ''}</td>
+                <td class="nome-cell">
+                    ${p.nome}${p.bloccato ? ' 🔒' : ''}
+                    ${labelHtml}
+                    <div class="date-assign-btns col-admin" style="display:${displayAdmin}">
+                        <button class="btn-date-small ${p.note !== 'B' && p.note !== 'C' ? 'active' : ''}" onclick="assegnaData('${p.id}', 'A')">A</button>
+                        <button class="btn-date-small ${p.note === 'B' ? 'active' : ''}" onclick="assegnaData('${p.id}', 'B')">B</button>
+                        <button class="btn-date-small ${p.note === 'C' ? 'active' : ''}" onclick="assegnaData('${p.id}', 'C')">C</button>
+                    </div>
+                </td>
                 <td data-label="Categoria">${p.categoria}</td>
                 <td data-label="Partecipa">
-                    <label>
-                        <input type="radio" name="r_${p.id}" value="si" ${p.stato==='si'?'checked':''} ${disabled} onclick="salva('${p.id}','si')">
-                        <span class="badge-btn badge-si">PARTECIPA</span>
-                    </label>
+                    <label><input type="radio" name="r_${p.id}" value="si" ${p.stato==='si'?'checked':''} ${disabled} onclick="salva('${p.id}','si')"><span class="badge-btn badge-si">PARTECIPA</span></label>
                 </td>
                 <td data-label="Non Partecipa">
-                    <label>
-                        <input type="radio" name="r_${p.id}" value="no" ${p.stato==='no'?'checked':''} ${disabled} onclick="salva('${p.id}','no')">
-                        <span class="badge-btn badge-no">NON PARTECIPA</span>
-                    </label>
+                    <label><input type="radio" name="r_${p.id}" value="no" ${p.stato==='no'?'checked':''} ${disabled} onclick="salva('${p.id}','no')"><span class="badge-btn badge-no">NON PARTECIPA</span></label>
                 </td>
                 <td data-label="Reset"><button class="action-btn" onclick="salva('${p.id}','vuoto')" ${disabled}>🔄</button></td>
                 <td class="col-admin" style="display:${displayAdmin}">
@@ -329,61 +310,71 @@
             tbody.appendChild(tr);
         });
 
-        const cats = Object.keys(partecipantiPerCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999));
-        if(cats.length > 0) {
-            document.getElementById('confirmedList').style.display = 'block';
-            cats.forEach(cat => {
-                const div = document.createElement('div');
-                div.innerHTML = `<div class="cat-title">${cat}</div>`;
-                partecipantiPerCat[cat].sort().forEach(n => div.innerHTML += `<span class="atleta-tag">${n}</span>`);
-                listContent.appendChild(div);
+        Object.keys(partPerCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(cat => {
+            const div = document.createElement('div');
+            div.innerHTML = `<div class="cat-title">${cat}</div>`;
+            partPerCat[cat].forEach(obj => { 
+                const tagData = obj.data ? ` (${obj.data})` : "";
+                div.innerHTML += `<span class="atleta-tag">${obj.nome}${tagData}</span>`; 
             });
-        } else { document.getElementById('confirmedList').style.display = 'none'; }
+            listContent.appendChild(div);
+        });
         
+        document.getElementById('confirmedList').style.display = cSi > 0 ? 'block' : 'none';
         document.getElementById('count-si').innerText = cSi;
         document.getElementById('count-no').innerText = cNo;
-        scrollBox.scrollTop = currentScroll;
+    }
+
+    async function assegnaData(id, tipo) {
+        await _supabase.from(T_DATA).update({ note: tipo }).eq('id', id);
+        caricaTabella();
+    }
+
+    async function salvaEtichetteDate() {
+        const a = document.getElementById('dateA_Label').value;
+        const b = document.getElementById('dateB_Label').value;
+        const c = document.getElementById('dateC_Label').value;
+        await _supabase.from(T_CONF).upsert([{ chiave: 'data_label_a', valore: a }, { chiave: 'data_label_b', valore: b }, { chiave: 'data_label_c', valore: c }], { onConflict: 'chiave' });
+        showToast("Etichette salvate!"); caricaConfig();
     }
 
     async function salva(id, val) { 
         const atleta = currentData.find(a => a.id == id);
-        if (!confirm(`Sei veramente ${atleta.nome}?`)) { renderData(); return; }
-        const { error } = await _supabase.from('presenze').update({ stato: val }).eq('id', id);
-        if(!error) {
-            showToast("Salvato");
-            const row = document.getElementById(`row-${id}`);
-            if(row) { row.classList.add('row-flash-success'); setTimeout(() => row.classList.remove('row-flash-success'), 2000); }
-            if (val !== 'vuoto') inviaTelegram(atleta.nome, val, document.getElementById('mainTitle').innerText);
-            await caricaTabella(); 
+        if (!isAdmin && !confirm(`Sei veramente ${atleta.nome}?`)) { renderData(); return; }
+        await _supabase.from(T_DATA).update({ stato: val }).eq('id', id);
+        showToast("Salvato");
+        if (val !== 'vuoto') {
+            let d = atleta.note === 'B' ? labelB : (atleta.note === 'C' ? labelC : labelA);
+            inviaTelegram(atleta.nome, val, document.getElementById('mainTitle').innerText, d);
         }
+        caricaTabella(); 
     }
 
-    async function inviaTelegram(nome, scelta, gara) {
+    async function inviaTelegram(nome, scelta, gara, dataGara) {
         const emoji = scelta === 'si' ? '✅ PARTECIPA' : '❌ NON PARTECIPA';
-        const testo = `🏆 *Gara:* ${gara}\n👤 *Atleta:* ${nome}\n📝 *Scelta:* ${emoji}`;
+        const dataTxt = dataGara ? `\n📅 *Data:* ${dataGara}` : "";
+        const testo = `🏆 *Gara:* ${gara}\n👤 *Atleta:* ${nome}${dataTxt}\n📝 *Scelta:* ${emoji}`;
         fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: testo, parse_mode: 'Markdown' }) });
     }
 
     async function inviaRiepilogoTelegram() {
         const gara = document.getElementById('mainTitle').innerText;
-        let partecipantiPerCat = {};
-        let totalePartecipanti = 0;
-        currentData.forEach(p => {
-            if(p.stato === 'si') {
-                totalePartecipanti++;
-                if(!partecipantiPerCat[p.categoria]) partecipantiPerCat[p.categoria] = [];
-                partecipantiPerCat[p.categoria].push(p.nome);
-            }
+        let pCat = {};
+        currentData.forEach(p => { 
+            if(p.stato === 'si') { 
+                if(!pCat[p.categoria]) pCat[p.categoria] = []; 
+                let d = p.note === 'B' ? labelB : (p.note === 'C' ? labelC : labelA);
+                const dTxt = d ? ` (${d})` : "";
+                pCat[p.categoria].push(`${p.nome}${dTxt}`); 
+            } 
         });
-        let messaggio = `📝 *RIEPILOGO ISCRIZIONI*\n🏆 *Gara:* ${gara}\n\n`;
-        const sortedCats = Object.keys(partecipantiPerCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999));
-        sortedCats.forEach(cat => {
-            messaggio += `*${cat.toUpperCase()}:*\n`;
-            partecipantiPerCat[cat].sort().forEach(nome => { messaggio += `• ${nome} (partecipa)\n`; });
-            messaggio += `\n`;
+        let msg = `📝 *RIEPILOGO ISCRIZIONI*\n🏆 *Evento:* ${gara}\n\n`;
+        Object.keys(pCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(c => {
+            msg += `*${c.toUpperCase()}:*\n`;
+            pCat[c].sort().forEach(n => { msg += `• ${n} (partecipa)\n`; });
+            msg += `\n`;
         });
-        messaggio += `👥 *Totale Atleti:* ${totalePartecipanti}`;
-        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: messaggio, parse_mode: 'Markdown' }) });
+        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' }) });
         showToast("Riepilogo inviato");
     }
 
@@ -395,50 +386,68 @@
             document.getElementById('addAtletaBox').style.display = 'flex';
             document.getElementById('adminButtons').style.display = 'grid';
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
+            document.getElementById('dateA_Label').value = labelA;
+            document.getElementById('dateB_Label').value = labelB;
+            document.getElementById('dateC_Label').value = labelC;
             renderData(); showToast("Admin Attivo");
         }
     }
 
-    async function confermaScadenzaDB() {
-        const v = document.getElementById('deadlineInput').value;
-        await _supabase.from('configurazione').upsert({ chiave: 'scadenza_adesioni', valore: v }, { onConflict: 'chiave' });
-        await caricaConfig();
+    function startCountdown(endTime) {
+        if(timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            const distance = new Date(endTime).getTime() - new Date().getTime();
+            if (distance <= 0) { clearInterval(timerInterval); isExpired = true; mostraTimerChiuso(); return; }
+            const d = Math.floor(distance/86400000), h = Math.floor((distance%86400000)/3600000), m = Math.floor((distance%3600000)/60000), s = Math.floor((distance%60000)/1000);
+            document.getElementById('timerDisplay').innerText = `SCADENZA: ${d}g ${h}h ${m}m ${s}s`;
+        }, 1000);
     }
 
-    async function resetScadenzaDB() {
-        await _supabase.from('configurazione').upsert({ chiave: 'scadenza_adesioni', valore: "" }, { onConflict: 'chiave' });
-        await caricaConfig();
+    function mostraTimerChiuso() {
+        const d = document.getElementById('timerDisplay'); d.innerText = "ISCRIZIONI CHIUSE"; d.style.color = "var(--danger)";
     }
 
     async function salvaTitolo() { 
         const t = document.getElementById('editTitleInput').value;
-        await _supabase.from('configurazione').upsert({ chiave: 'titolo_gara', valore: t }, { onConflict: 'chiave' });
-        await caricaConfig();
+        await _supabase.from(T_CONF).upsert({ chiave: 'titolo_gara', valore: t }, { onConflict: 'chiave' });
+        showToast("Titolo Aggiornato"); caricaConfig();
+    }
+
+    async function confermaScadenzaDB() {
+        const v = document.getElementById('deadlineInput').value;
+        if(!v) return;
+        await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: v }, { onConflict: 'chiave' });
+        caricaConfig();
+    }
+
+    async function resetScadenzaDB() {
+        await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: "" }, { onConflict: 'chiave' });
+        caricaConfig();
+    }
+
+    async function aggiungiAtleta() {
+        const n = document.getElementById('newNome').value, c = document.getElementById('newCat').value;
+        if(n && c) { await _supabase.from(T_DATA).insert([{ nome: n, categoria: c, stato: 'vuoto', note: 'A' }]); document.getElementById('newNome').value = ""; caricaTabella(); }
     }
 
     async function exportToExcel() {
-        const dataToExport = currentData.map(p => ({ Atleta: p.nome, Categoria: p.categoria, Stato: p.stato === 'si' ? 'PARTECIPA' : (p.stato === 'no' ? 'NON PARTECIPA' : 'NON DICHIARATO') }));
-        const ws = XLSX.utils.json_to_sheet(dataToExport);
+        const dataExp = currentData.map(p => {
+            let d = p.note === 'B' ? labelB : (p.note === 'C' ? labelC : labelA);
+            return { Atleta: p.nome, Categoria: p.categoria, Data: d, Stato: p.stato === 'si' ? 'partecipa' : (p.stato === 'no' ? 'non partecipa' : 'NON DICHIARATO') };
+        });
+        const ws = XLSX.utils.json_to_sheet(dataExp);
         const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Presenze");
-        XLSX.writeFile(wb, `Presenze_Juvenilia.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, "Dati");
+        XLSX.writeFile(wb, `Report_Juvenilia.xlsx`);
     }
 
-    function ordinaPerCategoria() { sortByCat = !sortByCat; showToast(sortByCat ? "Ordinato Categorie" : "Ordinato Nome"); renderData(); }
     function selectAll(s) { document.querySelectorAll('.bulk-cb').forEach(cb => cb.checked = s.checked); }
-    async function bulkAction(l) { const ids = Array.from(document.querySelectorAll('.bulk-cb:checked')).map(cb => cb.value); if (ids.length) { await _supabase.from('presenze').update({ bloccato: l }).in('id', ids); await caricaTabella(); } }
-    async function toggleLock(id, cur) { await _supabase.from('presenze').update({ bloccato: !cur }).eq('id', id); await caricaTabella(); }
-    async function eliminaAtleta(id, n) { if(confirm(`Eliminare ${n}?`)) { await _supabase.from('presenze').delete().eq('id', id); await caricaTabella(); } }
-    async function resetTutti() { if(confirm("Resettare tutto?")) { await _supabase.from('presenze').update({ stato: 'vuoto' }).neq('id', 0); await caricaTabella(); } }
-    async function unlockEverything() { await _supabase.from('presenze').update({ bloccato: false }).neq('id', 0); await caricaTabella(); }
-    async function aggiungiAtleta() {
-        const n = document.getElementById('newNome').value, c = document.getElementById('newCat').value;
-        if(n && c) { await _supabase.from('presenze').insert([{ nome: n, categoria: c, stato: 'vuoto' }]); document.getElementById('newNome').value = ""; await caricaTabella(); }
-    }
-    function filterTable() {
-        const s = document.getElementById("searchInput").value.toUpperCase();
-        document.querySelectorAll("#tabella-body tr").forEach(tr => { tr.style.display = tr.innerText.toUpperCase().includes(s) ? "" : "none"; });
-    }
+    async function bulkAction(l) { const ids = Array.from(document.querySelectorAll('.bulk-cb:checked')).map(cb => cb.value); if (ids.length) { await _supabase.from(T_DATA).update({ bloccato: l }).in('id', ids); caricaTabella(); } }
+    async function toggleLock(id, cur) { await _supabase.from(T_DATA).update({ bloccato: !cur }).eq('id', id); caricaTabella(); }
+    async function unlockEverything() { await _supabase.from(T_DATA).update({ bloccato: false }).neq('id', 0); caricaTabella(); }
+    async function resetTutti() { if(confirm("Resettare tutte le scelte?")) { await _supabase.from(T_DATA).update({ stato: 'vuoto' }).neq('id', 0); caricaTabella(); } }
+    async function eliminaAtleta(id, n) { if(confirm(`Eliminare ${n}?`)) { await _supabase.from(T_DATA).delete().eq('id', id); caricaTabella(); } }
+    function filterTable() { const s = document.getElementById("searchInput").value.toUpperCase(); document.querySelectorAll("#tabella-body tr").forEach(tr => tr.style.display = tr.innerText.toUpperCase().includes(s) ? "" : "none"); }
     function showToast(m) { const t = document.getElementById("toast"); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 3000); }
     function logoutAdmin() { location.reload(); }
     function toggleDarkMode() { const t = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.body.setAttribute('data-theme', t); localStorage.setItem('theme', t); }
