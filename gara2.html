@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gestione Presenze Juvenilia - Gara 2</title>
+    <title>Gestione Presenze Juvenilia</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -46,7 +46,17 @@
         input[value="si"]:checked + .badge-si { background-color: var(--success); color: white; border-color: #1e7e34; }
         input[value="no"]:checked + .badge-no { background-color: var(--danger); color: white; border-color: #bd2130; }
 
-        #addAtletaBox { background: rgba(26, 115, 232, 0.08); border: 2px solid var(--primary); border-radius: 12px; padding: 20px; margin-bottom: 20px; display: none; flex-direction: column; gap: 15px; }
+        .btn-reset { background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; width: 100%; }
+
+        .admin-action-btn { background: none; border: none; cursor: pointer; padding: 5px; border-radius: 50%; transition: transform 0.2s, background 0.2s; display: inline-flex; align-items: center; justify-content: center; }
+        .admin-action-btn:hover { transform: scale(1.2); background: rgba(0,0,0,0.05); }
+        .btn-lock { color: var(--primary); }
+        .btn-lock.locked { color: var(--orange); }
+        .btn-delete { color: var(--danger); }
+
+        #addAtletaBox, #costiBox { background: rgba(26, 115, 232, 0.08); border: 2px solid var(--primary); border-radius: 12px; padding: 20px; margin-bottom: 20px; display: none; flex-direction: column; gap: 15px; }
+        #costiBox { background: rgba(103, 58, 183, 0.08); border-color: var(--purple); }
+
         .admin-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
         .admin-row input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; min-width: 150px; font-size: 14px; }
         .admin-row button { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; }
@@ -55,6 +65,7 @@
         .stat-card { padding: 12px; border-radius: 8px; text-align: center; color: white; font-weight: bold; }
         .stat-presenti { background: var(--success); }
         .stat-assenti { background: var(--danger); }
+        #adminTotalBox { background: var(--purple); grid-column: span 2; display: none; }
 
         #confirmedList { background: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 20px; border-left: 5px solid var(--success); }
         .cat-title { font-weight: bold; color: var(--success); border-bottom: 1px solid #ddd; margin: 10px 0 5px 0; font-size: 0.9rem; }
@@ -69,17 +80,11 @@
         .nome-cell { text-align: left; font-weight: bold; padding-left: 10px !important; }
         
         .date-label { font-size: 0.65rem; color: var(--primary); display: block; font-weight: bold; margin-top: 2px; }
-        [data-theme="dark"] .date-label { color: #8ab4f8; }
-
         .date-assign-btns { margin-top: 5px; display: flex; gap: 5px; }
         .btn-date-small { padding: 4px 10px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer; font-weight: bold; color: #333; }
         .btn-date-small.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        .bg-si { background-color: rgba(40, 167, 69, 0.05) !important; }
-        .bg-no { background-color: rgba(220, 53, 69, 0.05) !important; }
-
         .col-admin { display: none; }
-        .action-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 5px; }
         #adminButtons { display: none; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
         #adminButtons button { padding: 12px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; }
 
@@ -92,7 +97,6 @@
             td::before { content: attr(data-label); font-weight: bold; font-size: 0.70rem; color: #777; }
             .nome-cell { background: rgba(0,0,0,0.03); justify-content: center; font-size: 1.0rem; flex-direction: column; }
             .nome-cell::before { display: none; }
-            .logo-container img { width: 180px; }
         }
     </style>
 </head>
@@ -113,7 +117,7 @@
     <h2 id="mainTitle">Sincronizzazione...</h2>
     
     <div id="countdownBox" class="countdown-container">
-        <div id="timerDisplay" class="timer">Caricamento...</div>
+        <div id="timerDisplay" class="timer">Inizializzazione...</div>
     </div>
 
     <div id="addAtletaBox">
@@ -127,7 +131,8 @@
             <input type="text" id="dateA_Label" placeholder="Data A">
             <input type="text" id="dateB_Label" placeholder="Data B">
             <input type="text" id="dateC_Label" placeholder="Data C">
-            <button onclick="salvaEtichetteDate()" style="background:var(--orange);">Salva Etichette</button>
+            <button onclick="salvaEtichetteDate()" style="background:var(--orange);">Salva</button>
+            <button onclick="azzeraEtichetteDate()" style="background:var(--danger);">🗑️ Azzera</button>
         </div>
 
         <div class="admin-row">
@@ -145,9 +150,22 @@
         </div>
     </div>
 
+    <div id="costiBox">
+        <div style="font-size: 12px; font-weight: bold; color: var(--purple); margin-bottom: 5px;">💰 COSTI ISCRIZIONE (€):</div>
+        <div id="costiInputs" class="admin-row" style="justify-content: center; gap: 15px;"></div>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 10px;">
+            <button onclick="salvaCosti()" style="background:var(--success); border:none; padding:12px 30px; color:white; border-radius:8px; font-weight:bold; cursor:pointer; flex: 1; min-width: 150px;">💾 Salva Quote</button>
+            <button onclick="eliminaTutteLeQuoteDB()" style="background:var(--danger); border:none; padding:12px 20px; color:white; border-radius:8px; font-weight:bold; cursor:pointer; min-width: 160px;">🗑️ Svuota Database</button>
+        </div>
+    </div>
+
     <div class="stats-grid">
         <div class="stat-card stat-presenti"><span>✅ PARTECIPA</span><div id="count-si">0</div></div>
         <div class="stat-card stat-assenti"><span>❌ NON PARTECIPA</span><div id="count-no">0</div></div>
+        <div id="adminTotalBox" class="stat-card">
+            <span>TOTALE QUOTE (ADMIN)</span>
+            <div id="totaleEuro" style="font-size: 1.4rem;">0.00 €</div>
+        </div>
     </div>
 
     <div id="confirmedList" style="display:none;">
@@ -188,16 +206,16 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuZm5mc3pla2ZzdHVvaWVta2dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODkzOTEsImV4cCI6MjA4MzQ2NTM5MX0.lh7eRFlg7nnI7kEzVPBL9kNyZWX-XFeWQxVbvmzRlvA';
     const TELEGRAM_TOKEN = '8441085660:AAEui_yfGnT_quKPHVx_wsslcuJtm3KbTOI';
     const TELEGRAM_CHAT_ID = '691756250';
-    
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const ADMIN_PASS = "juvenilia1179";
     
-    const T_DATA = 'gara2';
-    const T_CONF = 'config_gara2';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const T_DATA = 'presenze'; 
+    const T_CONF = 'configurazione';
 
     let isAdmin = false, isExpired = false, currentData = [], timerInterval;
-    let labelA = "", labelB = "", labelC = "";
-    let sortBy = 'nome'; 
+    let labelA = "", labelB = "", labelC = "", sortBy = 'nome'; 
+    let costiCategorie = {};
+    let isEditingCosti = false;
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
@@ -215,16 +233,23 @@
     async function caricaConfig() {
         const { data } = await _supabase.from(T_CONF).select('*');
         if(!data) return;
+
         const tit = data.find(c => c.chiave === 'titolo_gara');
         const sca = data.find(c => c.chiave === 'scadenza_adesioni');
-        const d1 = data.find(c => c.chiave === 'data_label_a');
-        const d2 = data.find(c => c.chiave === 'data_label_b');
-        const d3 = data.find(c => c.chiave === 'data_label_c');
+        labelA = data.find(c => c.chiave === 'data_label_a')?.valore || "";
+        labelB = data.find(c => c.chiave === 'data_label_b')?.valore || "";
+        labelC = data.find(c => c.chiave === 'data_label_c')?.valore || "";
 
-        document.getElementById('mainTitle').innerText = tit?.valore || "Gara 2";
-        labelA = d1?.valore || "";
-        labelB = d2?.valore || "";
-        labelC = d3?.valore || "";
+        document.getElementById('dateA_Label').value = labelA;
+        document.getElementById('dateB_Label').value = labelB;
+        document.getElementById('dateC_Label').value = labelC;
+
+        costiCategorie = {};
+        data.filter(c => c.chiave.startsWith('costo_')).forEach(c => {
+            costiCategorie[c.chiave.replace('costo_', '').toUpperCase()] = parseFloat(c.valore) || 0;
+        });
+
+        document.getElementById('mainTitle').innerText = tit?.valore || "Gara Juvenilia";
 
         if(sca?.valore) {
             const diff = new Date(sca.valore).getTime() - new Date().getTime();
@@ -233,13 +258,51 @@
         } else {
             isExpired = false;
             if(timerInterval) clearInterval(timerInterval);
-            document.getElementById('timerDisplay').innerText = "TIMER DA DEFINIRE";
+            document.getElementById('timerDisplay').innerText = "TERMINE DA DEFINIRE";
         }
+        
+        if(isAdmin && !isEditingCosti) renderCostiInputs();
     }
 
     async function caricaTabella() {
         const { data } = await _supabase.from(T_DATA).select('*');
         if(data) { currentData = data; renderData(); }
+    }
+
+    function renderCostiInputs() {
+        const container = document.getElementById('costiInputs');
+        const cats = [...new Set(currentData.map(a => a.categoria.toUpperCase()))];
+        cats.sort((a, b) => (customCatOrder[a] || 999) - (customCatOrder[b] || 999));
+
+        container.innerHTML = '';
+        cats.forEach(c => {
+            const val = costiCategorie[c] || 0;
+            container.innerHTML += `<div style="text-align:center; min-width:80px;"><label style="font-size:10px; display:block; font-weight:bold;">${c}</label>
+            <input type="number" step="0.5" class="costo-in" data-cat="${c}" value="${val}" 
+            onfocus="isEditingCosti=true" onblur="isEditingCosti=false"
+            style="width:65px; padding:8px; text-align:center; border: 1px solid #ccc; border-radius:5px;"></div>`;
+        });
+    }
+
+    async function salvaCosti() {
+        isEditingCosti = false;
+        const upserts = Array.from(document.querySelectorAll('.costo-in')).map(i => ({
+            chiave: `costo_${i.dataset.cat}`,
+            valore: i.value
+        }));
+        await _supabase.from(T_CONF).upsert(upserts, { onConflict: 'chiave' });
+        showToast("Quote salvate!"); 
+        await caricaConfig();
+    }
+
+    async function eliminaTutteLeQuoteDB() {
+        if(confirm("Eliminare tutte le quote dal database?")) {
+            const keys = Object.keys(costiCategorie).map(c => `costo_${c}`);
+            if(keys.length) await _supabase.from(T_CONF).delete().in('chiave', keys);
+            costiCategorie = {};
+            showToast("Database Costi Svuotato");
+            await caricaConfig();
+        }
     }
 
     function toggleSort() {
@@ -251,8 +314,9 @@
     function renderData() {
         const tbody = document.getElementById('tabella-body');
         const listContent = document.getElementById('listContent');
+        if (!tbody) return;
         tbody.innerHTML = ''; listContent.innerHTML = '';
-        let cSi = 0, cNo = 0, partPerCat = {};
+        let cSi = 0, cNo = 0, totaleEuro = 0, partPerCat = {};
 
         let sorted = [...currentData].sort((a,b) => {
             if (sortBy === 'categoria') {
@@ -269,18 +333,22 @@
             let dataUf = p.note === 'B' ? labelB : (p.note === 'C' ? labelC : labelA);
             if(p.stato === 'si') {
                 cSi++;
+                totaleEuro += (costiCategorie[p.categoria.toUpperCase()] || 0);
                 if(!partPerCat[p.categoria]) partPerCat[p.categoria] = [];
                 partPerCat[p.categoria].push({nome: p.nome, data: dataUf});
             }
             if(p.stato === 'no') cNo++;
 
             const tr = document.createElement('tr');
-            if(p.stato === 'si') tr.className = 'bg-si';
-            if(p.stato === 'no') tr.className = 'bg-no';
-            
             const disabled = isExpired && !isAdmin ? 'disabled' : '';
             const displayAdmin = isAdmin ? 'table-cell' : 'none';
             const labelHtml = dataUf ? `<span class="date-label">${dataUf}</span>` : "";
+
+            const lockIcon = p.bloccato ? 
+                `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>` : 
+                `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>`;
+
+            const deleteIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`;
 
             tr.innerHTML = `
                 <td class="col-admin" style="display:${displayAdmin}"><input type="checkbox" class="bulk-cb" value="${p.id}"></td>
@@ -300,14 +368,22 @@
                 <td data-label="Non Partecipa">
                     <label><input type="radio" name="r_${p.id}" value="no" ${p.stato==='no'?'checked':''} ${disabled} onclick="salva('${p.id}','no')"><span class="badge-btn badge-no">NON PARTECIPA</span></label>
                 </td>
-                <td data-label="Reset"><button class="action-btn" onclick="salva('${p.id}','vuoto')" ${disabled}>🔄</button></td>
+                <td data-label="Reset"><button class="btn-reset" onclick="salva('${p.id}','vuoto')" ${disabled}>Reset</button></td>
                 <td class="col-admin" style="display:${displayAdmin}">
-                    <button class="action-btn" onclick="toggleLock('${p.id}', ${p.bloccato})">${p.bloccato?'🔒':'🔓'}</button>
-                    <button class="action-btn" onclick="eliminaAtleta('${p.id}','${p.nome}')">🗑️</button>
+                    <button class="admin-action-btn btn-lock ${p.bloccato?'locked':''}" onclick="toggleLock('${p.id}', ${p.bloccato})">
+                        ${lockIcon}
+                    </button>
+                    <button class="admin-action-btn btn-delete" onclick="eliminaAtleta('${p.id}','${p.nome}')">
+                        ${deleteIcon}
+                    </button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
+
+        document.getElementById('totaleEuro').innerText = totaleEuro.toFixed(2) + " €";
+        document.getElementById('count-si').innerText = cSi;
+        document.getElementById('count-no').innerText = cNo;
 
         Object.keys(partPerCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(cat => {
             const div = document.createElement('div');
@@ -318,30 +394,13 @@
             });
             listContent.appendChild(div);
         });
-        
         document.getElementById('confirmedList').style.display = cSi > 0 ? 'block' : 'none';
-        document.getElementById('count-si').innerText = cSi;
-        document.getElementById('count-no').innerText = cNo;
-
         filterTable(); 
-    }
-
-    async function assegnaData(id, tipo) {
-        await _supabase.from(T_DATA).update({ note: tipo }).eq('id', id);
-        caricaTabella();
-    }
-
-    async function salvaEtichetteDate() {
-        const a = document.getElementById('dateA_Label').value;
-        const b = document.getElementById('dateB_Label').value;
-        const c = document.getElementById('dateC_Label').value;
-        await _supabase.from(T_CONF).upsert([{ chiave: 'data_label_a', valore: a }, { chiave: 'data_label_b', valore: b }, { chiave: 'data_label_c', valore: c }], { onConflict: 'chiave' });
-        showToast("Etichette salvate!"); caricaConfig();
     }
 
     async function salva(id, val) { 
         const atleta = currentData.find(a => a.id == id);
-        if (!isAdmin && !confirm(`Sei veramente ${atleta.nome}?`)) { renderData(); return; }
+        if (!isAdmin && !confirm(`Confermi la scelta per ${atleta.nome}?`)) { renderData(); return; }
         await _supabase.from(T_DATA).update({ stato: val }).eq('id', id);
         showToast("Salvato");
         if (val !== 'vuoto') {
@@ -352,9 +411,9 @@
     }
 
     async function inviaTelegram(nome, scelta, gara, dataGara) {
-        const emoji = scelta === 'si' ? '✅ PARTECIPA' : '❌ NON PARTECIPA';
+        const scTxt = scelta === 'si' ? 'PARTECIPA' : 'NON PARTECIPA';
         const dataTxt = dataGara ? `\n📅 *Data:* ${dataGara}` : "";
-        const testo = `🏆 *Gara:* ${gara}\n👤 *Atleta:* ${nome}${dataTxt}\n📝 *Scelta:* ${emoji}`;
+        const testo = `🏆 *Evento:* ${gara}\n👤 *Atleta:* ${nome}${dataTxt}\n📝 *Scelta:* ${scTxt}`;
         fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: testo, parse_mode: 'Markdown' }) });
     }
 
@@ -365,8 +424,7 @@
             if(p.stato === 'si') { 
                 if(!pCat[p.categoria]) pCat[p.categoria] = []; 
                 let d = p.note === 'B' ? labelB : (p.note === 'C' ? labelC : labelA);
-                const dTxt = d ? ` (${d})` : "";
-                pCat[p.categoria].push(`${p.nome}${dTxt}`); 
+                pCat[p.categoria].push(`${p.nome}${d ? ' ('+d+')' : ''}`); 
             } 
         });
         let msg = `📝 *RIEPILOGO ISCRIZIONI*\n🏆 *Evento:* ${gara}\n\n`;
@@ -376,7 +434,28 @@
             msg += `\n`;
         });
         fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' }) });
-        showToast("Riepilogo inviato su Telegram");
+        showToast("Riepilogo inviato");
+    }
+
+    async function exportToExcel() {
+        let grandTotal = 0;
+        const dataExp = currentData.map(p => {
+            let d = p.note === 'B' ? labelB : (p.note === 'C' ? labelC : labelA);
+            let quota = p.stato === 'si' ? (costiCategorie[p.categoria.toUpperCase()] || 0) : 0;
+            grandTotal += quota;
+            return { 
+                Atleta: p.nome, 
+                Categoria: p.categoria, 
+                Data: d, 
+                Scelta: p.stato === 'si' ? 'partecipa' : (p.stato === 'no' ? 'non partecipa' : 'da definire'),
+                "Quota (€)": quota.toFixed(2)
+            };
+        });
+        dataExp.push({ Atleta: "TOTALE GENERALE", Categoria: "", Data: "", Scelta: "", "Quota (€)": grandTotal.toFixed(2) });
+        const ws = XLSX.utils.json_to_sheet(dataExp);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Contabilità");
+        XLSX.writeFile(wb, `Report_Juvenilia_Costi.xlsx`);
     }
 
     function toggleAdmin() {
@@ -385,12 +464,11 @@
             document.getElementById('adminIcon').style.display = 'none';
             document.getElementById('logoutBtn').style.display = 'block';
             document.getElementById('addAtletaBox').style.display = 'flex';
+            document.getElementById('costiBox').style.display = 'flex';
+            document.getElementById('adminTotalBox').style.display = 'block';
             document.getElementById('adminButtons').style.display = 'grid';
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
-            document.getElementById('dateA_Label').value = labelA;
-            document.getElementById('dateB_Label').value = labelB;
-            document.getElementById('dateC_Label').value = labelC;
-            renderData(); showToast("Admin Attivo");
+            renderCostiInputs(); renderData(); showToast("Admin Attivo");
         }
     }
 
@@ -408,63 +486,36 @@
         const d = document.getElementById('timerDisplay'); d.innerText = "ISCRIZIONI CHIUSE"; d.style.color = "var(--danger)";
     }
 
-    async function salvaTitolo() { 
-        const t = document.getElementById('editTitleInput').value;
-        await _supabase.from(T_CONF).upsert({ chiave: 'titolo_gara', valore: t }, { onConflict: 'chiave' });
-        showToast("Titolo Aggiornato"); caricaConfig();
+    async function salvaTitolo() { const t = document.getElementById('editTitleInput').value; await _supabase.from(T_CONF).upsert({ chiave: 'titolo_gara', valore: t }, { onConflict: 'chiave' }); showToast("Titolo Aggiornato"); caricaConfig(); }
+    async function confermaScadenzaDB() { const v = document.getElementById('deadlineInput').value; if(v) await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: v }, { onConflict: 'chiave' }); caricaConfig(); }
+    async function resetScadenzaDB() { await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: "" }, { onConflict: 'chiave' }); caricaConfig(); }
+    async function aggiungiAtleta() { const n = document.getElementById('newNome').value, c = document.getElementById('newCat').value; if(n && c) { await _supabase.from(T_DATA).insert([{ nome: n, categoria: c, stato: 'vuoto', note: 'A' }]); document.getElementById('newNome').value = ""; caricaTabella(); } }
+    
+    async function salvaEtichetteDate() { 
+        const a = document.getElementById('dateA_Label').value, b = document.getElementById('dateB_Label').value, c = document.getElementById('dateC_Label').value; 
+        await _supabase.from(T_CONF).upsert([{ chiave: 'data_label_a', valore: a }, { chiave: 'data_label_b', valore: b }, { chiave: 'data_label_c', valore: c }], { onConflict: 'chiave' }); 
+        showToast("Etichette salvate!"); caricaConfig(); 
     }
 
-    async function confermaScadenzaDB() {
-        const v = document.getElementById('deadlineInput').value;
-        if(!v) return;
-        await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: v }, { onConflict: 'chiave' });
-        caricaConfig();
-    }
-
-    async function resetScadenzaDB() {
-        await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: "" }, { onConflict: 'chiave' });
-        caricaConfig();
-    }
-
-    async function aggiungiAtleta() {
-        const n = document.getElementById('newNome').value, c = document.getElementById('newCat').value;
-        if(n && c) { 
-            await _supabase.from(T_DATA).insert([{ nome: n, categoria: c, stato: 'vuoto', note: 'A' }]); 
-            document.getElementById('newNome').value = ""; 
-            caricaTabella(); 
+    async function azzeraEtichetteDate() {
+        if(confirm("Vuoi cancellare tutte le etichette delle date?")) {
+            await _supabase.from(T_CONF).upsert([
+                { chiave: 'data_label_a', valore: "" }, 
+                { chiave: 'data_label_b', valore: "" }, 
+                { chiave: 'data_label_c', valore: "" }
+            ], { onConflict: 'chiave' });
+            showToast("Etichette azzerate!"); caricaConfig();
         }
     }
 
-    async function exportToExcel() {
-        const dataExp = currentData.map(p => {
-            let d = p.note === 'B' ? labelB : (p.note === 'C' ? labelC : labelA);
-            return { 
-                Atleta: p.nome, 
-                Categoria: p.categoria, 
-                Data: d, 
-                Stato: p.stato === 'si' ? 'partecipa' : (p.stato === 'no' ? 'non partecipa' : 'non dichiarato') 
-            };
-        });
-        const ws = XLSX.utils.json_to_sheet(dataExp);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Dati");
-        XLSX.writeFile(wb, `Report_Juvenilia_Gara2.xlsx`);
-    }
-
+    async function assegnaData(id, tipo) { await _supabase.from(T_DATA).update({ note: tipo }).eq('id', id); caricaTabella(); }
     function selectAll(s) { document.querySelectorAll('.bulk-cb').forEach(cb => cb.checked = s.checked); }
     async function bulkAction(l) { const ids = Array.from(document.querySelectorAll('.bulk-cb:checked')).map(cb => cb.value); if (ids.length) { await _supabase.from(T_DATA).update({ bloccato: l }).in('id', ids); caricaTabella(); } }
     async function toggleLock(id, cur) { await _supabase.from(T_DATA).update({ bloccato: !cur }).eq('id', id); caricaTabella(); }
     async function unlockEverything() { await _supabase.from(T_DATA).update({ bloccato: false }).neq('id', 0); caricaTabella(); }
     async function resetTutti() { if(confirm("Resettare tutte le scelte?")) { await _supabase.from(T_DATA).update({ stato: 'vuoto' }).neq('id', 0); caricaTabella(); } }
     async function eliminaAtleta(id, n) { if(confirm(`Eliminare ${n}?`)) { await _supabase.from(T_DATA).delete().eq('id', id); caricaTabella(); } }
-    
-    function filterTable() { 
-        const s = document.getElementById("searchInput").value.toUpperCase(); 
-        document.querySelectorAll("#tabella-body tr").forEach(tr => {
-            tr.style.display = tr.innerText.toUpperCase().includes(s) ? "" : "none";
-        }); 
-    }
-
+    function filterTable() { const s = document.getElementById("searchInput").value.toUpperCase(); document.querySelectorAll("#tabella-body tr").forEach(tr => { tr.style.display = tr.innerText.toUpperCase().includes(s) ? "" : "none"; }); }
     function showToast(m) { const t = document.getElementById("toast"); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 3000); }
     function logoutAdmin() { location.reload(); }
     function toggleDarkMode() { const t = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.body.setAttribute('data-theme', t); localStorage.setItem('theme', t); }
