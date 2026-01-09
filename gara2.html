@@ -151,6 +151,7 @@
     </div>
 
     <div id="confirmedList" style="display:none;">
+        <div style="font-weight:bold; font-size:0.8rem; color:#555; margin-bottom:5px; padding-left:10px;">👥 PARTECIPANTI PER CATEGORIA:</div>
         <div id="listContent"></div>
     </div>
     
@@ -196,7 +197,7 @@
 
     let isAdmin = false, isExpired = false, currentData = [], timerInterval;
     let labelA = "", labelB = "", labelC = "";
-    let sortBy = 'nome'; // 'nome' o 'categoria'
+    let sortBy = 'nome'; 
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
@@ -301,6 +302,7 @@
                 </td>
                 <td data-label="Reset"><button class="action-btn" onclick="salva('${p.id}','vuoto')" ${disabled}>🔄</button></td>
                 <td class="col-admin" style="display:${displayAdmin}">
+                    <button class="action-btn" onclick="toggleLock('${p.id}', ${p.bloccato})">${p.bloccato?'🔒':'🔓'}</button>
                     <button class="action-btn" onclick="eliminaAtleta('${p.id}','${p.nome}')">🗑️</button>
                 </td>
             `;
@@ -308,16 +310,21 @@
         });
 
         Object.keys(partPerCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(cat => {
-            listContent.innerHTML += `<div class="cat-title">${cat}</div>`;
+            const div = document.createElement('div');
+            div.innerHTML = `<div class="cat-title">${cat}</div>`;
             partPerCat[cat].forEach(obj => { 
                 const tagData = obj.data ? ` (${obj.data})` : "";
-                listContent.innerHTML += `<span class="atleta-tag">${obj.nome}${tagData}</span>`; 
+                div.innerHTML += `<span class="atleta-tag">${obj.nome}${tagData}</span>`; 
             });
+            listContent.appendChild(div);
         });
         
         document.getElementById('confirmedList').style.display = cSi > 0 ? 'block' : 'none';
         document.getElementById('count-si').innerText = cSi;
         document.getElementById('count-no').innerText = cNo;
+
+        // --- CORREZIONE: Riapplica il filtro dopo aver ridisegnato la tabella ---
+        filterTable(); 
     }
 
     async function assegnaData(id, tipo) {
@@ -366,10 +373,11 @@
         let msg = `📝 *RIEPILOGO ISCRIZIONI*\n🏆 *Evento:* ${gara}\n\n`;
         Object.keys(pCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(c => {
             msg += `*${c.toUpperCase()}:*\n`;
-            pCat[c].sort().forEach(n => { msg += `• ${n}\n`; });
+            pCat[c].sort().forEach(n => { msg += `• ${n} (partecipa)\n`; });
             msg += `\n`;
         });
         fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' }) });
+        showToast("Riepilogo inviato su Telegram");
     }
 
     function toggleAdmin() {
@@ -383,7 +391,7 @@
             document.getElementById('dateA_Label').value = labelA;
             document.getElementById('dateB_Label').value = labelB;
             document.getElementById('dateC_Label').value = labelC;
-            renderData();
+            renderData(); showToast("Admin Attivo");
         }
     }
 
@@ -421,26 +429,44 @@
 
     async function aggiungiAtleta() {
         const n = document.getElementById('newNome').value, c = document.getElementById('newCat').value;
-        if(n && c) { await _supabase.from(T_DATA).insert([{ nome: n, categoria: c, stato: 'vuoto', note: 'A' }]); caricaTabella(); }
+        if(n && c) { 
+            await _supabase.from(T_DATA).insert([{ nome: n, categoria: c, stato: 'vuoto', note: 'A' }]); 
+            document.getElementById('newNome').value = ""; 
+            caricaTabella(); 
+        }
     }
 
     async function exportToExcel() {
         const dataExp = currentData.map(p => {
             let d = p.note === 'B' ? labelB : (p.note === 'C' ? labelC : labelA);
-            return { Atleta: p.nome, Categoria: p.categoria, Data: d, Stato: p.stato === 'si' ? 'partecipa' : (p.stato === 'no' ? 'non partecipa' : 'NON DICHIARATO') };
+            return { 
+                Atleta: p.nome, 
+                Categoria: p.categoria, 
+                Data: d, 
+                Stato: p.stato === 'si' ? 'partecipa' : (p.stato === 'no' ? 'non partecipa' : 'non dichiarato') 
+            };
         });
         const ws = XLSX.utils.json_to_sheet(dataExp);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Dati");
-        XLSX.writeFile(wb, `Report_Juvenilia.xlsx`);
+        XLSX.writeFile(wb, `Report_Juvenilia_Gara2.xlsx`);
     }
 
     function selectAll(s) { document.querySelectorAll('.bulk-cb').forEach(cb => cb.checked = s.checked); }
     async function bulkAction(l) { const ids = Array.from(document.querySelectorAll('.bulk-cb:checked')).map(cb => cb.value); if (ids.length) { await _supabase.from(T_DATA).update({ bloccato: l }).in('id', ids); caricaTabella(); } }
+    async function toggleLock(id, cur) { await _supabase.from(T_DATA).update({ bloccato: !cur }).eq('id', id); caricaTabella(); }
     async function unlockEverything() { await _supabase.from(T_DATA).update({ bloccato: false }).neq('id', 0); caricaTabella(); }
     async function resetTutti() { if(confirm("Resettare tutte le scelte?")) { await _supabase.from(T_DATA).update({ stato: 'vuoto' }).neq('id', 0); caricaTabella(); } }
     async function eliminaAtleta(id, n) { if(confirm(`Eliminare ${n}?`)) { await _supabase.from(T_DATA).delete().eq('id', id); caricaTabella(); } }
-    function filterTable() { const s = document.getElementById("searchInput").value.toUpperCase(); document.querySelectorAll("#tabella-body tr").forEach(tr => tr.style.display = tr.innerText.toUpperCase().includes(s) ? "" : "none"); }
+    
+    // Funzione ricerca migliorata
+    function filterTable() { 
+        const s = document.getElementById("searchInput").value.toUpperCase(); 
+        document.querySelectorAll("#tabella-body tr").forEach(tr => {
+            tr.style.display = tr.innerText.toUpperCase().includes(s) ? "" : "none";
+        }); 
+    }
+
     function showToast(m) { const t = document.getElementById("toast"); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 3000); }
     function logoutAdmin() { location.reload(); }
     function toggleDarkMode() { const t = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.body.setAttribute('data-theme', t); localStorage.setItem('theme', t); }
