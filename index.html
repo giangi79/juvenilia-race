@@ -1,40 +1,156 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gestione Presenze Juvenilia</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
     <style>
-        :root { 
-            --primary: #1a73e8; --success: #28a745; --danger: #dc3545; 
-            --purple: #673ab7; --orange: #ff9800; --table-header: #2c3e50; 
-            --bg-body: #f0f2f5; --bg-card: #ffffff; --text-main: #333333;
-            --timer-bg: #e8f0fe;
-        }
+        /* Aggiungi questo piccolo stile per l'indicatore */
+        .refresh-notice { font-size: 0.6rem; opacity: 0.6; text-align: center; margin-top: 5px; }
+    </style>
+</head>
+<body>
 
-        [data-theme="dark"] {
-            --bg-body: #121212; --bg-card: #1e1e1e; --text-main: #e0e0e0;
-            --table-header: #000000; --primary: #8ab4f8; --timer-bg: #1a273a;
-        }
+<script>
+    const SUPABASE_URL = 'https://jnfnfszekfstuoiemkgf.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuZm5mc3pla2ZzdHVvaWVta2dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODkzOTEsImV4cCI6MjA4MzQ2NTM5MX0.lh7eRFlg7nnI7kEzVPBL9kNyZWX-XFeWQxVbvmzRlvA';
+    
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const ADMIN_PASS = "juvenilia1179";
+    let isAdmin = false, isExpired = false, currentData = [], timerInterval;
 
-        body { margin: 0; padding: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', sans-serif; transition: 0.3s; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 15px; background: var(--bg-card); min-height: 100vh; }
-
-        .logo-container { text-align: center; margin-bottom: 10px; position: relative; min-height: 80px; }
-        .logo-container img { width: 140px; height: auto; border-radius: 8px; }
-        .top-btns { position: absolute; top: 0; right: 0; display: flex; gap: 8px; align-items: center; }
+    async function init() {
+        if(localStorage.getItem('theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
         
-        /* Indicatore Live */
-        .live-indicator { font-size: 0.65rem; font-weight: bold; color: var(--success); display: flex; align-items: center; gap: 4px; margin-right: 10px; }
-        .dot { width: 8px; height: 8px; background-color: var(--success); border-radius: 50%; animation: blink 1.5s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        // Caricamento iniziale
+        await ricaricaTutto();
 
-        .icon-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 5px; }
-        .logout-btn { display: none; color: var(--danger); border: 1px solid var(--danger); border-radius: 5px; padding: 5px 10px; cursor: pointer; font-size: 0.7rem; font-weight: bold; background: white; }
+        // FORZA AGGIORNAMENTO AUTOMATICO (POLLING)
+        // Scarica i dati ogni 5 secondi senza bisogno di Replication
+        setInterval(async () => {
+            // Se l'utente non sta scrivendo nella ricerca, aggiorna la tabella
+            const searchInput = document.getElementById('searchInput');
+            if (document.activeElement !== searchInput) {
+                await ricaricaTutto();
+                console.log("Dati aggiornati automaticamente");
+            }
+        }, 5000); 
+    }
+
+    async function ricaricaTutto() {
+        await caricaConfig();
+        await caricaTabella();
+    }
+
+    // --- FUNZIONI DI CARICAMENTO (Modificate per non resettare la vista) ---
+
+    async function caricaConfig() {
+        try {
+            const { data } = await _supabase.from('configurazione').select('*');
+            if(!data) return;
+
+            const titolo = data.find(c => c.chiave === 'titolo_gara')?.valore || "Gara Juvenilia";
+            const scadenza = data.find(c => c.chiave === 'scadenza_adesioni')?.valore;
+
+            if(document.getElementById('mainTitle').innerText !== titolo) {
+                document.getElementById('mainTitle').innerText = titolo;
+            }
+            
+            if (scadenza) {
+                const diff = new Date(scadenza).getTime() - new Date().getTime();
+                isExpired = diff <= 0;
+                if (isExpired) {
+                    mostraStatoTimer("ISCRIZIONI CHIUSE", "var(--danger)");
+                } else {
+                    startCountdown(scadenza);
+                }
+            } else {
+                isExpired = false;
+                mostraStatoTimer("TERMINE DA DEFINIRE", "var(--primary)");
+            }
+        } catch (e) { console.error("Errore config:", e); }
+    }
+
+    async function caricaTabella() {
+        const { data } = await _supabase.from('presenze').select('*').order('nome');
+        if(!data) return;
         
+        // Confronto i dati per evitare di ridisegnare la tabella se nulla è cambiato
+        if (JSON.stringify(data) === JSON.stringify(currentData)) return;
+        
+        currentData = data;
+        disegnaTabella();
+    }
+
+    function disegnaTabella() {
+        const tbody = document.getElementById('tabella-body');
+        const listContent = document.getElementById('listContent');
+        tbody.innerHTML = '';
+        listContent.innerHTML = '';
+        
+        let cSi = 0, cNo = 0;
+        let partecipantiPerCat = {};
+
+        currentData.forEach(p => {
+            if (p.bloccato && !isAdmin) return;
+            if(p.stato === 'si') {
+                cSi++;
+                if(!partecipantiPerCat[p.categoria]) partecipantiPerCat[p.categoria] = [];
+                partecipantiPerCat[p.categoria].push(p.nome);
+            }
+            if(p.stato === 'no') cNo++;
+
+            const tr = document.createElement('tr');
+            if(p.stato === 'si') tr.className = 'bg-si';
+            if(p.stato === 'no') tr.className = 'bg-no';
+            
+            const disabled = isExpired && !isAdmin ? 'disabled' : '';
+            const displayAdmin = isAdmin ? 'table-cell' : 'none';
+
+            tr.innerHTML = `
+                <td class="col-admin" style="display:${displayAdmin}"><input type="checkbox" class="bulk-cb" value="${p.id}"></td>
+                <td class="nome-cell">${p.nome}${p.bloccato ? ' 🔒' : ''}</td>
+                <td data-label="Categoria">${p.categoria}</td>
+                <td data-label="Partecipa"><input type="radio" name="r_${p.id}" ${p.stato==='si'?'checked':''} ${disabled} onclick="salva('${p.id}','si')"></td>
+                <td data-label="Non Partecipa"><input type="radio" name="r_${p.id}" ${p.stato==='no'?'checked':''} ${disabled} onclick="salva('${p.id}','no')"></td>
+                <td data-label="Reset"><button class="action-btn" onclick="salva('${p.id}','vuoto')" ${disabled}>🔄</button></td>
+                <td class="col-admin" style="display:${displayAdmin}">
+                    <button class="action-btn" onclick="toggleLock('${p.id}', ${p.bloccato})">${p.bloccato?'🔒':'🔓'}</button>
+                    <button class="action-btn" onclick="eliminaAtleta('${p.id}','${p.nome}')">🗑️</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Aggiorna lista nomi per categoria
+        const cats = Object.keys(partecipantiPerCat).sort();
+        if(cats.length > 0) {
+            document.getElementById('confirmedList').style.display = 'block';
+            cats.forEach(cat => {
+                const div = document.createElement('div');
+                div.innerHTML = `<div class="cat-title">${cat}</div>`;
+                partecipantiPerCat[cat].sort().forEach(n => div.innerHTML += `<span class="atleta-tag">${n}</span>`);
+                listContent.appendChild(div);
+            });
+        }
+        
+        document.getElementById('count-si').innerText = cSi;
+        document.getElementById('count-no').innerText = cNo;
+        filterTable(); // Riapplica il filtro se l'utente stava cercando
+    }
+
+    async function salva(id, val) { 
+        // Ottimizzazione: aggiorna subito l'interfaccia locale per velocità
+        const { error } = await _supabase.from('presenze').update({ stato: val }).eq('id', id);
+        if(!error) {
+            showToast("Registrato");
+            await ricaricaTutto();
+        }
+    }
+
+    // ... (tutte le altre funzioni admin rimangono uguali) ...
+
+    init();
+</script>
+</body>
+</html>        
         h2 { text-align: center; color: var(--primary); margin: 10px 0; font-size: 1.3rem; text-transform: uppercase; }
 
         .countdown-container { text-align: center; margin: 10px 0; padding: 15px; border-radius: 12px; background: var(--timer-bg); border: 2px solid var(--primary); transition: 0.5s; min-height: 60px; display: flex; align-items: center; justify-content: center; }
@@ -646,4 +762,5 @@
 </script>
 </body>
 </html>
+
 
