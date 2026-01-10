@@ -13,17 +13,20 @@
             --purple: #673ab7; --orange: #ff9800; --table-header: #2c3e50; 
             --bg-body: #f0f2f5; --bg-card: #ffffff; --text-main: #333333;
             --timer-bg: #e8f0fe;
+            --row-alt: #f1f3f5; 
+            --border-color: #cbd5e0;
         }
 
         [data-theme="dark"] {
             --bg-body: #121212; --bg-card: #1e1e1e; --text-main: #e0e0e0;
             --table-header: #000000; --primary: #8ab4f8; --timer-bg: #1a273a;
+            --row-alt: #2d2d2d;
+            --border-color: #444444;
         }
 
         body { margin: 0; padding: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', sans-serif; transition: 0.3s; }
         .container { max-width: 1000px; margin: 0 auto; padding: 15px; background: var(--bg-card); min-height: 100vh; }
 
-        /* LOGO: Grandezza x3 e spazio ridotto al minimo */
         .logo-container { text-align: center; margin-bottom: 5px; position: relative; min-height: auto; display: flex; justify-content: center; align-items: center; padding: 0; }
         .logo-container img { width: 660px; max-width: 100%; height: auto; border-radius: 8px; transition: 0.3s; display: block; margin: 0 auto; }
         
@@ -83,17 +86,41 @@
         [data-theme="dark"] .atleta-tag { background: #333; color: white; border-color: #444; }
 
         .search-box { position: sticky; top: 0; z-index: 100; width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box; background: var(--bg-card); }
-        .table-wrapper { width: 100%; max-height: 60vh; overflow-y: auto; border-radius: 8px; border: 1px solid #eee; }
-        table { width: 100%; border-collapse: collapse; }
         
-        thead th { background: var(--table-header); color: white; font-size: 0.70rem; position: sticky; top: 0; z-index: 10; padding: 12px 2px; text-transform: uppercase; }
+        .table-wrapper { 
+            width: 100%; 
+            max-height: 60vh; 
+            overflow-y: auto; 
+            border-radius: 8px; 
+            border: 1px solid var(--border-color); 
+            background: var(--bg-card);
+        }
         
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        
+        /* FIX SPAZIO BIANCO SOPRA HEADER */
+        thead th { 
+            background: var(--table-header); 
+            color: white; 
+            font-size: 0.70rem; 
+            position: sticky; 
+            top: 0; 
+            z-index: 50; 
+            padding: 12px 2px; 
+            text-transform: uppercase; 
+            border-bottom: 2px solid var(--border-color);
+            box-shadow: inset 0 1px 0 var(--table-header); /* Copre eventuali micro fessure */
+        }
+        
+        tbody tr:nth-child(even) { background-color: var(--row-alt); }
+        tbody tr:hover { background-color: rgba(26, 115, 232, 0.05); }
+
         .sortable { cursor: pointer; user-select: none; }
         .sortable:hover { background: #34495e; }
         .sort-icon { font-size: 0.6rem; margin-left: 5px; opacity: 0.6; display: none; }
 
-        td { padding: 10px 2px; border-bottom: 1px solid #eee; text-align: center; }
-        .nome-cell { text-align: left; font-weight: bold; padding-left: 10px !important; }
+        td { padding: 12px 2px; border-bottom: 1px solid var(--border-color); text-align: center; }
+        .nome-cell { text-align: left; font-weight: bold; padding-left: 10px !important; border-right: 1px solid var(--border-color); }
         
         .date-label { font-size: 0.65rem; color: var(--primary); display: block; font-weight: bold; margin-top: 2px; }
         .date-assign-btns { margin-top: 5px; display: flex; gap: 5px; }
@@ -109,11 +136,23 @@
 
         @media screen and (max-width: 600px) {
             thead { display: none; }
-            td { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 15px; }
+            .table-wrapper { border: none; padding: 0; max-height: none; overflow-y: visible; }
+            tr { 
+                display: block; 
+                margin-bottom: 18px; 
+                border: 2px solid var(--border-color); 
+                border-radius: 12px; 
+                overflow: hidden;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                background: var(--bg-card) !important;
+            }
+            tr:nth-child(even) { background: var(--row-alt) !important; }
+            td { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 12px 15px; }
+            td:last-child { border-bottom: none; }
             td::before { content: attr(data-label); font-weight: bold; font-size: 0.70rem; color: #777; }
             td[data-label="Partecipa"]::before, td[data-label="Non Partecipa"]::before, td[data-label="Reset"]::before { content: ""; }
-            td[data-label="Partecipa"], td[data-label="Non Partecipa"], td[data-label="Reset"] { justify-content: center; padding: 5px 15px; }
-            .nome-cell { background: rgba(0,0,0,0.03); justify-content: center; font-size: 1.0rem; flex-direction: column; }
+            td[data-label="Partecipa"], td[data-label="Non Partecipa"], td[data-label="Reset"] { justify-content: center; padding: 10px 15px; }
+            .nome-cell { background: rgba(26, 115, 232, 0.05); border-right: none; justify-content: center; font-size: 1.1rem; flex-direction: column; text-align: center; padding: 18px !important; border-bottom: 2px solid var(--primary); }
             .nome-cell::before { display: none; }
         }
     </style>
@@ -329,7 +368,6 @@
 
         document.getElementById('mainTitle').innerText = tit?.valore || "Gara 2";
         
-        // GESTIONE TIMER: Se vuoto, nascondi il riquadro
         const countdownBox = document.getElementById('countdownBox');
         if(sca?.valore && sca.valore !== "") {
             countdownBox.style.display = 'flex';
@@ -338,7 +376,7 @@
             else { isExpired = false; startCountdown(sca.valore); }
         } else {
             isExpired = false;
-            countdownBox.style.display = 'none'; // Nascondi se non impostato
+            countdownBox.style.display = 'none';
             if(timerInterval) clearInterval(timerInterval);
         }
     }
@@ -468,7 +506,7 @@
 
     async function salva(id, val) { 
         const a = currentData.find(at => at.id == id);
-        if (!isAdmin && !confirm(`Confermi per ${a.nome}?`)) { renderData(); return; }
+        if (!isAdmin && !confirm(`Sei veramente ${a.nome}?`)) { renderData(); return; }
         await _supabase.from(T_DATA).update({ stato: val }).eq('id', id);
         showToast("Salvato");
         if (val !== 'vuoto') {
@@ -540,7 +578,7 @@
             const dist = new Date(et).getTime() - new Date().getTime();
             if (dist <= 0) { clearInterval(timerInterval); isExpired = true; mostraTimerChiuso(); return; }
             const d = Math.floor(dist/86400000), h = Math.floor((dist%86400000)/3600000), m = Math.floor((dist%3600000)/60000), s = Math.floor((dist%60000)/1000);
-            document.getElementById('timerDisplay').innerText = `SCADENZA: ${d}g ${h}h ${m}m ${s}s`;
+            document.getElementById('timerDisplay').innerText = `SCADENZA: ${d}g ${h}h ${m} m ${s}s`;
         }, 1000);
     }
 
