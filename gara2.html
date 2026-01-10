@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gestione Presenze Juvenilia - Gara 2</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
@@ -98,7 +100,6 @@
         
         table { width: 100%; border-collapse: separate; border-spacing: 0; }
         
-        /* FIX SPAZIO BIANCO SOPRA HEADER */
         thead th { 
             background: var(--table-header); 
             color: white; 
@@ -109,7 +110,7 @@
             padding: 12px 2px; 
             text-transform: uppercase; 
             border-bottom: 2px solid var(--border-color);
-            box-shadow: inset 0 1px 0 var(--table-header); /* Copre eventuali micro fessure */
+            box-shadow: inset 0 1px 0 var(--table-header);
         }
         
         tbody tr:nth-child(even) { background-color: var(--row-alt); }
@@ -578,7 +579,7 @@
             const dist = new Date(et).getTime() - new Date().getTime();
             if (dist <= 0) { clearInterval(timerInterval); isExpired = true; mostraTimerChiuso(); return; }
             const d = Math.floor(dist/86400000), h = Math.floor((dist%86400000)/3600000), m = Math.floor((dist%3600000)/60000), s = Math.floor((dist%60000)/1000);
-            document.getElementById('timerDisplay').innerText = `SCADENZA: ${d}g ${h}h ${m} m ${s}s`;
+            document.getElementById('timerDisplay').innerText = `SCADENZA: ${d}g ${h}h ${m}m ${s}s`;
         }, 1000);
     }
 
