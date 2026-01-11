@@ -12,105 +12,126 @@
             --primary: #1a73e8; --success: #28a745; --danger: #dc3545; 
             --purple: #673ab7; --orange: #ff9800; --table-header: #2c3e50; 
             --bg-body: #f0f2f5; --bg-card: #ffffff; --text-main: #333333;
-            --timer-bg: #e8f0fe;
+            --timer-bg: #ffffff; --male: #007bff; --female: #e83e8c;
+            --search-bg: #ffffff;
+            --row-border: #d1d5db;
+            /* Colori Categorie */
+            --cat-senior: #2c3e50; --cat-junior: #e74c3c; --cat-allievi: #27ae60;
+            --cat-ragazzi: #2980b9; --cat-r12: #8e44ad; --cat-esordienti: #f39c12;
+            --cat-giovanissimi: #16a085; --cat-default: #7f8c8d;
         }
 
-        [data-theme="dark"] {
-            --bg-body: #121212; --bg-card: #1e1e1e; --text-main: #e0e0e0;
-            --table-header: #000000; --primary: #8ab4f8; --timer-bg: #1a273a;
-        }
+        body { margin: 0; padding: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 15px; background: var(--bg-card); min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 
-        body { margin: 0; padding: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', sans-serif; transition: 0.3s; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 15px; background: var(--bg-card); min-height: 100vh; }
-
-        .logo-container { 
-            text-align: center; 
-            margin-bottom: 5px; 
-            position: relative; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            padding: 0;
-        }
-        .logo-container img { 
-            width: 660px;
-            max-width: 100%; 
-            height: auto; 
-            border-radius: 8px; 
-            display: block;
-        }
+        .logo-container { text-align: center; margin-bottom: 20px; position: relative; display: flex; justify-content: center; align-items: center; padding: 10px; }
+        .logo-container img { width: 100%; max-width: 600px; height: auto; border-radius: 12px; display: block; }
         
-        .top-btns { position: absolute; top: 5px; right: 5px; display: flex; gap: 8px; z-index: 10; }
-        .icon-btn { background: rgba(255,255,255,0.7); border: none; font-size: 1.2rem; cursor: pointer; padding: 5px; border-radius: 50%; }
-        .logout-btn { display: none; color: var(--danger); border: 1px solid var(--danger); border-radius: 5px; padding: 5px 10px; cursor: pointer; font-size: 0.7rem; font-weight: bold; background: white; }
+        .top-btns { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 10; }
+        .icon-btn { background: var(--bg-card); border: 1px solid #ddd; font-size: 1.2rem; cursor: pointer; padding: 8px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
+        .logout-btn { display: none; color: var(--danger); border: 2px solid var(--danger); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.8rem; font-weight: bold; background: white; transition: 0.2s; }
+        .logout-btn:hover { background: var(--danger); color: white; }
         
-        h2 { text-align: center; color: var(--primary); margin: 5px 0 15px 0; font-size: 1.3rem; text-transform: uppercase; }
+        h2 { text-align: center; color: var(--primary); margin: 10px 0 20px 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
 
-        .countdown-container { text-align: center; margin: 10px 0; padding: 15px; border-radius: 12px; background: var(--timer-bg); border: 2px solid var(--primary); transition: 0.5s; min-height: 60px; display: flex; align-items: center; justify-content: center; }
-        .timer { font-family: 'Courier New', monospace; font-size: 1.3rem; font-weight: bold; color: var(--primary); }
+        .countdown-container { text-align: center; margin: 15px 0; padding: 15px; border-radius: 15px; background: var(--timer-bg); border: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15); transition: 0.5s; min-height: 50px; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+        .timer { font-family: 'Monaco', 'Consolas', monospace; font-size: 1.2rem; font-weight: bold; color: var(--primary); }
+
+        .search-container { position: relative; margin: 20px 0; width: 100%; }
+        .search-box { width: 100%; padding: 15px 15px 15px 45px; border-radius: 12px; border: 2px solid #ddd; background-color: var(--search-bg); color: var(--text-main); font-size: 1rem; box-sizing: border-box; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .search-box:focus { outline: none; border-color: var(--primary); box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2); }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; font-size: 1.2rem; pointer-events: none; }
+
+        .doc-links-user { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; width: 100%; margin: 10px 0 20px 0; }
+        .btn-doc-link { background: var(--purple); color: white; padding: 10px 18px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 0.85rem; transition: 0.2s; border: none; box-shadow: 0 4px 10px rgba(103, 58, 183, 0.2); }
+        .btn-doc-link:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(103, 58, 183, 0.3); }
 
         input[type="radio"] { display: none; }
-        .badge-btn {
-            display: inline-block; padding: 10px 12px; border-radius: 20px; border: 2px solid #ddd;
-            cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.2s;
-            user-select: none; width: 100%; box-sizing: border-box; text-align: center; background: white; color: #555;
-        }
-        [data-theme="dark"] .badge-btn { background: #333; color: #bbb; border-color: #444; }
+        .badge-btn { display: inline-block; padding: 12px 10px; border-radius: 12px; border: 2px solid #eee; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.3s; user-select: none; width: 100%; box-sizing: border-box; text-align: center; background: #fdfdfd; color: #777; text-transform: uppercase; }
 
-        input[value="si"]:checked + .badge-si { background-color: var(--success); color: white; border-color: #1e7e34; }
-        input[value="no"]:checked + .badge-no { background-color: var(--danger); color: white; border-color: #bd2130; }
+        input[value="si"]:checked + .badge-si { background-color: var(--success); color: white; border-color: #1e7e34; transform: scale(1.02); box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3); }
+        input[value="no"]:checked + .badge-no { background-color: var(--danger); color: white; border-color: #bd2130; transform: scale(1.02); box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3); }
 
-        .btn-reset { background-color: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 0.70rem; width: 100%; }
+        .btn-date-small, .btn-gender-small { border: 1px solid #ddd; background: white; cursor: pointer; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; transition: 0.2s; }
+        .btn-date-small.active { background-color: var(--orange); color: white; border-color: #e68a00; }
+        .btn-gender-small.active-m { background-color: var(--male); color: white; border-color: #0056b3; }
+        .btn-gender-small.active-f { background-color: var(--female); color: white; border-color: #c8237e; }
 
-        .admin-action-btn { background: none; border: none; cursor: pointer; padding: 5px; border-radius: 50%; transition: transform 0.2s, background 0.2s; display: inline-flex; align-items: center; justify-content: center; }
-        .admin-action-btn:hover { transform: scale(1.2); background: rgba(0,0,0,0.05); }
-        .btn-lock { color: var(--primary); }
-        .btn-lock.locked { color: var(--orange); }
-        .btn-delete { color: var(--danger); }
-
-        #addAtletaBox, #costiBox { background: rgba(26, 115, 232, 0.08); border: 2px solid var(--primary); border-radius: 12px; padding: 20px; margin-bottom: 20px; display: none; flex-direction: column; gap: 15px; }
-        #costiBox { background: rgba(103, 58, 183, 0.08); border-color: var(--purple); }
-
-        .admin-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .admin-row input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; min-width: 150px; font-size: 14px; }
-        .admin-row button { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stat-card { padding: 12px; border-radius: 8px; text-align: center; color: white; font-weight: bold; }
-        .stat-presenti { background: var(--success); }
-        .stat-assenti { background: var(--danger); }
-        #adminTotalBox { background: var(--purple); grid-column: span 2; display: none; }
-
-        #confirmedList { background: #f8f9fa; border-radius: 10px; padding: 15px; margin-bottom: 20px; border-left: 5px solid var(--success); }
-        .cat-title { font-weight: bold; color: var(--success); border-bottom: 1px solid #ddd; margin: 10px 0 5px 0; font-size: 0.9rem; }
-        .atleta-tag { display: inline-block; background: white; padding: 4px 10px; margin: 3px; border-radius: 20px; font-size: 0.85rem; border: 1px solid #ddd; }
-        [data-theme="dark"] .atleta-tag { background: #333; color: white; border-color: #444; }
-
-        .search-box { position: sticky; top: 0; z-index: 100; width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 15px; font-size: 16px; box-sizing: border-box; background: var(--bg-card); }
-        .table-wrapper { width: 100%; max-height: 60vh; overflow-y: auto; border-radius: 8px; border: 1px solid #eee; }
-        <table> { width: 100%; border-collapse: collapse; }
-        thead th { background: var(--table-header); color: white; font-size: 0.70rem; position: sticky; top: 0; z-index: 10; padding: 12px 2px; text-transform: uppercase; }
-        td { padding: 10px 2px; border-bottom: 1px solid #eee; text-align: center; }
-        .nome-cell { text-align: left; font-weight: bold; padding-left: 10px !important; }
+        .btn-reset { background-color: #6c757d; color: white; border: none; padding: 10px 12px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 0.75rem; width: 100%; transition: 0.2s; }
         
-        .date-label { font-size: 0.65rem; color: var(--primary); display: block; font-weight: bold; margin-top: 2px; }
-        .date-assign-btns { margin-top: 5px; display: flex; gap: 5px; }
-        .btn-date-small { padding: 4px 10px; font-size: 0.7rem; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer; font-weight: bold; color: #333; }
-        .btn-date-small.active { background: var(--primary); color: white; border-color: var(--primary); }
+        #addAtletaBox, #costiBox, #docsBox { background: rgba(26, 115, 232, 0.04); border: 2px solid var(--primary); border-radius: 16px; padding: 20px; margin-bottom: 25px; display: none; flex-direction: column; gap: 15px; }
+        #costiBox { background: rgba(103, 58, 183, 0.04); border-color: var(--purple); }
+        #docsBox { background: rgba(255, 152, 0, 0.04); border-color: var(--orange); }
 
-        .col-admin { display: none; }
-        #adminButtons { display: none; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
-        #adminButtons button { padding: 12px; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; }
+        .admin-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px 0; }
+        .admin-row input, .admin-row select { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 10px; min-width: 120px; font-size: 14px; background: white; }
+        .admin-row button { padding: 12px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
+        .btn-clear-input { background: #6c757d !important; color: white !important; font-size: 0.75rem !important; padding: 12px 15px !important; text-transform: uppercase; }
 
-        #toast { visibility: hidden; min-width: 200px; background: #333; color: #fff; text-align: center; border-radius: 50px; padding: 12px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .stat-card { padding: 15px; border-radius: 16px; text-align: center; color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .stat-presenti { background: linear-gradient(135deg, #28a745, #218838); }
+        .stat-assenti { background: linear-gradient(135deg, #dc3545, #c82333); }
+        #adminTotalBox { background: linear-gradient(135deg, #673ab7, #512da8); grid-column: span 2; display: none; }
+
+        .table-wrapper { width: 100%; max-height: 65vh; overflow-y: auto; border-radius: 16px; border: 1px solid var(--row-border); background: #eee; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 4px; background: transparent; }
+        thead th { background: var(--table-header); color: white; font-size: 0.75rem; position: sticky; top: 0; z-index: 10; padding: 15px 5px; text-transform: uppercase; }
+        
+        tbody tr { background-color: #ffffff; transition: 0.2s; }
+        tbody tr:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 5; position: relative; }
+        
+        td { padding: 14px 5px; border-bottom: 1px solid #eee; text-align: center; font-size: 0.9rem; }
+        
+        .tr-senior { border-left: 6px solid var(--cat-senior); }
+        .tr-junior { border-left: 6px solid var(--cat-junior); }
+        .tr-allievi { border-left: 6px solid var(--cat-allievi); }
+        .tr-ragazzi { border-left: 6px solid var(--cat-ragazzi); }
+        .tr-r12 { border-left: 6px solid var(--cat-r12); }
+        .tr-esordienti { border-left: 6px solid var(--cat-esordienti); }
+        .tr-giovanissimi { border-left: 6px solid var(--cat-giovanissimi); }
+
+        .nome-cell { text-align: left; font-weight: bold; padding: 15px !important; color: #2c3e50; }
+        
+        .badge-gender { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; color: white; margin-left: 5px; vertical-align: middle; }
+        .bg-m { background-color: var(--male); }
+        .bg-f { background-color: var(--female); }
+
+        .gender-section { margin-top: 5px; padding-left: 10px; border-left: 2px solid #eee; }
+        .gender-title { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-top: 5px; display: block; opacity: 0.8; }
+        .title-m { color: var(--male); }
+        .title-f { color: var(--female); }
+
+        #adminButtons { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; padding-bottom: 30px; }
+        #adminButtons button { padding: 14px; border: none; border-radius: 12px; color: white; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+
+        #toast { visibility: hidden; min-width: 250px; background: #333; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
 
+        /* NUOVI STILI PER POPUP CELEBRATIVO */
+        #confettiPopup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; pointer-events: none; }
+        .pop-animation { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes popIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            70% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         @media screen and (max-width: 600px) {
+            .table-wrapper { background: transparent; border: none; max-height: none; overflow: visible; }
+            table { border-spacing: 0 12px; }
             thead { display: none; }
-            td { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 15px; }
-            td::before { content: attr(data-label); font-weight: bold; font-size: 0.70rem; color: #777; }
-            .nome-cell { background: rgba(0,0,0,0.03); justify-content: center; font-size: 1.0rem; flex-direction: column; }
-            .nome-cell::before { display: none; }
+            tr { display: block; margin-bottom: 15px; border: 2px solid var(--row-border); border-radius: 16px; overflow: hidden; background: var(--bg-card); box-shadow: 0 4px 8px rgba(0,0,0,0.08); border-left-width: 0px; }
+            .tr-senior { border-top: 8px solid var(--cat-senior); }
+            .tr-junior { border-top: 8px solid var(--cat-junior); }
+            .tr-allievi { border-top: 8px solid var(--cat-allievi); }
+            .tr-ragazzi { border-top: 8px solid var(--cat-ragazzi); }
+            .tr-r12 { border-top: 8px solid var(--cat-r12); }
+            .tr-esordienti { border-top: 8px solid var(--cat-esordienti); }
+            .tr-giovanissimi { border-top: 8px solid var(--cat-giovanissimi); }
+            td { display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #f0f0f0; padding: 10px 15px; }
+            .nome-cell { background: rgba(0,0,0,0.02); justify-content: center; padding: 18px !important; border-radius: 0; font-size: 1.1rem; }
+            .badge-btn, .btn-reset { width: auto; min-width: 160px; padding: 18px 20px; font-size: 0.95rem; border-radius: 14px; white-space: nowrap; }
         }
     </style>
 </head>
@@ -118,11 +139,17 @@
 
 <div id="toast">Operazione riuscita!</div>
 
+<div id="confettiPopup">
+    <div style="text-align: center;">
+        <div class="pop-animation" style="font-size: 150px;">🎉</div>
+        <h2 style="color: white; margin-top: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); font-weight: 800;">ISCRITTO!</h2>
+    </div>
+</div>
+
 <div class="container">
     <div class="logo-container">
         <div class="top-btns">
             <button class="logout-btn" id="logoutBtn" onclick="logoutAdmin()">LOGOUT</button>
-            <button class="icon-btn" onclick="toggleDarkMode()">🌓</button>
             <button class="icon-btn" id="adminIcon" onclick="toggleAdmin()">⚙️</button>
         </div>
         <img src="logo.png" alt="Logo Juvenilia" onerror="this.style.display='none'">
@@ -134,30 +161,59 @@
         <div id="timerDisplay" class="timer">Inizializzazione...</div>
     </div>
 
+    <div id="docLinksContainer" class="doc-links-user"></div>
+
+    <div id="docsBox">
+        <div style="font-size: 12px; font-weight: bold; color: var(--orange); margin-left: 5px;">📄 DOCUMENTI E LINK ESTERNI:</div>
+        <div class="admin-row">
+            <input type="text" id="docLink1_URL" placeholder="Link Documento 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false">
+            <input type="text" id="docLink1_Text" placeholder="Testo Pulsante 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false">
+            <button onclick="salvaDoc(1)" style="background:var(--success);">Salva 1</button>
+            <button onclick="azzeraDoc(1)" style="background:var(--danger);">Azzera 1</button>
+        </div>
+        <div class="admin-row">
+            <input type="text" id="docLink2_URL" placeholder="Link Documento 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false">
+            <input type="text" id="docLink2_Text" placeholder="Testo Pulsante 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false">
+            <button onclick="salvaDoc(2)" style="background:var(--success);">Salva 2</button>
+            <button onclick="azzeraDoc(2)" style="background:var(--danger);">Azzera 2</button>
+        </div>
+    </div>
+
     <div id="addAtletaBox">
         <div class="admin-row">
-            <input type="text" id="editTitleInput" placeholder="Titolo della gara...">
+            <input type="text" id="editTitleInput" placeholder="Titolo della gara..." onfocus="isEditingOther=true" onblur="isEditingOther=false">
+            <button onclick="document.getElementById('editTitleInput').value=''" class="btn-clear-input">reset</button>
             <button onclick="salvaTitolo()" style="background:var(--purple);">Aggiorna Titolo</button>
         </div>
-        
-        <div style="font-size: 11px; font-weight: bold; color: var(--primary);">📅 ETICHETTE DATE (A / B / C):</div>
         <div class="admin-row">
-            <input type="text" id="dateA_Label" placeholder="Data A">
-            <input type="text" id="dateB_Label" placeholder="Data B">
-            <input type="text" id="dateC_Label" placeholder="Data C">
+            <input type="text" id="dateA_Label" placeholder="Data A" onfocus="isEditingOther=true" onblur="isEditingOther=false">
+            <input type="text" id="dateB_Label" placeholder="Data B" onfocus="isEditingOther=true" onblur="isEditingOther=false">
+            <input type="text" id="dateC_Label" placeholder="Data C" onfocus="isEditingOther=true" onblur="isEditingOther=false">
+            <button onclick="document.getElementById('dateA_Label').value=''; document.getElementById('dateB_Label').value=''; document.getElementById('dateC_Label').value='';" class="btn-clear-input">reset</button>
             <button onclick="salvaEtichetteDate()" style="background:var(--orange);">Salva</button>
-            <button onclick="azzeraEtichetteDate()" style="background:var(--danger);">🗑️ Azzera</button>
         </div>
-
         <div class="admin-row">
             <input type="text" id="newNome" placeholder="Cognome e Nome">
-            <input type="text" id="newCat" placeholder="Categoria">
+            <button onclick="document.getElementById('newNome').value=''" class="btn-clear-input">reset</button>
+            <select id="newCat">
+                <option value="">Categoria</option>
+                <option value="SENIOR">SENIOR</option>
+                <option value="JUNIOR">JUNIOR</option>
+                <option value="ALLIEVI">ALLIEVI</option>
+                <option value="RAGAZZI">RAGAZZI</option>
+                <option value="R12">R12</option>
+                <option value="ESORDIENTI">ESORDIENTI</option>
+                <option value="GIOVANISSIMI">GIOVANISSIMI</option>
+            </select>
+            <select id="newGender" style="flex: 0.3; min-width: 60px;">
+                <option value="">M/F</option>
+                <option value="M">M</option>
+                <option value="F">F</option>
+            </select>
             <button onclick="aggiungiAtleta()" style="background:var(--primary);">+ Aggiungi</button>
-            <button onclick="toggleSort()" style="background:var(--table-header);">↕️ Ordina: <span id="sortLabel">Nome</span></button>
         </div>
-        
         <div class="admin-row">
-            <div style="font-size: 12px; font-weight: bold;">SCADENZA:</div>
+            <div style="font-size: 12px; font-weight: bold; margin-left: 5px;">SCADENZA:</div>
             <input type="datetime-local" id="deadlineInput">
             <button onclick="confermaScadenzaDB()" style="background:var(--success);">CONFERMA</button>
             <button onclick="resetScadenzaDB()" style="background:var(--danger);">RESET</button>
@@ -165,41 +221,43 @@
     </div>
 
     <div id="costiBox">
-        <div style="font-size: 12px; font-weight: bold; color: var(--purple); margin-bottom: 5px;">💰 COSTI ISCRIZIONE (€):</div>
         <div id="costiInputs" class="admin-row" style="justify-content: center; gap: 15px;"></div>
         <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 10px;">
-            <button onclick="salvaCosti()" style="background:var(--success); border:none; padding:12px 30px; color:white; border-radius:8px; font-weight:bold; cursor:pointer; flex: 1; min-width: 150px;">💾 Salva Quote</button>
-            <button onclick="eliminaTutteLeQuoteDB()" style="background:var(--danger); border:none; padding:12px 20px; color:white; border-radius:8px; font-weight:bold; cursor:pointer; min-width: 160px;">🗑️ Svuota Database</button>
+            <button onclick="salvaCosti()" style="background:var(--success); border:none; padding:12px 30px; color:white; border-radius:12px; font-weight:bold; cursor:pointer;">💾 Salva Quote</button>
+            <button onclick="azzeraTutteQuote()" style="background:var(--danger); border:none; padding:12px 30px; color:white; border-radius:12px; font-weight:bold; cursor:pointer;">🗑️ Azzera Quote</button>
         </div>
     </div>
 
     <div class="stats-grid">
-        <div class="stat-card stat-presenti"><span>✅ PARTECIPA</span><div id="count-si">0</div></div>
-        <div class="stat-card stat-assenti"><span>❌ NON PARTECIPA</span><div id="count-no">0</div></div>
+        <div class="stat-card stat-presenti"><span>✅ PARTECIPA</span><div id="count-si" style="font-size: 1.5rem;">0</div></div>
+        <div class="stat-card stat-assenti"><span>❌ NON PARTECIPA</span><div id="count-no" style="font-size: 1.5rem;">0</div></div>
         <div id="adminTotalBox" class="stat-card">
             <span>TOTALE QUOTE (ADMIN)</span>
-            <div id="totaleEuro" style="font-size: 1.4rem;">0.00 €</div>
+            <div id="totaleEuro" style="font-size: 1.8rem;">0.00 €</div>
         </div>
     </div>
 
-    <div id="confirmedList" style="display:none;">
-        <div style="font-weight:bold; font-size:0.8rem; color:#555; margin-bottom:5px; padding-left:10px;">👥 PARTECIPANTI PER CATEGORIA:</div>
+    <div id="confirmedList" style="display:none; background: #ffffff; border-radius: 16px; padding: 20px; margin-bottom: 25px; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <div style="font-weight:800; font-size:0.85rem; color:#555; margin-bottom:10px; text-transform: uppercase;">👥 RIEPILOGO PARTECIPANTI:</div>
         <div id="listContent"></div>
     </div>
     
-    <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="🔍 Cerca il tuo nome...">
+    <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="Cerca il tuo nome o la tua categoria...">
+    </div>
 
     <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
-                    <th class="col-admin"><input type="checkbox" onclick="selectAll(this)"></th>
-                    <th>Atleta</th>
-                    <th>Categoria</th>
+                    <th class="col-admin" style="display:none;"><input type="checkbox" onclick="selectAll(this)"></th>
+                    <th onclick="setSort('nome')" style="cursor:pointer;">Atleta ↕</th>
+                    <th onclick="setSort('categoria')" style="cursor:pointer;">Categoria ↕</th>
                     <th>Partecipa</th>
                     <th>Non Partecipa</th>
                     <th>Reset</th>
-                    <th class="col-admin">Azioni</th>
+                    <th class="col-admin" style="display:none;">Azioni</th>
                 </tr>
             </thead>
             <tbody id="tabella-body"></tbody>
@@ -220,7 +278,8 @@
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuZm5mc3pla2ZzdHVvaWVta2dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODkzOTEsImV4cCI6MjA4MzQ2NTM5MX0.lh7eRFlg7nnI7kEzVPBL9kNyZWX-XFeWQxVbvmzRlvA';
     const TELEGRAM_TOKEN = '8441085660:AAEui_yfGnT_quKPHVx_wsslcuJtm3KbTOI';
     const TELEGRAM_CHAT_ID = '691756250';
-    const ADMIN_PASS = "juvenilia1179";
+    
+    const O_P = "anV2ZW5pbGlhMTE3OQ==";
     
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const T_DATA = 'presenze_gara2'; 
@@ -229,184 +288,177 @@
     let isAdmin = false, isExpired = false, currentData = [], timerInterval;
     let labelA = "", labelB = "", labelC = "", sortBy = 'nome'; 
     let costiCategorie = {};
-    let isEditingCosti = false;
+    let isEditingCosti = false, isEditingDocs = false, isEditingOther = false;
+    let selectedIds = new Set(); 
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
-    async function init() {
-        if(localStorage.getItem('theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
-        await fullLoad();
-        setInterval(fullLoad, 5000);
-    }
+    async function init() { await fullLoad(); setInterval(fullLoad, 5000); }
 
     async function fullLoad() {
-        await caricaConfig();
-        await caricaTabella();
+        document.querySelectorAll('.bulk-cb:checked').forEach(cb => selectedIds.add(cb.value));
+        document.querySelectorAll('.bulk-cb:not(:checked)').forEach(cb => selectedIds.delete(cb.value));
+        await caricaConfig(); await caricaTabella();
     }
 
     async function caricaConfig() {
         const { data } = await _supabase.from(T_CONF).select('*');
         if(!data) return;
-
         const tit = data.find(c => c.chiave === 'titolo_gara');
         const sca = data.find(c => c.chiave === 'scadenza_adesioni');
         labelA = data.find(c => c.chiave === 'data_label_a')?.valore || "";
         labelB = data.find(c => c.chiave === 'data_label_b')?.valore || "";
         labelC = data.find(c => c.chiave === 'data_label_c')?.valore || "";
-
-        document.getElementById('dateA_Label').value = labelA;
-        document.getElementById('dateB_Label').value = labelB;
-        document.getElementById('dateC_Label').value = labelC;
-
-        costiCategorie = {};
-        data.filter(c => c.chiave.startsWith('costo_')).forEach(c => {
-            costiCategorie[c.chiave.replace('costo_', '').toUpperCase()] = parseFloat(c.valore) || 0;
-        });
-
-        document.getElementById('mainTitle').innerText = tit?.valore || "Gara Juvenilia - Gara 2";
-
-        if(sca?.valore) {
-            const diff = new Date(sca.valore).getTime() - new Date().getTime();
-            if(diff <= 0) { isExpired = true; mostraTimerChiuso(); }
-            else { isExpired = false; startCountdown(sca.valore); }
-        } else {
-            isExpired = false;
-            if(timerInterval) clearInterval(timerInterval);
-            document.getElementById('timerDisplay').innerText = "TERMINE DA DEFINIRE";
+        const url1 = data.find(c => c.chiave === 'doc_url_1')?.valore || "";
+        const txt1 = data.find(c => c.chiave === 'doc_txt_1')?.valore || "";
+        const url2 = data.find(c => c.chiave === 'doc_url_2')?.valore || "";
+        const txt2 = data.find(c => c.chiave === 'doc_txt_2')?.valore || "";
+        if(isAdmin) {
+            if(!isEditingOther) {
+                document.getElementById('dateA_Label').value = labelA;
+                document.getElementById('dateB_Label').value = labelB;
+                document.getElementById('dateC_Label').value = labelC;
+                document.getElementById('editTitleInput').value = tit?.valore || "";
+            }
+            if(!isEditingDocs) {
+                document.getElementById('docLink1_URL').value = url1;
+                document.getElementById('docLink1_Text').value = txt1;
+                document.getElementById('docLink2_URL').value = url2;
+                document.getElementById('docLink2_Text').value = txt2;
+            }
+            document.getElementById('deadlineInput').value = sca?.valore || "";
         }
-        
+        const docCont = document.getElementById('docLinksContainer');
+        docCont.innerHTML = "";
+        if(url1) docCont.innerHTML += `<a href="${url1}" target="_blank" class="btn-doc-link">📄 ${txt1 || 'Link 1'}</a>`;
+        if(url2) docCont.innerHTML += `<a href="${url2}" target="_blank" class="btn-doc-link">📄 ${txt2 || 'Link 2'}</a>`;
+        costiCategorie = {};
+        data.filter(c => c.chiave.startsWith('costo_')).forEach(c => { costiCategorie[c.chiave.replace('costo_', '').toUpperCase()] = parseFloat(c.valore) || 0; });
+        document.getElementById('mainTitle').innerText = tit?.valore || "Gara Juvenilia";
+        const cBox = document.getElementById('countdownBox');
+        if(sca?.valore && sca.valore !== "") {
+            const diff = new Date(sca.valore).getTime() - new Date().getTime();
+            cBox.style.display = 'flex';
+            if(diff <= 0) { isExpired = true; mostraTimerChiuso(); } else { isExpired = false; startCountdown(sca.valore); }
+        } else { isExpired = false; cBox.style.display = 'none'; }
         if(isAdmin && !isEditingCosti) renderCostiInputs();
     }
 
-    async function caricaTabella() {
-        const { data } = await _supabase.from(T_DATA).select('*');
-        if(data) { currentData = data; renderData(); }
+    async function salvaDoc(num) {
+        const url = document.getElementById(`docLink${num}_URL`).value;
+        const txt = document.getElementById(`docLink${num}_Text`).value;
+        await _supabase.from(T_CONF).upsert([{ chiave: `doc_url_${num}`, valore: url }, { chiave: `doc_txt_${num}`, valore: txt }], { onConflict: 'chiave' });
+        showToast(`Documento ${num} salvato!`); isEditingDocs = false; caricaConfig();
     }
+
+    async function azzeraDoc(num) { if(confirm(`Cancellare?`)) { await _supabase.from(T_CONF).upsert([{ chiave: `doc_url_${num}`, valore: "" }, { chiave: `doc_txt_${num}`, valore: "" }], { onConflict: 'chiave' }); showToast(`Azzerato!`); caricaConfig(); } }
+    async function caricaTabella() { const { data } = await _supabase.from(T_DATA).select('*'); if(data) { currentData = data; renderData(); } }
 
     function renderCostiInputs() {
-        const container = document.getElementById('costiInputs');
-        const cats = [...new Set(currentData.map(a => a.categoria.toUpperCase()))];
-        cats.sort((a, b) => (customCatOrder[a] || 999) - (customCatOrder[b] || 999));
-
-        container.innerHTML = '';
-        cats.forEach(c => {
-            const val = costiCategorie[c] || 0;
-            container.innerHTML += `<div style="text-align:center; min-width:80px;"><label style="font-size:10px; display:block; font-weight:bold;">${c}</label>
-            <input type="number" step="0.5" class="costo-in" data-cat="${c}" value="${val}" 
-            onfocus="isEditingCosti=true" onblur="isEditingCosti=false"
-            style="width:65px; padding:8px; text-align:center; border: 1px solid #ccc; border-radius:5px;"></div>`;
-        });
-    }
-
-    async function salvaCosti() {
-        isEditingCosti = false;
-        const upserts = Array.from(document.querySelectorAll('.costo-in')).map(i => ({
-            chiave: `costo_${i.dataset.cat}`,
-            valore: i.value
-        }));
-        await _supabase.from(T_CONF).upsert(upserts, { onConflict: 'chiave' });
-        showToast("Quote salvate!"); 
-        await caricaConfig();
-    }
-
-    async function eliminaTutteLeQuoteDB() {
-        if(confirm("Eliminare tutte le quote dal database?")) {
-            const keys = Object.keys(costiCategorie).map(c => `costo_${c}`);
-            if(keys.length) await _supabase.from(T_CONF).delete().in('chiave', keys);
-            costiCategorie = {};
-            showToast("Database Costi Svuotato");
-            await caricaConfig();
+        const container = document.getElementById('costiInputs'); if (!container) return;
+        const cats = [...new Set(currentData.map(a => a.categoria.toUpperCase()))].sort((a, b) => (customCatOrder[a] || 999) - (customCatOrder[b] || 999));
+        if (container.children.length > 0) {
+            cats.forEach(c => { const input = container.querySelector(`input[data-cat="${c}"]`); if (input && document.activeElement !== input) { input.value = costiCategorie[c] || 0; } });
+        } else {
+            cats.forEach(c => {
+                const val = costiCategorie[c] || 0;
+                container.innerHTML += `<div style="text-align:center;"><label style="font-size:10px; display:block; font-weight:bold;">${c}</label>
+                <input type="number" step="0.5" class="costo-in" data-cat="${c}" value="${val}" onfocus="isEditingCosti=true" onblur="isEditingCosti=false" style="width:60px; padding:8px; border-radius:8px; border:1px solid #ddd;"></div>`;
+            });
         }
     }
 
-    function toggleSort() {
-        sortBy = sortBy === 'nome' ? 'categoria' : 'nome';
-        document.getElementById('sortLabel').innerText = sortBy === 'nome' ? 'Nome' : 'Categoria';
-        renderData();
+    async function salvaCosti() {
+        const inputs = Array.from(document.querySelectorAll('.costo-in'));
+        const upserts = inputs.map(i => ({ chiave: `costo_${i.dataset.cat}`, valore: i.value }));
+        await _supabase.from(T_CONF).upsert(upserts, { onConflict: 'chiave' });
+        showToast("Quote salvate!"); isEditingCosti = false; await caricaConfig();
     }
+
+    async function azzeraTutteQuote() {
+        if(confirm("Vuoi davvero azzerare tutte le quote di categoria?")) {
+            const cats = [...new Set(currentData.map(a => a.categoria.toUpperCase()))];
+            const upserts = cats.map(c => ({ chiave: `costo_${c}`, valore: "0" }));
+            await _supabase.from(T_CONF).upsert(upserts, { onConflict: 'chiave' });
+            document.querySelectorAll('.costo-in').forEach(i => i.value = 0);
+            showToast("Quote azzerate!"); await caricaConfig();
+        }
+    }
+
+    function setSort(type) { sortBy = type; renderData(); }
 
     function renderData() {
         const tbody = document.getElementById('tabella-body');
         const listContent = document.getElementById('listContent');
-        if (!tbody) return;
-        tbody.innerHTML = ''; listContent.innerHTML = '';
+        if (!tbody) return; tbody.innerHTML = ''; listContent.innerHTML = '';
         let cSi = 0, cNo = 0, totaleEuro = 0, partPerCat = {};
-
         let sorted = [...currentData].sort((a,b) => {
             if (sortBy === 'categoria') {
                 const orderA = customCatOrder[a.categoria.toUpperCase()] || 999;
                 const orderB = customCatOrder[b.categoria.toUpperCase()] || 999;
                 if (orderA !== orderB) return orderA - orderB;
+                return a.nome.localeCompare(b.nome);
             }
             return a.nome.localeCompare(b.nome);
         });
-
         sorted.forEach(p => {
             if (p.bloccato && !isAdmin) return;
-            
-            let dataUf = p.note === 'B' ? labelB : (p.note === 'C' ? labelC : labelA);
+            let note = p.note || "";
+            let dataUf = note.includes('B') ? labelB : (note.includes('C') ? labelC : labelA);
+            const gender = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : '');
             if(p.stato === 'si') {
-                cSi++;
-                totaleEuro += (costiCategorie[p.categoria.toUpperCase()] || 0);
-                if(!partPerCat[p.categoria]) partPerCat[p.categoria] = [];
-                partPerCat[p.categoria].push({nome: p.nome, data: dataUf});
+                cSi++; totaleEuro += (costiCategorie[p.categoria.toUpperCase()] || 0);
+                if(!partPerCat[p.categoria]) partPerCat[p.categoria] = { M: [], F: [], U: [] };
+                const atletaObj = {nome: p.nome, data: dataUf, gender: gender};
+                if(gender === 'M') partPerCat[p.categoria].M.push(atletaObj); else if(gender === 'F') partPerCat[p.categoria].F.push(atletaObj); else partPerCat[p.categoria].U.push(atletaObj);
             }
             if(p.stato === 'no') cNo++;
-
-            const tr = document.createElement('tr');
+            const tr = document.createElement('tr'); tr.classList.add("tr-" + p.categoria.toLowerCase());
             const disabled = isExpired && !isAdmin ? 'disabled' : '';
             const displayAdmin = isAdmin ? 'table-cell' : 'none';
-            const labelHtml = dataUf ? `<span class="date-label">${dataUf}</span>` : "";
-
-            const lockIcon = p.bloccato ? 
-                `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>` : 
-                `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1.9c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>`;
-
-            const deleteIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`;
-
+            const labelHtml = dataUf ? `<span class="date-label" style="background:var(--orange); color:white; padding:2px 6px; border-radius:4px; font-size:0.7rem;">${dataUf}</span>` : "";
+            const genderHtml = gender ? `<span class="badge-gender bg-${gender.toLowerCase()}">${gender}</span>` : "";
+            const isChecked = selectedIds.has(p.id.toString()) ? 'checked' : '';
             tr.innerHTML = `
-                <td class="col-admin" style="display:${displayAdmin}"><input type="checkbox" class="bulk-cb" value="${p.id}"></td>
+                <td class="col-admin" style="display:${displayAdmin}"><input type="checkbox" class="bulk-cb" value="${p.id}" ${isChecked}></td>
                 <td class="nome-cell">
-                    ${p.nome}${p.bloccato ? ' 🔒' : ''}
-                    ${labelHtml}
-                    <div class="date-assign-btns col-admin" style="display:${displayAdmin}">
-                        <button class="btn-date-small ${p.note !== 'B' && p.note !== 'C' ? 'active' : ''}" onclick="assegnaData('${p.id}', 'A')">A</button>
-                        <button class="btn-date-small ${p.note === 'B' ? 'active' : ''}" onclick="assegnaData('${p.id}', 'B')">B</button>
-                        <button class="btn-date-small ${p.note === 'C' ? 'active' : ''}" onclick="assegnaData('${p.id}', 'C')">C</button>
+                    <div style="display:flex; flex-direction:column; gap:5px;">
+                        <div>${p.nome}${genderHtml}${p.bloccato ? ' 🔒' : ''}</div>
+                        ${labelHtml}
+                        <div class="col-admin" style="display:${displayAdmin}; gap:4px; margin-top:8px;">
+                            <div style="display:inline-flex; gap:3px; margin-right:12px;">
+                                <button class="btn-date-small ${!note || (!note.includes('B') && !note.includes('C')) ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'A')">A</button>
+                                <button class="btn-date-small ${note.includes('B') ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'B')">B</button>
+                                <button class="btn-date-small ${note.includes('C') ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'C')">C</button>
+                            </div>
+                            <div style="display:inline-flex; gap:3px;"><button class="btn-gender-small ${gender==='M'?'active-m':''}" onclick="assegnaDettaglio('${p.id}', 'gender', 'M')">M</button><button class="btn-gender-small ${gender==='F'?'active-f':''}" onclick="assegnaDettaglio('${p.id}', 'gender', 'F')">F</button></div>
+                        </div>
                     </div>
                 </td>
-                <td data-label="Categoria">${p.categoria}</td>
-                <td data-label="Partecipa">
-                    <label><input type="radio" name="r_${p.id}" value="si" ${p.stato==='si'?'checked':''} ${disabled} onclick="salva('${p.id}','si')"><span class="badge-btn badge-si">PARTECIPA</span></label>
-                </td>
-                <td data-label="Non Partecipa">
-                    <label><input type="radio" name="r_${p.id}" value="no" ${p.stato==='no'?'checked':''} ${disabled} onclick="salva('${p.id}','no')"><span class="badge-btn badge-no">NON PARTECIPA</span></label>
-                </td>
+                <td data-label="Categoria" style="font-weight:bold;">${p.categoria}</td>
+                <td data-label="Partecipa"><label><input type="radio" name="r_${p.id}" value="si" ${p.stato==='si'?'checked':''} ${disabled} onclick="salva('${p.id}','si')"><span class="badge-btn badge-si">PARTECIPA</span></label></td>
+                <td data-label="Non Partecipa"><label><input type="radio" name="r_${p.id}" value="no" ${p.stato==='no'?'checked':''} ${disabled} onclick="salva('${p.id}','no')"><span class="badge-btn badge-no">NON PARTECIPA</span></label></td>
                 <td data-label="Reset"><button class="btn-reset" onclick="salva('${p.id}','vuoto')" ${disabled}>Reset</button></td>
-                <td class="col-admin" style="display:${displayAdmin}">
-                    <button class="admin-action-btn btn-lock ${p.bloccato?'locked':''}" onclick="toggleLock('${p.id}', ${p.bloccato})">
-                        ${lockIcon}
-                    </button>
-                    <button class="admin-action-btn btn-delete" onclick="eliminaAtleta('${p.id}','${p.nome}')">
-                        ${deleteIcon}
-                    </button>
-                </td>
+                <td class="col-admin" style="display:${displayAdmin}"><button onclick="toggleLock('${p.id}', ${p.bloccato})" style="background:none; border:none; cursor:pointer;">🔒</button><button onclick="eliminaAtleta('${p.id}','${p.nome}')" style="background:none; border:none; cursor:pointer;">🗑️</button></td>
             `;
             tbody.appendChild(tr);
         });
-
         document.getElementById('totaleEuro').innerText = totaleEuro.toFixed(2) + " €";
-        document.getElementById('count-si').innerText = cSi;
-        document.getElementById('count-no').innerText = cNo;
-
+        document.getElementById('count-si').innerText = cSi; document.getElementById('count-no').innerText = cNo;
         Object.keys(partPerCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(cat => {
-            const div = document.createElement('div');
-            div.innerHTML = `<div class="cat-title">${cat}</div>`;
-            partPerCat[cat].forEach(obj => { 
-                const tagData = obj.data ? ` (${obj.data})` : "";
-                div.innerHTML += `<span class="atleta-tag">${obj.nome}${tagData}</span>`; 
-            });
-            listContent.appendChild(div);
+            const catDiv = document.createElement('div'); catDiv.style.marginBottom = "15px";
+            catDiv.innerHTML = `<div style="font-weight:bold; color:var(--primary); margin-top:10px; border-bottom:1px solid #eee; padding-bottom:5px; text-transform:uppercase;">${cat}</div>`;
+            const renderGroup = (label, list, colorClass, titleClass) => {
+                if(list.length === 0) return "";
+                list.sort((a,b) => a.nome.localeCompare(b.nome));
+                let html = `<div class="gender-section"><span class="gender-title ${titleClass}">${label} (${list.length}):</span>`;
+                list.forEach(obj => { const tagData = obj.data ? ` (${obj.data})` : ""; html += `<span style="display:inline-block; background:#f0f7ff; padding:5px 10px; border-radius:20px; font-size:0.75rem; margin:3px; border:1px solid #d0e3ff;">${obj.nome}${tagData}</span>`; });
+                html += `</div>`; return html;
+            };
+            catDiv.innerHTML += renderGroup("Maschi", partPerCat[cat].M, "bg-m", "title-m");
+            catDiv.innerHTML += renderGroup("Femmine", partPerCat[cat].F, "bg-f", "title-f");
+            catDiv.innerHTML += renderGroup("Non specificati", partPerCat[cat].U, "", "");
+            listContent.appendChild(catDiv);
         });
         document.getElementById('confirmedList').style.display = cSi > 0 ? 'block' : 'none';
         filterTable(); 
@@ -414,11 +466,20 @@
 
     async function salva(id, val) { 
         const atleta = currentData.find(a => a.id == id);
-        if (!isAdmin && !confirm(`Confermi la scelta per ${atleta.nome}?`)) { renderData(); return; }
+        if (!isAdmin && !confirm(`Sei veramente tu ${atleta.nome}?`)) { renderData(); return; }
+        
+        // MOSTRA POPUP SE SI ISCRIVE (PARTECIPA)
+        if (val === 'si' && !isAdmin) {
+            const popup = document.getElementById('confettiPopup');
+            popup.style.display = 'flex';
+            setTimeout(() => { popup.style.display = 'none'; }, 2000);
+        }
+
         await _supabase.from(T_DATA).update({ stato: val }).eq('id', id);
-        showToast("Salvato");
+        showToast("Scelta salvata");
         if (val !== 'vuoto') {
-            let d = atleta.note === 'B' ? labelB : (atleta.note === 'C' ? labelC : labelA);
+            let note = atleta.note || "";
+            let d = note.includes('B') ? labelB : (note.includes('C') ? labelC : labelA);
             inviaTelegram(atleta.nome, val, document.getElementById('mainTitle').innerText, d);
         }
         caricaTabella(); 
@@ -436,15 +497,20 @@
         let pCat = {};
         currentData.forEach(p => { 
             if(p.stato === 'si') { 
-                if(!pCat[p.categoria]) pCat[p.categoria] = []; 
-                let d = p.note === 'B' ? labelB : (p.note === 'C' ? labelC : labelA);
-                pCat[p.categoria].push(`${p.nome}${d ? ' ('+d+')' : ''}`); 
+                if(!pCat[p.categoria]) pCat[p.categoria] = { M: [], F: [], U: [] }; 
+                let note = p.note || "";
+                let d = note.includes('B') ? labelB : (note.includes('C') ? labelC : labelA);
+                let g = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : '');
+                let info = `${p.nome}${d ? ' ['+d+']' : ''}`;
+                if(g === 'M') pCat[p.categoria].M.push(info); else if(g === 'F') pCat[p.categoria].F.push(info); else pCat[p.categoria].U.push(info);
             } 
         });
         let msg = `📝 *RIEPILOGO ISCRIZIONI*\n🏆 *Evento:* ${gara}\n\n`;
         Object.keys(pCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(c => {
-            msg += `*${c.toUpperCase()}:*\n`;
-            pCat[c].sort().forEach(n => { msg += `• ${n} (partecipa)\n`; });
+            msg += `*${c.toUpperCase()}*\n`;
+            if(pCat[c].M.length > 0) { pCat[c].M.sort(); msg += `♂️ Maschi: ${pCat[c].M.join(', ')}\n`; }
+            if(pCat[c].F.length > 0) { pCat[c].F.sort(); msg += `♀️ Femmine: ${pCat[c].F.join(', ')}\n`; }
+            if(pCat[c].U.length > 0) { pCat[c].U.sort(); msg += `? Altri: ${pCat[c].U.join(', ')}\n`; }
             msg += `\n`;
         });
         fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' }) });
@@ -452,38 +518,25 @@
     }
 
     async function exportToExcel() {
-        let grandTotal = 0;
-        const dataExp = currentData.map(p => {
-            let d = p.note === 'B' ? labelB : (p.note === 'C' ? labelC : labelA);
-            let quota = p.stato === 'si' ? (costiCategorie[p.categoria.toUpperCase()] || 0) : 0;
-            grandTotal += quota;
-            return { 
-                Atleta: p.nome, 
-                Categoria: p.categoria, 
-                Data: d, 
-                Scelta: p.stato === 'si' ? 'partecipa' : (p.stato === 'no' ? 'non partecipa' : 'da definire'),
-                "Quota (€)": quota.toFixed(2)
-            };
-        });
-        dataExp.push({ Atleta: "TOTALE GENERALE", Categoria: "", Data: "", Scelta: "", "Quota (€)": grandTotal.toFixed(2) });
+        const dataExp = currentData.map(p => ({ Atleta: p.nome, Categoria: p.categoria, Sesso: p.note?.includes('F')?'F':'M', Scelta: p.stato === 'si' ? 'partecipa' : (p.stato === 'no' ? 'non partecipa' : 'da definire') }));
         const ws = XLSX.utils.json_to_sheet(dataExp);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Contabilità");
-        XLSX.writeFile(wb, `Report_Juvenilia_Gara2.xlsx`);
+        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Iscrizioni"); XLSX.writeFile(wb, `Report_Juvenilia.xlsx`);
     }
 
     function toggleAdmin() {
-        if (prompt("Password:") === ADMIN_PASS) {
+        const pass = prompt("Password:"); if (!pass) return;
+        if (btoa(pass) === O_P) {
             isAdmin = true;
             document.getElementById('adminIcon').style.display = 'none';
             document.getElementById('logoutBtn').style.display = 'block';
             document.getElementById('addAtletaBox').style.display = 'flex';
             document.getElementById('costiBox').style.display = 'flex';
+            document.getElementById('docsBox').style.display = 'flex';
             document.getElementById('adminTotalBox').style.display = 'block';
             document.getElementById('adminButtons').style.display = 'grid';
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
-            renderCostiInputs(); renderData(); showToast("Admin Attivo");
-        }
+            caricaConfig(); renderData(); showToast("Admin Attivo");
+        } else { alert("Password Errata"); }
     }
 
     function startCountdown(endTime) {
@@ -496,64 +549,34 @@
         }, 1000);
     }
 
-    function mostraTimerChiuso() {
-        const d = document.getElementById('timerDisplay'); d.innerText = "ISCRIZIONI CHIUSE"; d.style.color = "var(--danger)";
-    }
-
-    async function salvaTitolo() { const t = document.getElementById('editTitleInput').value; await _supabase.from(T_CONF).upsert({ chiave: 'titolo_gara', valore: t }, { onConflict: 'chiave' }); showToast("Titolo Aggiornato"); caricaConfig(); }
+    function mostraTimerChiuso() { const d = document.getElementById('timerDisplay'); d.innerText = "ISCRIZIONI CHIUSE"; d.style.color = "var(--danger)"; }
+    async function salvaTitolo() { const t = document.getElementById('editTitleInput').value; await _supabase.from(T_CONF).upsert({ chiave: 'titolo_gara', valore: t }, { onConflict: 'chiave' }); showToast("Titolo Salvato"); isEditingOther = false; caricaConfig(); }
     async function confermaScadenzaDB() { const v = document.getElementById('deadlineInput').value; if(v) await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: v }, { onConflict: 'chiave' }); caricaConfig(); }
     async function resetScadenzaDB() { await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: "" }, { onConflict: 'chiave' }); caricaConfig(); }
-    
     async function aggiungiAtleta() { 
-        const n = document.getElementById('newNome').value.trim(); 
-        const c = document.getElementById('newCat').value.trim(); 
-        if(n && c) { 
-            const { error } = await _supabase.from(T_DATA).insert([
-                { nome: n, categoria: c.toUpperCase(), stato: 'vuoto', note: 'A', bloccato: false }
-            ]);
-            
-            if(error) {
-                console.error("Errore:", error.message);
-                alert("Errore RLS: Crea la Policy INSERT su Supabase!");
-            } else {
-                document.getElementById('newNome').value = ""; 
-                document.getElementById('newCat').value = "";
-                showToast("Atleta aggiunto!");
-                await caricaTabella(); 
-            }
-        } else {
-            alert("Inserisci sia il nome che la categoria.");
-        }
+        const n = document.getElementById('newNome').value.trim(); const c = document.getElementById('newCat').value; const g = document.getElementById('newGender').value;
+        if(n && c && g) { await _supabase.from(T_DATA).insert([{ nome: n.toUpperCase(), categoria: c, stato: 'vuoto', note: g, bloccato: false }]); document.getElementById('newNome').value = ""; await caricaTabella(); }
+        else { alert("Inserisci Nome, Categoria e Genere"); }
     }
-    
     async function salvaEtichetteDate() { 
-        const a = document.getElementById('dateA_Label').value, b = document.getElementById('dateB_Label').value, c = document.getElementById('dateC_Label').value; 
-        await _supabase.from(T_CONF).upsert([{ chiave: 'data_label_a', valore: a }, { chiave: 'data_label_b', valore: b }, { chiave: 'data_label_c', valore: c }], { onConflict: 'chiave' }); 
-        showToast("Etichette salvate!"); caricaConfig(); 
+        const a = document.getElementById('dateA_Label').value, b = document.getElementById('dateB_Label').value, c = document.getElementById('dateC_Label').value;
+        await _supabase.from(T_CONF).upsert([{ chiave: 'data_label_a', valore: a }, { chiave: 'data_label_b', valore: b }, { chiave: 'data_label_c', valore: c }], { onConflict: 'chiave' });
+        showToast("Etichette Salvate"); isEditingOther = false; caricaConfig(); 
     }
-
-    async function azzeraEtichetteDate() {
-        if(confirm("Vuoi cancellare tutte le etichette delle date?")) {
-            await _supabase.from(T_CONF).upsert([
-                { chiave: 'data_label_a', valore: "" }, 
-                { chiave: 'data_label_b', valore: "" }, 
-                { chiave: 'data_label_c', valore: "" }
-            ], { onConflict: 'chiave' });
-            showToast("Etichette azzerate!"); caricaConfig();
-        }
+    async function assegnaDettaglio(id, tipo, valore) { 
+        const atleta = currentData.find(a => a.id == id); let note = atleta.note || ""; let g = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : ''); let d = note.includes('B') ? 'B' : (note.includes('C') ? 'C' : '');
+        if(tipo === 'gender') g = valore; if(tipo === 'data') d = (valore === 'A' ? '' : valore);
+        await _supabase.from(T_DATA).update({ note: g + d }).eq('id', id); caricaTabella(); 
     }
-
-    async function assegnaData(id, tipo) { await _supabase.from(T_DATA).update({ note: tipo }).eq('id', id); caricaTabella(); }
-    function selectAll(s) { document.querySelectorAll('.bulk-cb').forEach(cb => cb.checked = s.checked); }
-    async function bulkAction(l) { const ids = Array.from(document.querySelectorAll('.bulk-cb:checked')).map(cb => cb.value); if (ids.length) { await _supabase.from(T_DATA).update({ bloccato: l }).in('id', ids); caricaTabella(); } }
+    function selectAll(s) { document.querySelectorAll('.bulk-cb').forEach(cb => { cb.checked = s.checked; if(s.checked) selectedIds.add(cb.value); else selectedIds.delete(cb.value); }); }
+    async function bulkAction(l) { const ids = Array.from(document.querySelectorAll('.bulk-cb:checked')).map(cb => cb.value); if (ids.length) { await _supabase.from(T_DATA).update({ bloccato: l }).in('id', ids); selectedIds.clear(); caricaTabella(); } }
     async function toggleLock(id, cur) { await _supabase.from(T_DATA).update({ bloccato: !cur }).eq('id', id); caricaTabella(); }
     async function unlockEverything() { await _supabase.from(T_DATA).update({ bloccato: false }).neq('id', 0); caricaTabella(); }
-    async function resetTutti() { if(confirm("Resettare tutte le scelte?")) { await _supabase.from(T_DATA).update({ stato: 'vuoto' }).neq('id', 0); caricaTabella(); } }
+    async function resetTutti() { if(confirm("Resettare tutto?")) { await _supabase.from(T_DATA).update({ stato: 'vuoto' }).neq('id', 0); caricaTabella(); } }
     async function eliminaAtleta(id, n) { if(confirm(`Eliminare ${n}?`)) { await _supabase.from(T_DATA).delete().eq('id', id); caricaTabella(); } }
     function filterTable() { const s = document.getElementById("searchInput").value.toUpperCase(); document.querySelectorAll("#tabella-body tr").forEach(tr => { tr.style.display = tr.innerText.toUpperCase().includes(s) ? "" : "none"; }); }
     function showToast(m) { const t = document.getElementById("toast"); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 3000); }
     function logoutAdmin() { location.reload(); }
-    function toggleDarkMode() { const t = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.body.setAttribute('data-theme', t); localStorage.setItem('theme', t); }
 
     init();
 </script>
