@@ -37,8 +37,26 @@
         .countdown-container { text-align: center; margin: 15px 0; padding: 15px; border-radius: 15px; background: var(--timer-bg); border: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15); transition: 0.5s; min-height: 50px; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
         .timer { font-family: 'Monaco', 'Consolas', monospace; font-size: 1.2rem; font-weight: bold; color: var(--primary); }
 
-        .search-container { position: relative; margin: 20px 0; width: 100%; }
-        .search-box { width: 100%; padding: 15px 15px 15px 45px; border-radius: 12px; border: 2px solid #ddd; background-color: var(--search-bg); color: var(--text-main); font-size: 1rem; box-sizing: border-box; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .search-container { 
+            position: relative; 
+            margin: 20px 0; 
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .search-box { 
+            flex: 1;
+            padding: 15px 15px 15px 45px; 
+            border-radius: 12px; 
+            border: 2px solid #ddd; 
+            background-color: var(--search-bg); 
+            color: var(--text-main); 
+            font-size: 1rem; 
+            box-sizing: border-box; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+        }
         .search-box:focus { outline: none; border-color: var(--primary); box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2); }
         .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; font-size: 1.2rem; pointer-events: none; }
 
@@ -112,6 +130,156 @@
         .pop-animation { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popIn { 0% { transform: scale(0.3); opacity: 0; } 70% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
 
+        /* NUOVI STILI PER ACCOMPAGNATORI - COMPATTI */
+        .accompagnatore-box {
+            margin-top: 3px;
+            display: none;
+            width: 100%;
+            max-width: 200px;
+        }
+        
+        .accompagnatore-box.show {
+            display: block;
+        }
+        
+        .accompagnatore-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+        }
+        
+        .accompagnatore-input {
+            width: 100%;
+            padding: 4px 6px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            box-sizing: border-box;
+            max-width: 180px;
+            text-transform: uppercase;
+        }
+        
+        .accompagnatore-input:focus {
+            outline: none;
+            border-color: #17a2b8;
+        }
+        
+        .btn-accompagnatore {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 4px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            font-weight: bold;
+            transition: 0.2s;
+            width: 100%;
+            max-width: 180px;
+        }
+        
+        .btn-accompagnatore:hover {
+            background: #138496;
+        }
+        
+        .btn-accompagnatore:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .accompagnatore-confirmed {
+            background: #e8f5e9 !important;
+            border: 1px dashed #28a745 !important;
+            color: #155724 !important;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 3px;
+        }
+        
+        .accompagnatore-actions {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+            max-width: 180px;
+        }
+        
+        .btn-modify {
+            background: #ffc107;
+            color: black;
+            border: none;
+            padding: 3px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.6rem;
+            flex: 1;
+        }
+        
+        .btn-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 3px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.6rem;
+            flex: 1;
+        }
+        
+        #riepilogoAccompagnatori {
+            display: none;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 12px;
+            margin: 15px 0;
+            border: 2px solid #17a2b8;
+            box-shadow: 0 4px 10px rgba(23, 162, 184, 0.1);
+        }
+        
+        .riepilogo-header {
+            font-weight: 800;
+            font-size: 0.75rem;
+            color: #17a2b8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .riepilogo-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.7rem;
+        }
+        
+        .riepilogo-row:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        /* Pulsante toggle accompagnatori */
+        #toggleAccompagnatoriBtn {
+            display: none;
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+        
+        #toggleAccompagnatoriBtn:hover {
+            background: #138496;
+        }
+
         @media screen and (max-width: 600px) {
             .table-wrapper { background: transparent; border: none; max-height: none; overflow: visible; }
             table { border-spacing: 0 12px; }
@@ -124,11 +292,151 @@
             .tr-r12 { border-top: 8px solid var(--cat-r12); }
             .tr-esordienti { border-top: 8px solid var(--cat-esordienti); }
             .tr-giovanissimi { border-top: 8px solid var(--cat-giovanissimi); }
-            td { display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #f0f0f0; padding: 10px 15px; }
-            .nome-cell { background: rgba(0,0,0,0.02); justify-content: center; padding: 18px !important; border-radius: 0; font-size: 1.1rem; }
-            .badge-btn, .btn-reset { width: auto; min-width: 160px; padding: 18px 20px; font-size: 0.95rem; border-radius: 14px; white-space: nowrap; }
+            
+            /* CORREZIONE MODIFICATA: Centra tutte le celle nella versione mobile */
+            td { 
+                display: flex; 
+                justify-content: center; 
+                align-items: center; 
+                border-bottom: 1px solid #f0f0f0; 
+                padding: 10px 15px; 
+                text-align: center !important; 
+            }
+            
+            /* CORREZIONE MODIFICATA: Nome centrato con contenuti interni allineati al centro */
+            .nome-cell { 
+                background: rgba(0,0,0,0.02); 
+                justify-content: center !important; 
+                align-items: center !important;
+                padding: 15px !important; 
+                border-radius: 0; 
+                font-size: 1rem; 
+                flex-direction: column;
+                text-align: center !important;
+            }
+            
+            /* CORREZIONE MODIFICATA: Per i contenuti dentro nome-cell, allinea al centro */
+            .nome-cell > div {
+                width: 100%;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            /* CORREZIONE MODIFICATA: Allinea al centro il testo del nome e del badge */
+            .nome-cell > div > div:first-child {
+                text-align: center;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            
+            .badge-btn, .btn-reset { 
+                width: auto; 
+                min-width: 160px; 
+                padding: 18px 20px; 
+                font-size: 0.95rem; 
+                border-radius: 14px; 
+                white-space: nowrap; 
+                justify-content: center !important;
+            }
+            
             /* Forza testo NON PARTECIPA su una riga sola */
             .badge-no { white-space: nowrap !important; }
+            
+            /* Responsive per accompagnatori */
+            .accompagnatore-box {
+                max-width: 100%;
+                width: 100%;
+                margin-top: 8px;
+                text-align: center !important;
+            }
+            
+            .accompagnatore-input, .btn-accompagnatore {
+                max-width: 100%;
+                width: 100%;
+                text-align: center !important;
+            }
+            
+            .accompagnatore-actions {
+                max-width: 100%;
+                width: 100%;
+                text-align: center !important;
+                justify-content: center;
+            }
+            
+            /* CORREZIONE MODIFICATA: Allinea al centro il contenuto degli accompagnatori */
+            .accompagnatore-content {
+                text-align: center !important;
+                align-items: center !important;
+            }
+            
+            /* Responsive per riepilogo accompagnatori */
+            .riepilogo-row {
+                flex-direction: column;
+                gap: 3px;
+                padding: 8px 10px;
+            }
+            
+            #riepilogoAccompagnatori {
+                padding: 10px;
+                margin: 10px 0;
+            }
+            
+            /* Responsive per search container */
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            #toggleAccompagnatoriBtn {
+                width: 100%;
+            }
+            
+            /* CORREZIONE MODIFICATA: Allinea al centro i bottoni radio e badge */
+            td[data-label="Partecipa"],
+            td[data-label="Non Partecipa"],
+            td[data-label="Reset"] {
+                justify-content: center !important;
+            }
+            
+            /* CORREZIONE MODIFICATA: Assicura che i label siano centrati */
+            td[data-label="Partecipa"] label,
+            td[data-label="Non Partecipa"] label {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+            }
+            
+            /* CORREZIONE MODIFICATA: Allinea al centro i bottoni data e gender in modalità admin */
+            .col-admin[style*="display:table-cell"] {
+                justify-content: center !important;
+                text-align: center !important;
+            }
+            
+            .col-admin[style*="display:table-cell"] > div {
+                justify-content: center !important;
+                text-align: center !important;
+                width: 100%;
+            }
+            
+            /* CORREZIONE MODIFICATA: Allinea al centro il contenuto dei bottoni data e gender */
+            .col-admin[style*="display:table-cell"] .btn-date-small,
+            .col-admin[style*="display:table-cell"] .btn-gender-small {
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            /* CORREZIONE MODIFICATA: Allinea al centro il label della data */
+            .date-label {
+                display: inline-block;
+                text-align: center;
+                margin: 5px auto;
+            }
         }
     </style>
 </head>
@@ -163,14 +471,14 @@
     <div id="docsBox">
         <div style="font-size: 12px; font-weight: bold; color: var(--orange); margin-left: 5px;">📄 DOCUMENTI E LINK ESTERNI:</div>
         <div class="admin-row">
-            <input type="text" id="docLink1_URL" placeholder="Link Documento 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false">
-            <input type="text" id="docLink1_Text" placeholder="Testo Pulsante 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false">
+            <input type="text" id="docLink1_URL" placeholder="Link Documento 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
+            <input type="text" id="docLink1_Text" placeholder="Testo Pulsante 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
             <button onclick="salvaDoc(1)" style="background:var(--success);">Salva 1</button>
             <button onclick="azzeraDoc(1)" style="background:var(--danger);">Azzera 1</button>
         </div>
         <div class="admin-row">
-            <input type="text" id="docLink2_URL" placeholder="Link Documento 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false">
-            <input type="text" id="docLink2_Text" placeholder="Testo Pulsante 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false">
+            <input type="text" id="docLink2_URL" placeholder="Link Documento 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
+            <input type="text" id="docLink2_Text" placeholder="Testo Pulsante 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
             <button onclick="salvaDoc(2)" style="background:var(--success);">Salva 2</button>
             <button onclick="azzeraDoc(2)" style="background:var(--danger);">Azzera 2</button>
         </div>
@@ -178,19 +486,21 @@
 
     <div id="addAtletaBox">
         <div class="admin-row">
-            <input type="text" id="editTitleInput" placeholder="Titolo della gara..." onfocus="isEditingOther=true" onblur="isEditingOther=false">
-            <button onclick="document.getElementById('editTitleInput').value=''" class="btn-clear-input">reset</button>
+            <input type="text" id="editTitleInput" placeholder="Titolo della gara..." onfocus="isEditingOther=true" onblur="isEditingOther=false" style="text-transform: uppercase;">
+            <!-- MODIFICA: Il tasto reset ora chiama una funzione per salvare -->
+            <button onclick="resetTitolo()" class="btn-clear-input">reset</button>
             <button onclick="salvaTitolo()" style="background:var(--purple);">Aggiorna Titolo</button>
         </div>
         <div class="admin-row">
-            <input type="text" id="dateA_Label" placeholder="Data A" onfocus="isEditingOther=true" onblur="isEditingOther=false">
-            <input type="text" id="dateB_Label" placeholder="Data B" onfocus="isEditingOther=true" onblur="isEditingOther=false">
-            <input type="text" id="dateC_Label" placeholder="Data C" onfocus="isEditingOther=true" onblur="isEditingOther=false">
-            <button onclick="document.getElementById('dateA_Label').value=''; document.getElementById('dateB_Label').value=''; document.getElementById('dateC_Label').value='';" class="btn-clear-input">reset</button>
+            <input type="text" id="dateA_Label" placeholder="Data A" onfocus="isEditingOther=true" onblur="isEditingOther=false" style="text-transform: uppercase;">
+            <input type="text" id="dateB_Label" placeholder="Data B" onfocus="isEditingOther=true" onblur="isEditingOther=false" style="text-transform: uppercase;">
+            <input type="text" id="dateC_Label" placeholder="Data C" onfocus="isEditingOther=true" onblur="isEditingOther=false" style="text-transform: uppercase;">
+            <!-- MODIFICA: Il tasto reset ora chiama una funzione per salvare -->
+            <button onclick="resetDateLabels()" class="btn-clear-input">reset</button>
             <button onclick="salvaEtichetteDate()" style="background:var(--orange);">Salva</button>
         </div>
         <div class="admin-row">
-            <input type="text" id="newNome" placeholder="Cognome e Nome">
+            <input type="text" id="newNome" placeholder="Cognome e Nome" oninput="this.value = this.value.toUpperCase()" style="text-transform: uppercase;">
             <button onclick="document.getElementById('newNome').value=''" class="btn-clear-input">reset</button>
             <select id="newCat">
                 <option value="">Categoria</option>
@@ -239,9 +549,20 @@
         <div id="listContent"></div>
     </div>
     
+    <!-- NUOVA SEZIONE RIEPILOGO ACCOMPAGNATORI - SEMPLIFICATA -->
+    <div id="riepilogoAccompagnatori">
+        <div class="riepilogo-header">
+            <span>👥 ACCOMPAGNATORI (ADMIN)</span>
+        </div>
+        <div id="riepilogoContent"></div>
+    </div>
+    
     <div class="search-container">
         <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="Cerca il tuo nome o la tua categoria...">
+        <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="Cerca il tuo nome o la tua categoria..." style="text-transform: uppercase;">
+        <button id="toggleAccompagnatoriBtn" onclick="toggleVisibilitaAccompagnatori()">
+            👁️ Nascondi Box
+        </button>
     </div>
 
     <div class="table-wrapper">
@@ -266,6 +587,7 @@
         <button onclick="exportToExcel()" style="background:var(--success)">📊 Esporta Excel</button>
         <button onclick="resetTutti()" style="background:var(--danger)">🔄 Reset Scelte</button>
         <button onclick="unlockEverything()" style="background:var(--orange)">🔓 Mostra Tutti</button>
+        <button onclick="exportAccompagnatoriExcel()" style="background:#17a2b8">📋 Export Accompagnatori</button>
         <button onclick="inviaRiepilogoTelegram()" style="background:var(--primary); grid-column: span 2;">📢 Invia Riepilogo Telegram</button>
     </div>
 </div>
@@ -279,7 +601,6 @@
     const O_P = "anV2ZW5pbGlhMTE3OQ==";
     
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    // PUNTA ALLE NUOVE TABELLE PER GARA 3
     const T_DATA = 'presenze_gara3'; 
     const T_CONF = 'configurazione_gara3';
 
@@ -288,16 +609,104 @@
     let costiCategorie = {};
     let isEditingCosti = false, isEditingDocs = false, isEditingOther = false;
     let selectedIds = new Set();
+    let mostraAccompagnatori = true; // Impostazione di default
+    let tempAccompagnatoriValues = {};
+    let isTypingInAccompagnatore = false;
+    let refreshInterval = null;
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
-    async function init() { await fullLoad(); setInterval(fullLoad, 5000); }
+    async function init() { 
+        await fullLoad(); 
+        refreshInterval = setInterval(checkAndRefresh, 15000);
+    }
+
+    async function checkAndRefresh() {
+        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingOther) {
+            await fullLoad();
+        }
+    }
 
     async function fullLoad() {
+        saveTempAccompagnatoriValues();
+        
         document.querySelectorAll('.bulk-cb:checked').forEach(cb => selectedIds.add(cb.value));
         document.querySelectorAll('.bulk-cb:not(:checked)').forEach(cb => selectedIds.delete(cb.value));
-        await caricaConfig(); await caricaTabella();
+        
+        if (isTypingInAccompagnatore) {
+            return;
+        }
+        
+        await caricaConfig(); 
+        await caricaTabella();
+        
+        restoreTempAccompagnatoriValues();
     }
+
+    function saveTempAccompagnatoriValues() {
+        tempAccompagnatoriValues = {};
+        document.querySelectorAll('.accompagnatore-input').forEach(input => {
+            const id = input.id.replace('acc_input_', '');
+            tempAccompagnatoriValues[id] = input.value;
+        });
+    }
+
+    function restoreTempAccompagnatoriValues() {
+        Object.keys(tempAccompagnatoriValues).forEach(id => {
+            const input = document.getElementById(`acc_input_${id}`);
+            if (input && !input.disabled) {
+                input.value = tempAccompagnatoriValues[id];
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Event listener per input maiuscolo
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('accompagnatore-input') || 
+                e.target.classList.contains('search-box') ||
+                e.target.id === 'newNome' ||
+                e.target.id === 'editTitleInput' ||
+                e.target.id === 'dateA_Label' ||
+                e.target.id === 'dateB_Label' ||
+                e.target.id === 'dateC_Label' ||
+                e.target.id === 'docLink1_URL' ||
+                e.target.id === 'docLink1_Text' ||
+                e.target.id === 'docLink2_URL' ||
+                e.target.id === 'docLink2_Text') {
+                e.target.value = e.target.value.toUpperCase();
+            }
+        });
+        
+        // Event listener per rilevare quando si sta scrivendo
+        document.addEventListener('focusin', function(e) {
+            if (e.target.classList.contains('accompagnatore-input')) {
+                isTypingInAccompagnatore = true;
+            }
+        });
+        
+        document.addEventListener('focusout', function(e) {
+            if (e.target.classList.contains('accompagnatore-input')) {
+                setTimeout(() => {
+                    isTypingInAccompagnatore = false;
+                }, 1000);
+            }
+        });
+        
+        document.addEventListener('focusin', function(e) {
+            if (e.target.classList.contains('costo-in')) {
+                isEditingCosti = true;
+            }
+        });
+        
+        document.addEventListener('focusout', function(e) {
+            if (e.target.classList.contains('costo-in')) {
+                setTimeout(() => {
+                    isEditingCosti = false;
+                }, 500);
+            }
+        });
+    });
 
     async function caricaConfig() {
         const { data } = await _supabase.from(T_CONF).select('*');
@@ -311,6 +720,13 @@
         const txt1 = data.find(c => c.chiave === 'doc_txt_1')?.valore || "";
         const url2 = data.find(c => c.chiave === 'doc_url_2')?.valore || "";
         const txt2 = data.find(c => c.chiave === 'doc_txt_2')?.valore || "";
+        
+        // Carica impostazione visibilità box accompagnatori
+        const visibilitaAccompagnatori = data.find(c => c.chiave === 'mostra_accompagnatori');
+        if (visibilitaAccompagnatori) {
+            mostraAccompagnatori = visibilitaAccompagnatori.valore === 'true';
+        }
+        
         if(isAdmin) {
             if(!isEditingOther) {
                 document.getElementById('dateA_Label').value = labelA;
@@ -342,6 +758,13 @@
         if(isAdmin && !isEditingCosti) renderCostiInputs();
     }
 
+    async function salvaVisibilitaAccompagnatori() {
+        await _supabase.from(T_CONF).upsert({ 
+            chiave: 'mostra_accompagnatori', 
+            valore: mostraAccompagnatori.toString() 
+        }, { onConflict: 'chiave' });
+    }
+
     async function salvaDoc(num) {
         const url = document.getElementById(`docLink${num}_URL`).value;
         const txt = document.getElementById(`docLink${num}_Text`).value;
@@ -350,7 +773,40 @@
     }
 
     async function azzeraDoc(num) { if(confirm(`Cancellare?`)) { await _supabase.from(T_CONF).upsert([{ chiave: `doc_url_${num}`, valore: "" }, { chiave: `doc_txt_${num}`, valore: "" }], { onConflict: 'chiave' }); showToast(`Azzerato!`); caricaConfig(); } }
-    async function caricaTabella() { const { data } = await _supabase.from(T_DATA).select('*'); if(data) { currentData = data; renderData(); } }
+    
+    // MODIFICA: Funzione per resettare il titolo salvando nel database
+    async function resetTitolo() {
+        if (confirm("Resettare il titolo della gara?")) {
+            await _supabase.from(T_CONF).upsert({ chiave: 'titolo_gara', valore: "" }, { onConflict: 'chiave' });
+            document.getElementById('editTitleInput').value = "";
+            showToast("Titolo resettato!");
+            caricaConfig();
+        }
+    }
+    
+    // MODIFICA: Funzione per resettare le etichette date salvando nel database
+    async function resetDateLabels() {
+        if (confirm("Resettare tutte le etichette date?")) {
+            await _supabase.from(T_CONF).upsert([
+                { chiave: 'data_label_a', valore: "" },
+                { chiave: 'data_label_b', valore: "" },
+                { chiave: 'data_label_c', valore: "" }
+            ], { onConflict: 'chiave' });
+            document.getElementById('dateA_Label').value = "";
+            document.getElementById('dateB_Label').value = "";
+            document.getElementById('dateC_Label').value = "";
+            showToast("Etichette date resettate!");
+            caricaConfig();
+        }
+    }
+    
+    async function caricaTabella() { 
+        const { data } = await _supabase.from(T_DATA).select('*'); 
+        if(data) { 
+            currentData = data; 
+            renderData(); 
+        } 
+    }
 
     function renderCostiInputs() {
         const container = document.getElementById('costiInputs');
@@ -389,8 +845,17 @@
     function renderData() {
         const tbody = document.getElementById('tabella-body');
         const listContent = document.getElementById('listContent');
-        if (!tbody) return; tbody.innerHTML = ''; listContent.innerHTML = '';
+        const riepilogoContent = document.getElementById('riepilogoContent');
+        
+        if (!tbody) return; 
+        
+        tbody.innerHTML = ''; 
+        listContent.innerHTML = '';
+        riepilogoContent.innerHTML = '';
+        
         let cSi = 0, cNo = 0, totaleEuro = 0, partPerCat = {};
+        let riepilogoArray = [];
+        
         let sorted = [...currentData].sort((a,b) => {
             if (sortBy === 'categoria') {
                 const orderA = customCatOrder[a.categoria.toUpperCase()] || 999;
@@ -400,37 +865,101 @@
             }
             return a.nome.localeCompare(b.nome);
         });
+        
         sorted.forEach(p => {
             if (p.bloccato && !isAdmin) return;
+            
             let note = p.note || "";
             let dataUf = note.includes('B') ? labelB : (note.includes('C') ? labelC : labelA);
             const gender = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : '');
-            if(p.stato === 'si') {
-                cSi++; totaleEuro += (costiCategorie[p.categoria.toUpperCase()] || 0);
-                if(!partPerCat[p.categoria]) partPerCat[p.categoria] = { M: [], F: [], U: [] };
-                const atletaObj = {nome: p.nome, data: dataUf, gender: gender};
-                if(gender === 'M') partPerCat[p.categoria].M.push(atletaObj); else if(gender === 'F') partPerCat[p.categoria].F.push(atletaObj); else partPerCat[p.categoria].U.push(atletaObj);
+            
+            // Aggiungi al riepilogo admin solo se ha un accompagnatore
+            if (isAdmin && p.accompagnatore && p.accompagnatore.trim() !== "") {
+                riepilogoArray.push({
+                    nome: p.nome,
+                    accompagnatore: p.accompagnatore,
+                    stato: p.stato
+                });
             }
+            
+            if(p.stato === 'si') {
+                cSi++; 
+                totaleEuro += (costiCategorie[p.categoria.toUpperCase()] || 0);
+                
+                if(!partPerCat[p.categoria]) partPerCat[p.categoria] = { M: [], F: [], U: [] };
+                const atletaObj = {
+                    nome: p.nome, 
+                    data: dataUf, 
+                    gender: gender,
+                    accompagnatore: p.accompagnatore || ""
+                };
+                
+                if(gender === 'M') partPerCat[p.categoria].M.push(atletaObj); 
+                else if(gender === 'F') partPerCat[p.categoria].F.push(atletaObj); 
+                else partPerCat[p.categoria].U.push(atletaObj);
+            }
+            
             if(p.stato === 'no') cNo++;
-            const tr = document.createElement('tr'); tr.classList.add("tr-" + p.categoria.toLowerCase());
+            
+            const tr = document.createElement('tr'); 
+            tr.classList.add("tr-" + p.categoria.toLowerCase());
+            
             const disabled = isExpired && !isAdmin ? 'disabled' : '';
             const displayAdmin = isAdmin ? 'table-cell' : 'none';
             const labelHtml = dataUf ? `<span class="date-label" style="background:var(--orange); color:white; padding:2px 6px; border-radius:4px; font-size:0.7rem;">${dataUf}</span>` : "";
             const genderHtml = gender ? `<span class="badge-gender bg-${gender.toLowerCase()}">${gender}</span>` : "";
             const isChecked = selectedIds.has(p.id.toString()) ? 'checked' : '';
+            
+            const hasAccompagnatore = p.accompagnatore && p.accompagnatore.trim() !== "";
+            const showInput = !hasAccompagnatore || isAdmin;
+            
+            // Box accompagnatore - compatto
+            const accompagnatoreBox = `
+                <div class="accompagnatore-box ${mostraAccompagnatori ? 'show' : ''}">
+                    ${showInput ? 
+                        `<div class="accompagnatore-content">
+                            <input type="text" class="accompagnatore-input" id="acc_input_${p.id}" 
+                                   placeholder="${hasAccompagnatore ? 'Modifica accompagnatore...' : 'Nome accompagnatore...'}" 
+                                   ${disabled ? 'disabled' : ''}
+                                   value="${hasAccompagnatore ? p.accompagnatore : ''}"
+                                   style="text-transform: uppercase;">
+                            <button class="btn-accompagnatore" id="acc_btn_${p.id}" 
+                                    onclick="salvaAccompagnatore('${p.id}')" 
+                                    ${disabled ? 'disabled' : ''}>
+                                ${hasAccompagnatore ? 'Aggiorna' : 'Conferma'}
+                            </button>
+                            ${hasAccompagnatore && isAdmin ? 
+                                `<div class="accompagnatore-actions">
+                                    <button class="btn-modify" onclick="modificaAccompagnatore('${p.id}')">Modifica</button>
+                                    <button class="btn-remove" onclick="rimuoviAccompagnatore('${p.id}')">Rimuovi</button>
+                                </div>` 
+                                : ''}
+                        </div>` 
+                        : 
+                        `<div class="accompagnatore-confirmed">
+                            ✅ Accompagnatore registrato
+                        </div>`
+                    }
+                </div>
+            `;
+            
             tr.innerHTML = `
                 <td class="col-admin" style="display:${displayAdmin}"><input type="checkbox" class="bulk-cb" value="${p.id}" ${isChecked}></td>
                 <td class="nome-cell">
                     <div style="display:flex; flex-direction:column; gap:5px;">
                         <div>${p.nome}${genderHtml}${p.bloccato ? ' 🔒' : ''}</div>
                         ${labelHtml}
+                        ${accompagnatoreBox}
                         <div class="col-admin" style="display:${displayAdmin}; gap:4px; margin-top:8px;">
                             <div style="display:inline-flex; gap:3px; margin-right:12px;">
                                 <button class="btn-date-small ${!note || (!note.includes('B') && !note.includes('C')) ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'A')">A</button>
                                 <button class="btn-date-small ${note.includes('B') ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'B')">B</button>
                                 <button class="btn-date-small ${note.includes('C') ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'C')">C</button>
                             </div>
-                            <div style="display:inline-flex; gap:3px;"><button class="btn-gender-small ${gender==='M'?'active-m':''}" onclick="assegnaDettaglio('${p.id}', 'gender', 'M')">M</button><button class="btn-gender-small ${gender==='F'?'active-f':''}" onclick="assegnaDettaglio('${p.id}', 'gender', 'F')">F</button></div>
+                            <div style="display:inline-flex; gap:3px;">
+                                <button class="btn-gender-small ${gender==='M'?'active-m':''}" onclick="assegnaDettaglio('${p.id}', 'gender', 'M')">M</button>
+                                <button class="btn-gender-small ${gender==='F'?'active-f':''}" onclick="assegnaDettaglio('${p.id}', 'gender', 'F')">F</button>
+                            </div>
                         </div>
                     </div>
                 </td>
@@ -438,29 +967,85 @@
                 <td data-label="Partecipa"><label><input type="radio" name="r_${p.id}" value="si" ${p.stato==='si'?'checked':''} ${disabled} onclick="salva('${p.id}','si')"><span class="badge-btn badge-si">PARTECIPA</span></label></td>
                 <td data-label="Non Partecipa"><label><input type="radio" name="r_${p.id}" value="no" ${p.stato==='no'?'checked':''} ${disabled} onclick="salva('${p.id}','no')"><span class="badge-btn badge-no">NON PARTECIPA</span></label></td>
                 <td data-label="Reset"><button class="btn-reset" onclick="salva('${p.id}','vuoto')" ${disabled}>Reset</button></td>
-                <td class="col-admin" style="display:${displayAdmin}"><button onclick="toggleLock('${p.id}', ${p.bloccato})" style="background:none; border:none; cursor:pointer;">🔒</button><button onclick="eliminaAtleta('${p.id}','${p.nome}')" style="background:none; border:none; cursor:pointer;">🗑️</button></td>
+                <td class="col-admin" style="display:${displayAdmin}">
+                    <button onclick="toggleLock('${p.id}', ${p.bloccato})" style="background:none; border:none; cursor:pointer;">🔒</button>
+                    <button onclick="eliminaAtleta('${p.id}','${p.nome}')" style="background:none; border:none; cursor:pointer;">🗑️</button>
+                </td>
             `;
+            
             tbody.appendChild(tr);
         });
+        
         document.getElementById('totaleEuro').innerText = totaleEuro.toFixed(2) + " €";
-        document.getElementById('count-si').innerText = cSi; document.getElementById('count-no').innerText = cNo;
+        document.getElementById('count-si').innerText = cSi; 
+        document.getElementById('count-no').innerText = cNo;
+        
+        // RENDER RIEPILOGO ACCOMPAGNATORI (solo admin)
+        if (isAdmin) {
+            document.getElementById('riepilogoAccompagnatori').style.display = 'block';
+            
+            if (riepilogoArray.length > 0) {
+                riepilogoArray.sort((a,b) => a.nome.localeCompare(b.nome));
+                
+                riepilogoContent.innerHTML = `
+                    <div class="riepilogo-row" style="font-weight:bold; background:#17a2b8; color:white;">
+                        <span>Atleta</span>
+                        <span>Accompagnatore</span>
+                    </div>
+                `;
+                
+                riepilogoArray.forEach(item => {
+                    riepilogoContent.innerHTML += `
+                        <div class="riepilogo-row">
+                            <span>${item.nome}</span>
+                            <span>${item.accompagnatore}</span>
+                        </div>
+                    `;
+                });
+            } else {
+                riepilogoContent.innerHTML = `<div style="text-align:center; padding:10px; color:#666; font-size:0.8rem;">Nessun accompagnatore registrato</div>`;
+            }
+        } else {
+            document.getElementById('riepilogoAccompagnatori').style.display = 'none';
+        }
+        
+        // RENDER LISTA PARTECIPANTI (SOLO NOME ATLETA, SENZA ACCOMPAGNATORE NE DATA)
         Object.keys(partPerCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(cat => {
-            const catDiv = document.createElement('div'); catDiv.style.marginBottom = "15px";
+            const catDiv = document.createElement('div'); 
+            catDiv.style.marginBottom = "15px";
+            
             catDiv.innerHTML = `<div style="font-weight:bold; color:var(--primary); margin-top:10px; border-bottom:1px solid #eee; padding-bottom:5px; text-transform:uppercase;">${cat}</div>`;
+            
             const renderGroup = (label, list, colorClass, titleClass) => {
                 if(list.length === 0) return "";
                 list.sort((a,b) => a.nome.localeCompare(b.nome));
                 let html = `<div class="gender-section"><span class="gender-title ${titleClass}">${label} (${list.length}):</span>`;
-                list.forEach(obj => { const tagData = obj.data ? ` (${obj.data})` : ""; html += `<span style="display:inline-block; background:#f0f7ff; padding:5px 10px; border-radius:20px; font-size:0.75rem; margin:3px; border:1px solid #d0e3ff;">${obj.nome}${tagData}</span>`; });
-                html += `</div>`; return html;
+                list.forEach(obj => { 
+                    // SOLO NOME ATLETA, niente data nè accompagnatore
+                    html += `<span style="display:inline-block; background:#f0f7ff; padding:5px 10px; border-radius:20px; font-size:0.75rem; margin:3px; border:1px solid #d0e3ff;">${obj.nome}</span>`; 
+                });
+                html += `</div>`; 
+                return html;
             };
+            
             catDiv.innerHTML += renderGroup("Maschi", partPerCat[cat].M, "bg-m", "title-m");
             catDiv.innerHTML += renderGroup("Femmine", partPerCat[cat].F, "bg-f", "title-f");
             catDiv.innerHTML += renderGroup("Non specificati", partPerCat[cat].U, "", "");
+            
             listContent.appendChild(catDiv);
         });
+        
         document.getElementById('confirmedList').style.display = cSi > 0 ? 'block' : 'none';
         filterTable();
+        
+        // Aggiorna il pulsante toggle
+        const toggleBtn = document.getElementById('toggleAccompagnatoriBtn');
+        if (isAdmin) {
+            toggleBtn.style.display = 'inline-block';
+            toggleBtn.textContent = mostraAccompagnatori ? '👁️ Nascondi Box' : '👁️ Mostra Box';
+        } else {
+            toggleBtn.style.display = 'none';
+        }
     }
 
     async function salva(id, val) { 
@@ -471,14 +1056,134 @@
             popup.style.display = 'flex';
             setTimeout(() => { popup.style.display = 'none'; }, 2000);
         }
-        await _supabase.from(T_DATA).update({ stato: val }).eq('id', id);
+        
+        // Creiamo l'oggetto di aggiornamento
+        const updateData = { stato: val };
+        
+        // MODIFICA 1: SOLO ADMIN può resettare anche l'accompagnatore quando resetta lo stato
+        if (val === 'vuoto' && isAdmin) {
+            updateData.accompagnatore = "";
+        }
+        
+        await _supabase.from(T_DATA).update(updateData).eq('id', id);
         showToast("Scelta salvata");
-        if (val !== 'vuoto') {
+        
+        // MODIFICA 2: INVIA TELEGRAM SOLO SE NON ADMIN
+        if (val !== 'vuoto' && !isAdmin) {
             let note = atleta.note || "";
             let d = note.includes('B') ? labelB : (note.includes('C') ? labelC : labelA);
             inviaTelegram(atleta.nome, val, document.getElementById('mainTitle').innerText, d);
         }
         caricaTabella(); 
+    }
+
+    async function salvaAccompagnatore(id) {
+        const input = document.getElementById(`acc_input_${id}`);
+        const valore = input.value.trim().toUpperCase();
+        
+        if (!valore) {
+            showToast("Inserisci un nome per l'accompagnatore");
+            return;
+        }
+        
+        const atleta = currentData.find(a => a.id == id);
+        
+        if (!isAdmin) {
+            if (!confirm(`Confermi di voler ${atleta.accompagnatore ? 'modificare' : 'aggiungere'} "${valore}" come accompagnatore per ${atleta.nome}?\n\nQuesta scelta è definitiva e non può essere modificata senza contattare l'amministratore.`)) {
+                return;
+            }
+        }
+        
+        await _supabase.from(T_DATA).update({ accompagnatore: valore }).eq('id', id);
+        showToast("Accompagnatore salvato!");
+        
+        if (!isAdmin) {
+            const testo = `👤 *${atleta.accompagnatore ? 'Accompagnatore modificato' : 'Nuovo accompagnatore registrato'}*\nAtleta: ${atleta.nome}\nAccompagnatore: ${valore}`;
+            fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    chat_id: TELEGRAM_CHAT_ID, 
+                    text: testo, 
+                    parse_mode: 'Markdown' 
+                })
+            });
+        }
+        
+        await caricaTabella();
+    }
+
+    async function modificaAccompagnatore(id) {
+        const input = document.getElementById(`acc_input_${id}`);
+        const atleta = currentData.find(a => a.id == id);
+        
+        const nuovoNome = prompt(`Modifica accompagnatore per ${atleta.nome}:`, atleta.accompagnatore || "");
+        if (nuovoNome !== null) {
+            const valore = nuovoNome.trim().toUpperCase();
+            if (valore === "") {
+                if (confirm(`Rimuovere l'accompagnatore per ${atleta.nome}?`)) {
+                    await _supabase.from(T_DATA).update({ accompagnatore: "" }).eq('id', id);
+                    showToast("Accompagnatore rimosso");
+                    await caricaTabella();
+                }
+            } else {
+                await _supabase.from(T_DATA).update({ accompagnatore: valore }).eq('id', id);
+                showToast("Accompagnatore aggiornato");
+                await caricaTabella();
+            }
+        }
+    }
+
+    async function rimuoviAccompagnatore(id) {
+        const atleta = currentData.find(a => a.id == id);
+        if (confirm(`Rimuovere l'accompagnatore "${atleta.accompagnatore}" per ${atleta.nome}?`)) {
+            await _supabase.from(T_DATA).update({ accompagnatore: "" }).eq('id', id);
+            showToast("Accompagnatore rimosso");
+            await caricaTabella();
+        }
+    }
+
+    // FUNZIONE CORRETTA: Toggle visibilità box accompagnatori
+    async function toggleVisibilitaAccompagnatori() {
+        mostraAccompagnatori = !mostraAccompagnatori;
+        
+        // Salva nel database
+        await salvaVisibilitaAccompagnatori();
+        
+        // Aggiorna il testo del pulsante
+        const btn = document.getElementById('toggleAccompagnatoriBtn');
+        if (mostraAccompagnatori) {
+            btn.textContent = '👁️ Nascondi Box';
+        } else {
+            btn.textContent = '👁️ Mostra Box';
+        }
+        
+        // Ricarica i dati per applicare la visibilità
+        await caricaTabella();
+        
+        showToast(`Box accompagnatori ${mostraAccompagnatori ? 'mostrati' : 'nascosti'}`);
+    }
+
+    async function exportAccompagnatoriExcel() {
+        const dataExp = currentData
+            .filter(p => p.accompagnatore && p.accompagnatore.trim() !== "")
+            .map(p => ({
+                Atleta: p.nome,
+                Categoria: p.categoria,
+                Stato: p.stato === 'si' ? 'PARTECIPA' : (p.stato === 'no' ? 'NON PARTECIPA' : 'DA DEFINIRE'),
+                Accompagnatore: p.accompagnatore
+            }));
+        
+        if (dataExp.length === 0) {
+            showToast("Nessun accompagnatore da esportare");
+            return;
+        }
+        
+        const ws = XLSX.utils.json_to_sheet(dataExp);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Accompagnatori");
+        XLSX.writeFile(wb, `Accompagnatori_Gara3.xlsx`);
+        showToast("Excel esportato!");
     }
 
     async function inviaTelegram(nome, scelta, gara, dataGara) {
@@ -497,7 +1202,7 @@
                 let note = p.note || "";
                 let d = note.includes('B') ? labelB : (note.includes('C') ? labelC : labelA);
                 let g = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : '');
-                let info = `${p.nome}${d ? ' ['+d+']' : ''}`;
+                let info = `${p.nome}${d ? ' ['+d+']' : ''}${p.accompagnatore ? ' (+' + p.accompagnatore + ')' : ''}`;
                 if(g === 'M') pCat[p.categoria].M.push(info); else if(g === 'F') pCat[p.categoria].F.push(info); else pCat[p.categoria].U.push(info);
             } 
         });
@@ -514,14 +1219,23 @@
     }
 
     async function exportToExcel() {
-        const dataExp = currentData.map(p => ({ Atleta: p.nome, Categoria: p.categoria, Sesso: p.note?.includes('F')?'F':'M', Scelta: p.stato === 'si' ? 'partecipa' : (p.stato === 'no' ? 'non partecipa' : 'da definire') }));
+        const dataExp = currentData.map(p => ({ 
+            Atleta: p.nome, 
+            Categoria: p.categoria, 
+            Sesso: p.note?.includes('F')?'F':'M', 
+            Scelta: p.stato === 'si' ? 'partecipa' : (p.stato === 'no' ? 'non partecipa' : 'da definire'),
+            Accompagnatore: p.accompagnatore || ""
+        }));
         const ws = XLSX.utils.json_to_sheet(dataExp);
-        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Iscrizioni"); XLSX.writeFile(wb, `Report_Juvenilia_Gara3.xlsx`);
+        const wb = XLSX.utils.book_new(); 
+        XLSX.utils.book_append_sheet(wb, ws, "Iscrizioni"); 
+        XLSX.writeFile(wb, `Report_Juvenilia_Gara3.xlsx`);
     }
 
     function toggleAdmin() {
         const pass = prompt("Password:");
         if (!pass) return;
+        
         if (btoa(pass) === O_P) {
             isAdmin = true;
             document.getElementById('adminIcon').style.display = 'none';
@@ -531,9 +1245,16 @@
             document.getElementById('docsBox').style.display = 'flex';
             document.getElementById('adminTotalBox').style.display = 'block';
             document.getElementById('adminButtons').style.display = 'grid';
+            document.getElementById('riepilogoAccompagnatori').style.display = 'block';
+            document.getElementById('toggleAccompagnatoriBtn').style.display = 'inline-block';
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
-            caricaConfig(); renderData(); showToast("Admin Attivo");
-        } else { alert("Password Errata"); }
+            
+            caricaConfig(); 
+            renderData(); 
+            showToast("Admin Attivo");
+        } else { 
+            alert("Password Errata"); 
+        }
     }
 
     function startCountdown(endTime) {
@@ -551,9 +1272,9 @@
     async function confermaScadenzaDB() { const v = document.getElementById('deadlineInput').value; if(v) await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: v }, { onConflict: 'chiave' }); caricaConfig(); }
     async function resetScadenzaDB() { await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: "" }, { onConflict: 'chiave' }); caricaConfig(); }
     async function aggiungiAtleta() { 
-        const n = document.getElementById('newNome').value.trim();
+        const n = document.getElementById('newNome').value.trim().toUpperCase();
         const c = document.getElementById('newCat').value; const g = document.getElementById('newGender').value;
-        if(n && c && g) { await _supabase.from(T_DATA).insert([{ nome: n.toUpperCase(), categoria: c, stato: 'vuoto', note: g, bloccato: false }]); document.getElementById('newNome').value = ""; await caricaTabella(); }
+        if(n && c && g) { await _supabase.from(T_DATA).insert([{ nome: n, categoria: c, stato: 'vuoto', note: g, bloccato: false, accompagnatore: "" }]); document.getElementById('newNome').value = ""; await caricaTabella(); }
         else { alert("Inserisci Nome, Categoria e Genere"); }
     }
     async function salvaEtichetteDate() { 
@@ -574,7 +1295,19 @@
     async function bulkAction(l) { const ids = Array.from(document.querySelectorAll('.bulk-cb:checked')).map(cb => cb.value); if (ids.length) { await _supabase.from(T_DATA).update({ bloccato: l }).in('id', ids); selectedIds.clear(); caricaTabella(); } }
     async function toggleLock(id, cur) { await _supabase.from(T_DATA).update({ bloccato: !cur }).eq('id', id); caricaTabella(); }
     async function unlockEverything() { await _supabase.from(T_DATA).update({ bloccato: false }).neq('id', 0); caricaTabella(); }
-    async function resetTutti() { if(confirm("Resettare tutto?")) { await _supabase.from(T_DATA).update({ stato: 'vuoto' }).neq('id', 0); caricaTabella(); } }
+    
+    // MODIFICA 4: Reset tutti resetta e salva immediatamente
+    async function resetTutti() { 
+        if(confirm("Resettare TUTTE le scelte e rimuovere TUTTI gli accompagnatori?")) { 
+            await _supabase.from(T_DATA).update({ 
+                stato: 'vuoto', 
+                accompagnatore: "" 
+            }).neq('id', 0); 
+            caricaTabella(); 
+            showToast("Tutte le scelte e accompagnatori resettati");
+        } 
+    }
+    
     async function eliminaAtleta(id, n) { if(confirm(`Eliminare ${n}?`)) { await _supabase.from(T_DATA).delete().eq('id', id); caricaTabella(); } }
     function filterTable() { const s = document.getElementById("searchInput").value.toUpperCase(); document.querySelectorAll("#tabella-body tr").forEach(tr => { tr.style.display = tr.innerText.toUpperCase().includes(s) ? "" : "none"; }); }
     function showToast(m) { const t = document.getElementById("toast"); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 3000); }
