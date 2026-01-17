@@ -3,104 +3,611 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gestione Presenze Juvenilia - Gara 3</title>
+    <title>Juvenilia Racing Team - Iscrizioni Gara</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root { 
-            --primary: #1a73e8; --success: #28a745; --danger: #dc3545; 
-            --purple: #673ab7; --orange: #ff9800; --table-header: #2c3e50; 
-            --bg-body: #f0f2f5; --bg-card: #ffffff; --text-main: #333333;
-            --timer-bg: #ffffff; --male: #007bff; --female: #e83e8c;
-            --search-bg: #ffffff; --row-border: #d1d5db;
-            /* Colori Categorie */
-            --cat-senior: #2c3e50; --cat-junior: #e74c3c; --cat-allievi: #27ae60;
-            --cat-ragazzi: #2980b9; --cat-r12: #8e44ad; --cat-esordienti: #f39c12;
-            --cat-giovanissimi: #16a085; --cat-default: #7f8c8d;
+            --racing-red: #E63946; --racing-blue: #1D3557; --racing-light: #A8DADC; 
+            --racing-white: #F1FAEE; --racing-yellow: #FFD166; --racing-orange: #F4A261;
+            --racing-green: #2A9D8F; --racing-purple: #6A4C93; --racing-silver: #C0C0C0;
+            --gradient-primary: linear-gradient(135deg, #1D3557 0%, #457B9D 100%);
+            --gradient-success: linear-gradient(135deg, #2A9D8F 0%, #4ECDC4 100%);
+            --gradient-danger: linear-gradient(135deg, #E63946 0%, #FF6B6B 100%);
+            --gradient-racing: linear-gradient(90deg, #1D3557, #E63946, #FFD166);
+            --text-main: #1D3557; --bg-body: #f8f9fa; --bg-card: #ffffff;
+            --shadow-light: 0 8px 25px rgba(29, 53, 87, 0.08);
+            --shadow-medium: 0 12px 35px rgba(29, 53, 87, 0.12);
+            --shadow-heavy: 0 15px 40px rgba(29, 53, 87, 0.15);
+            
+            /* Colori Categorie aggiornati */
+            --cat-senior: #1D3557; --cat-junior: #E63946; --cat-allievi: #2A9D8F;
+            --cat-ragazzi: #457B9D; --cat-r12: #6A4C93; --cat-esordienti: #F4A261;
+            --cat-giovanissimi: #4ECDC4; --cat-default: #8A8D93;
         }
 
-        body { margin: 0; padding: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; overflow-x: hidden; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 15px; background: var(--bg-card); min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); position: relative; z-index: 1; }
+        * {
+            box-sizing: border-box;
+        }
 
-        .logo-container { text-align: center; margin-bottom: 20px; position: relative; display: flex; justify-content: center; align-items: center; padding: 10px; }
-        .logo-container img { width: 100%; max-width: 600px; height: auto; border-radius: 12px; display: block; }
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+            color: var(--text-main); 
+            font-family: 'Montserrat', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
         
-        .top-btns { position: absolute; top: 10px; right: 10px; display: flex; gap: 8px; z-index: 10; }
-        .icon-btn { background: var(--bg-card); border: 1px solid #ddd; font-size: 1.2rem; cursor: pointer; padding: 8px; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
-        .logout-btn { display: none; color: var(--danger); border: 2px solid var(--danger); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.8rem; font-weight: bold; background: white; transition: 0.2s; }
-        .logout-btn:hover { background: var(--danger); color: white; }
-        
-        h2 { text-align: center; color: var(--primary); margin: 10px 0 20px 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(168, 218, 220, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 209, 102, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(233, 196, 106, 0.05) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
 
-        .countdown-container { text-align: center; margin: 15px 0; padding: 15px; border-radius: 15px; background: var(--timer-bg); border: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(26, 115, 232, 0.15); transition: 0.5s; min-height: 50px; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
-        .timer { font-family: 'Monaco', 'Consolas', monospace; font-size: 1.2rem; font-weight: bold; color: var(--primary); }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: var(--bg-card); 
+            min-height: 100vh; 
+            box-shadow: var(--shadow-heavy);
+            position: relative;
+            z-index: 1;
+            border-radius: 0 0 20px 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-racing);
+            z-index: 2;
+        }
+
+        .logo-container { 
+            text-align: center; 
+            margin-bottom: 20px; 
+            position: relative; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 15px; 
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .logo-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.05"><path d="M20,20 L80,20 L80,80 L20,80 Z" fill="none" stroke="white" stroke-width="2"/><circle cx="50" cy="50" r="15" fill="none" stroke="white" stroke-width="2"/><path d="M20,50 L35,35 M80,50 L65,35 M20,50 L35,65 M80,50 L65,65" stroke="white" stroke-width="2"/></svg>');
+            background-size: 200px;
+            z-index: 0;
+        }
+        
+        .logo-container img { 
+            width: 100%; 
+            max-width: 800px; 
+            height: auto; 
+            border-radius: 15px; 
+            display: block;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: 5px solid white;
+            background: white;
+            padding: 10px;
+        }
+        
+        .top-btns { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            display: flex; 
+            gap: 8px; 
+            z-index: 10; 
+        }
+        .icon-btn { 
+            background: var(--racing-white); 
+            border: none; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            padding: 8px; 
+            border-radius: 50%; 
+            box-shadow: var(--shadow-light); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: var(--racing-blue);
+            transition: all 0.3s ease;
+        }
+        .icon-btn:hover { 
+            transform: translateY(-3px) rotate(10deg); 
+            box-shadow: var(--shadow-medium);
+            background: var(--racing-yellow);
+        }
+        .logout-btn { 
+            display: none; 
+            color: var(--racing-white); 
+            border: 2px solid var(--racing-white); 
+            border-radius: 50px; 
+            padding: 6px 12px; 
+            cursor: pointer; 
+            font-size: 0.75rem; 
+            font-weight: bold; 
+            background: rgba(231, 57, 70, 0.8); 
+            transition: 0.3s; 
+            box-shadow: var(--shadow-light);
+        }
+        .logout-btn:hover { 
+            background: var(--racing-red); 
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        h2 { 
+            text-align: center; 
+            color: var(--racing-blue); 
+            margin: 15px 0 20px 0; 
+            font-size: 1.8rem; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            font-weight: 800;
+            position: relative;
+            padding-bottom: 15px;
+            flex-shrink: 0;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 4px;
+            background: var(--gradient-racing);
+            border-radius: 2px;
+        }
+
+        .countdown-container { 
+            text-align: center; 
+            margin: 15px 0; 
+            padding: 20px; 
+            border-radius: 20px; 
+            background: var(--gradient-primary); 
+            border: none; 
+            box-shadow: var(--shadow-medium); 
+            transition: 0.5s; 
+            min-height: 50px; 
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .countdown-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20" width="100" height="20" opacity="0.1"><path d="M0,10 Q25,0 50,10 T100,10" fill="none" stroke="white" stroke-width="1"/></svg>');
+            background-size: 200px 40px;
+            z-index: 0;
+        }
+        
+        .timer { 
+            font-family: 'Monaco', 'Consolas', monospace; 
+            font-size: 1.3rem; 
+            font-weight: bold; 
+            color: var(--racing-white); 
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+            letter-spacing: 1px;
+        }
+        
+        .timer i {
+            margin-right: 8px;
+            color: var(--racing-yellow);
+        }
 
         .search-container { 
             position: relative; 
             margin: 20px 0; 
             width: 100%;
             display: flex;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
+            flex-shrink: 0;
         }
         .search-box { 
             flex: 1;
-            padding: 15px 15px 15px 45px; 
-            border-radius: 12px; 
-            border: 2px solid #ddd; 
-            background-color: var(--search-bg); 
+            padding: 16px 16px 16px 50px; 
+            border-radius: 50px; 
+            border: 2px solid var(--racing-light); 
+            background-color: var(--racing-white); 
             color: var(--text-main); 
-            font-size: 1rem; 
+            font-size: 0.95rem; 
             box-sizing: border-box; 
             transition: all 0.3s ease; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+            box-shadow: var(--shadow-light); 
+            font-weight: 500;
         }
-        .search-box:focus { outline: none; border-color: var(--primary); box-shadow: 0 4px 12px rgba(26, 115, 232, 0.2); }
-        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; font-size: 1.2rem; pointer-events: none; }
+        .search-box:focus { 
+            outline: none; 
+            border-color: var(--racing-blue); 
+            box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.2), var(--shadow-medium); 
+        }
+        .search-icon { 
+            position: absolute; 
+            left: 18px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            color: var(--racing-blue); 
+            font-size: 1.2rem; 
+            pointer-events: none; 
+            z-index: 2;
+        }
 
-        .doc-links-user { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; width: 100%; margin: 10px 0 20px 0; }
-        .btn-doc-link { background: var(--purple); color: white; padding: 10px 18px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 0.85rem; transition: 0.2s; border: none; box-shadow: 0 4px 10px rgba(103, 58, 183, 0.2); }
-        .btn-doc-link:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(103, 58, 183, 0.3); }
+        .doc-links-user { 
+            display: flex; 
+            gap: 12px; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+            width: 100%; 
+            margin: 15px 0 20px 0; 
+            flex-shrink: 0;
+        }
+        .btn-doc-link { 
+            background: var(--gradient-primary); 
+            color: white; 
+            padding: 12px 20px; 
+            border-radius: 50px; 
+            text-decoration: none; 
+            font-weight: bold; 
+            font-size: 0.85rem; 
+            transition: all 0.3s ease; 
+            border: none; 
+            box-shadow: var(--shadow-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-doc-link:hover { 
+            transform: translateY(-5px) scale(1.05); 
+            box-shadow: var(--shadow-medium);
+        }
 
         input[type="radio"] { display: none; }
-        .badge-btn { display: inline-block; padding: 12px 10px; border-radius: 12px; border: 2px solid #eee; cursor: pointer; font-weight: bold; font-size: 0.75rem; transition: 0.3s; user-select: none; width: 100%; box-sizing: border-box; text-align: center; background: #fdfdfd; color: #777; text-transform: uppercase; }
+        .badge-btn { 
+            display: inline-block; 
+            padding: 12px 10px; 
+            border-radius: 12px; 
+            border: 2px solid #eee; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 0.8rem; 
+            transition: all 0.3s ease; 
+            user-select: none; 
+            width: 100%; 
+            box-sizing: border-box; 
+            text-align: center; 
+            background: #fdfdfd; 
+            color: #777; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
 
-        input[value="si"]:checked + .badge-si { background-color: var(--success); color: white; border-color: #1e7e34; transform: scale(1.02); box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3); }
-        input[value="no"]:checked + .badge-no { background-color: var(--danger); color: white; border-color: #bd2130; transform: scale(1.02); box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3); }
+        input[value="si"]:checked + .badge-si { 
+            background: var(--gradient-success); 
+            color: white; 
+            border-color: #1e7e34; 
+            transform: scale(1.05); 
+            box-shadow: 0 6px 15px rgba(42, 157, 143, 0.4); 
+        }
+        input[value="no"]:checked + .badge-no { 
+            background: var(--gradient-danger); 
+            color: white; 
+            border-color: #bd2130; 
+            transform: scale(1.05); 
+            box-shadow: 0 6px 15px rgba(230, 57, 70, 0.4); 
+        }
 
-        .btn-date-small, .btn-gender-small { border: 1px solid #ddd; background: white; cursor: pointer; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; transition: 0.2s; }
-        .btn-date-small.active { background-color: var(--orange); color: white; border-color: #e68a00; }
-        .btn-gender-small.active-m { background-color: var(--male); color: white; border-color: #0056b3; }
-        .btn-gender-small.active-f { background-color: var(--female); color: white; border-color: #c8237e; }
+        .btn-date-small, .btn-gender-small { 
+            border: 1px solid #ddd; 
+            background: white; 
+            cursor: pointer; 
+            padding: 5px 8px; 
+            border-radius: 6px; 
+            font-size: 0.7rem; 
+            font-weight: bold; 
+            transition: all 0.2s ease; 
+        }
+        .btn-date-small.active { 
+            background-color: var(--racing-orange); 
+            color: white; 
+            border-color: #e68a00; 
+            box-shadow: 0 3px 8px rgba(244, 162, 97, 0.4);
+        }
+        .btn-gender-small.active-m { 
+            background-color: var(--racing-blue); 
+            color: white; 
+            border-color: #0056b3; 
+            box-shadow: 0 3px 8px rgba(29, 53, 87, 0.4);
+        }
+        .btn-gender-small.active-f { 
+            background-color: var(--racing-red); 
+            color: white; 
+            border-color: #c8237e; 
+            box-shadow: 0 3px 8px rgba(230, 57, 70, 0.4);
+        }
 
-        .btn-reset { background-color: #6c757d; color: white; border: none; padding: 10px 12px; border-radius: 12px; cursor: pointer; font-weight: bold; font-size: 0.75rem; width: 100%; transition: 0.2s; }
+        .btn-reset { 
+            background-color: #6c757d; 
+            color: white; 
+            border: none; 
+            padding: 10px 12px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 0.75rem; 
+            width: 100%; 
+            transition: all 0.3s ease; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-reset:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
         
-        #addAtletaBox, #costiBox, #docsBox { background: rgba(26, 115, 232, 0.04); border: 2px solid var(--primary); border-radius: 16px; padding: 20px; margin-bottom: 25px; display: none; flex-direction: column; gap: 15px; }
-        #costiBox { background: rgba(103, 58, 183, 0.04); border-color: var(--purple); }
-        #docsBox { background: rgba(255, 152, 0, 0.04); border-color: var(--orange); }
+        #addAtletaBox, #costiBox, #docsBox { 
+            background: rgba(168, 218, 220, 0.1); 
+            border: 2px solid var(--racing-light); 
+            border-radius: 20px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            display: none; 
+            flex-direction: column; 
+            gap: 15px; 
+            box-shadow: var(--shadow-light);
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+        }
+        #costiBox { 
+            background: rgba(106, 76, 147, 0.05); 
+            border-color: var(--racing-purple); 
+        }
+        #docsBox { 
+            background: rgba(255, 209, 102, 0.05); 
+            border-color: var(--racing-yellow); 
+        }
 
-        .admin-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding: 8px 0; }
-        .admin-row input, .admin-row select { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 10px; min-width: 120px; font-size: 14px; background: white; }
-        .admin-row button { padding: 12px 20px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; transition: 0.2s; }
-        .btn-clear-input { background: #6c757d !important; color: white !important; font-size: 0.75rem !important; padding: 12px 15px !important; text-transform: uppercase; }
+        .admin-row { 
+            display: flex; 
+            gap: 12px; 
+            flex-wrap: wrap; 
+            align-items: center; 
+            padding: 8px 0; 
+        }
+        .admin-row input, .admin-row select { 
+            flex: 1; 
+            padding: 12px; 
+            border: 1px solid var(--racing-light); 
+            border-radius: 8px; 
+            min-width: 110px; 
+            font-size: 13px; 
+            background: white; 
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+        .admin-row input:focus, .admin-row select:focus {
+            outline: none;
+            border-color: var(--racing-blue);
+            box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.1), 0 5px 15px rgba(0,0,0,0.08);
+        }
+        .admin-row button { 
+            padding: 12px 20px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            color: white; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .admin-row button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        .btn-clear-input { 
+            background: #6c757d !important; 
+            color: white !important; 
+            font-size: 0.7rem !important; 
+            padding: 12px 15px !important; 
+            text-transform: uppercase; 
+        }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .stat-card { padding: 15px; border-radius: 16px; text-align: center; color: white; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .stat-presenti { background: linear-gradient(135deg, #28a745, #218838); }
-        .stat-assenti { background: linear-gradient(135deg, #dc3545, #c82333); }
-        #adminTotalBox { background: linear-gradient(135deg, #673ab7, #512da8); grid-column: span 2; display: none; }
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+            margin-bottom: 20px; 
+            flex-shrink: 0;
+        }
+        .stat-card { 
+            padding: 20px; 
+            border-radius: 18px; 
+            text-align: center; 
+            color: white; 
+            font-weight: bold; 
+            box-shadow: var(--shadow-medium); 
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-heavy);
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.1"><path d="M0,50 Q25,30 50,50 T100,50" fill="none" stroke="white" stroke-width="2"/></svg>');
+            background-size: 150px;
+            z-index: 0;
+        }
+        .stat-presenti { 
+            background: var(--gradient-success); 
+        }
+        .stat-assenti { 
+            background: var(--gradient-danger); 
+        }
+        #adminTotalBox { 
+            background: var(--gradient-primary); 
+            grid-column: span 2; 
+            display: none; 
+        }
+        
+        .stat-card span {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .stat-card div {
+            font-size: 1.8rem;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
 
-        .table-wrapper { width: 100%; max-height: 65vh; overflow-y: auto; border-radius: 16px; border: 1px solid var(--row-border); background: #eee; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0 4px; background: transparent; }
-        thead th { background: var(--table-header); color: white; font-size: 0.75rem; position: sticky; top: 0; z-index: 10; padding: 15px 5px; text-transform: uppercase; }
+        .table-wrapper { 
+            width: 100%; 
+            flex: 1;
+            max-height: 500px;
+            overflow-y: auto; 
+            border-radius: 20px; 
+            border: 2px solid var(--racing-light); 
+            background: #f8f9fa; 
+            box-shadow: var(--shadow-light);
+            position: relative;
+            margin-bottom: 20px;
+        }
         
-        tbody tr { background-color: #ffffff; transition: 0.2s; }
-        tbody tr:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 5; position: relative; }
+        /* Fix per l'header fisso senza riga bianca */
+        .table-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: var(--gradient-primary);
+            z-index: 12;
+        }
         
-        td { padding: 14px 5px; border-bottom: 1px solid #eee; text-align: center; font-size: 0.9rem; }
+        table { 
+            width: 100%; 
+            border-collapse: separate; 
+            border-spacing: 0; 
+            background: transparent; 
+        }
+        thead { 
+            position: sticky; 
+            top: 0; 
+            z-index: 11;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
         
+        thead th { 
+            background: var(--gradient-primary); 
+            color: white; 
+            font-size: 0.75rem; 
+            padding: 15px 10px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--racing-blue);
+            position: sticky;
+            top: 0;
+        }
+        thead th:first-child {
+            border-radius: 15px 0 0 0;
+        }
+        thead th:last-child {
+            border-radius: 0 15px 0 0;
+        }
+        
+        tbody tr { 
+            background-color: #ffffff; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.03);
+            border-bottom: 1px solid #f0f0f0;
+        }
+        tbody tr:hover { 
+            transform: translateY(-3px); 
+            box-shadow: var(--shadow-medium); 
+            z-index: 5; 
+            position: relative; 
+        }
+        
+        td { 
+            padding: 16px 10px; 
+            border-bottom: 1px solid #f0f0f0; 
+            text-align: center; 
+            font-size: 0.9rem; 
+            font-weight: 500;
+            vertical-align: middle;
+        }
+        
+        /* Stili categorie aggiornati */
         .tr-senior { border-left: 6px solid var(--cat-senior); }
         .tr-junior { border-left: 6px solid var(--cat-junior); }
         .tr-allievi { border-left: 6px solid var(--cat-allievi); }
@@ -108,25 +615,117 @@
         .tr-r12 { border-left: 6px solid var(--cat-r12); }
         .tr-esordienti { border-left: 6px solid var(--cat-esordienti); }
         .tr-giovanissimi { border-left: 6px solid var(--cat-giovanissimi); }
-
-        .nome-cell { text-align: left; font-weight: bold; padding: 15px !important; color: #2c3e50; }
         
-        .badge-gender { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; color: white; margin-left: 5px; vertical-align: middle; }
-        .bg-m { background-color: var(--male); }
-        .bg-f { background-color: var(--female); }
+        /* Badge categoria */
+        .categoria-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 18px;
+            font-weight: bold;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            min-width: 90px;
+        }
+        
+        .cat-senior { background: var(--cat-senior); color: white; }
+        .cat-junior { background: var(--cat-junior); color: white; }
+        .cat-allievi { background: var(--cat-allievi); color: white; }
+        .cat-ragazzi { background: var(--cat-ragazzi); color: white; }
+        .cat-r12 { background: var(--cat-r12); color: white; }
+        .cat-esordienti { background: var(--cat-esordienti); color: white; }
+        .cat-giovanissimi { background: var(--cat-giovanissimi); color: white; }
 
-        .gender-section { margin-top: 5px; padding-left: 10px; border-left: 2px solid #eee; }
-        .gender-title { font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-top: 5px; display: block; opacity: 0.8; }
-        .title-m { color: var(--male); }
-        .title-f { color: var(--female); }
+        .nome-cell { 
+            text-align: left; 
+            font-weight: bold; 
+            padding: 18px !important; 
+            color: var(--racing-blue); 
+        }
+        
+        .badge-gender { 
+            font-size: 0.65rem; 
+            padding: 3px 6px; 
+            border-radius: 15px; 
+            color: white; 
+            margin-left: 6px; 
+            vertical-align: middle; 
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .bg-m { background-color: var(--racing-blue); }
+        .bg-f { background-color: var(--racing-red); }
 
-        #adminButtons { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; padding-bottom: 30px; }
-        #adminButtons button { padding: 14px; border: none; border-radius: 12px; color: white; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        .gender-section { margin-top: 8px; padding-left: 15px; border-left: 3px solid var(--racing-light); }
+        .gender-title { 
+            font-size: 0.7rem; 
+            font-weight: bold; 
+            text-transform: uppercase; 
+            margin-top: 8px; 
+            display: block; 
+            opacity: 0.9; 
+            letter-spacing: 0.5px;
+        }
+        .title-m { color: var(--racing-blue); }
+        .title-f { color: var(--racing-red); }
 
-        #toast { visibility: hidden; min-width: 250px; background: #333; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); }
-        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        #adminButtons { 
+            display: none; 
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); 
+            gap: 12px; 
+            margin-top: 20px; 
+            padding-bottom: 30px; 
+            flex-shrink: 0;
+        }
+        #adminButtons button { 
+            padding: 15px; 
+            border: none; 
+            border-radius: 12px; 
+            color: white; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 0.85rem; 
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: var(--shadow-light);
+        }
+        #adminButtons button:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
 
-        /* ANIMAZIONE SCENOGRAFICA MIGLIORATA */
+        #toast { 
+            visibility: hidden; 
+            min-width: 300px; 
+            background: var(--gradient-primary); 
+            color: #fff; 
+            text-align: center; 
+            border-radius: 15px; 
+            padding: 20px; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 50%; 
+            bottom: 40px; 
+            transform: translateX(-50%); 
+            box-shadow: var(--shadow-heavy);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        #toast.show { 
+            visibility: visible; 
+            animation: slideIn 0.5s, fadeout 0.5s 2.5s; 
+        }
+        
+        @keyframes slideIn {
+            from { bottom: 0; opacity: 0; }
+            to { bottom: 40px; opacity: 1; }
+        }
+
+        /* ANIMAZIONE SCENOGRAFICA MIGLIORATA - TEMA PATTINAGGIO CORSIA */
         #celebrationEffect {
             display: none;
             position: fixed;
@@ -134,7 +733,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
+            background: linear-gradient(135deg, #0a1929 0%, #1D3557 100%);
             z-index: 9999;
             pointer-events: none;
             overflow: hidden;
@@ -157,6 +756,7 @@
             animation: zoomIn 0.8s ease-out;
             opacity: 1;
             transition: opacity 0.8s ease-out;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.5);
         }
         
         .celebration-content.fade-out {
@@ -164,124 +764,121 @@
         }
         
         .celebration-title {
-            font-size: 3rem;
+            font-size: 4rem;
             font-weight: 900;
-            text-shadow: 0 0 20px rgba(255,255,255,0.8);
             margin-bottom: 20px;
-            background: linear-gradient(45deg, #FFD700, #FFA500, #FF4500, #FF1493);
+            background: linear-gradient(45deg, #FFD166, #FFFFFF, #E63946);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             animation: pulse 2s infinite;
+            letter-spacing: 2px;
         }
         
         .celebration-subtitle {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             margin-bottom: 30px;
             color: #FFD700;
-            text-shadow: 0 0 10px rgba(255,215,0,0.8);
+            font-weight: 600;
         }
         
         .celebration-icon {
-            font-size: 8rem;
+            font-size: 10rem;
             margin-bottom: 20px;
             display: block;
             animation: bounce 1s infinite alternate, rotate 3s linear infinite;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
         }
         
-        /* Particelle di fuochi d'artificio */
-        .firework-particle {
+        /* Particelle a tema pattinaggio corsia */
+        .skate-particle {
             position: absolute;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+            width: 30px;
+            height: 20px;
             pointer-events: none;
             z-index: 10000;
             opacity: 1;
             transition: opacity 0.8s ease-out;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 24" width="32" height="24"><path d="M4,12 L12,4 L20,4 L28,12 L20,20 L12,20 Z" fill="%23E63946"/><circle cx="8" cy="18" r="3" fill="%231D3557"/><circle cx="24" cy="18" r="3" fill="%231D3557"/><path d="M10,8 L14,8 L16,12" stroke="%23FFFFFF" stroke-width="1.5" fill="none"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
         }
         
-        .firework-particle.fade-out {
+        .skate-particle.fade-out {
             opacity: 0;
         }
         
-        .confetti {
+        .speed-line {
             position: absolute;
-            width: 15px;
-            height: 15px;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            pointer-events: none;
+            z-index: 10000;
+            opacity: 0.7;
+            border-radius: 2px;
+        }
+        
+        .speed-line.fade-out {
+            opacity: 0;
+        }
+        
+        .racing-confetti {
+            position: absolute;
+            width: 20px;
+            height: 20px;
             pointer-events: none;
             opacity: 0.8;
             z-index: 10000;
             transition: opacity 0.8s ease-out;
-        }
-        
-        .confetti.fade-out {
-            opacity: 0;
-        }
-        
-        .sparkle {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: white;
             border-radius: 50%;
-            pointer-events: none;
-            box-shadow: 0 0 10px 2px rgba(255,255,255,0.8);
-            z-index: 10000;
-            opacity: 1;
-            transition: opacity 0.8s ease-out;
         }
         
-        .sparkle.fade-out {
+        .racing-confetti.fade-out {
             opacity: 0;
         }
         
-        /* Animazioni */
+        /* Animazioni pattinaggio */
+        @keyframes skateMove {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+            70% { transform: translate(var(--skate-x), var(--skate-y)) rotate(var(--skate-rotate)) scale(0.8); opacity: 0.8; }
+            100% { transform: translate(var(--skate-x), var(--skate-y)) rotate(var(--skate-rotate)) scale(0); opacity: 0; }
+        }
+        
+        @keyframes speedLineMove {
+            0% { transform: translateX(-100px) rotate(var(--line-angle)); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateX(calc(100vw + 100px)) rotate(var(--line-angle)); opacity: 0; }
+        }
+
         @keyframes zoomIn {
-            0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            from { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
         }
         
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
         
         @keyframes bounce {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-20px); }
+            from { transform: translateY(0px); }
+            to { transform: translateY(-20px); }
         }
         
         @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes explode {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            70% { transform: translate(var(--tx), var(--ty)) scale(0.8); opacity: 0.8; }
-            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
-        }
-        
-        @keyframes floatDown {
-            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
-            80% { transform: translateY(80vh) rotate(360deg); opacity: 0.8; }
-            100% { transform: translateY(100vh) rotate(450deg); opacity: 0; }
-        }
-        
-        @keyframes sparkleMove {
-            0% { transform: translate(0, 0) scale(1); opacity: 1; }
-            70% { transform: translate(var(--sparkle-x), var(--sparkle-y)) scale(0.8); opacity: 0.8; }
-            100% { transform: translate(var(--sparkle-x), var(--sparkle-y)) scale(0); opacity: 0; }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         /* NUOVI STILI PER ACCOMPAGNATORI - COMPATTI */
         .accompagnatore-box {
-            margin-top: 3px;
+            margin-top: 5px;
             display: none;
             width: 100%;
-            max-width: 200px;
+            max-width: 220px;
         }
         
         .accompagnatore-box.show {
@@ -291,146 +888,341 @@
         .accompagnatore-content {
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
             width: 100%;
         }
         
         .accompagnatore-input {
             width: 100%;
-            padding: 4px 6px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 0.7rem;
+            padding: 8px 12px;
+            border: 2px solid var(--racing-light);
+            border-radius: 10px;
+            font-size: 0.8rem;
             box-sizing: border-box;
-            max-width: 180px;
+            max-width: 200px;
             text-transform: uppercase;
+            transition: all 0.3s ease;
+            background: var(--racing-white);
         }
         
         .accompagnatore-input:focus {
             outline: none;
-            border-color: #17a2b8;
+            border-color: var(--racing-blue);
+            box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.1);
         }
         
         .btn-accompagnatore {
-            background: #17a2b8;
+            background: var(--gradient-primary);
             color: white;
             border: none;
-            padding: 4px 6px;
-            border-radius: 4px;
+            padding: 8px 12px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             font-weight: bold;
-            transition: 0.2s;
+            transition: 0.3s;
             width: 100%;
-            max-width: 180px;
+            max-width: 200px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
         }
         
         .btn-accompagnatore:hover {
-            background: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(0,0,0,0.15);
         }
         
         .btn-accompagnatore:disabled {
             background: #cccccc;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
         .accompagnatore-confirmed {
-            background: #e8f5e9 !important;
-            border: 1px dashed #28a745 !important;
-            color: #155724 !important;
-            padding: 4px 6px;
-            border-radius: 4px;
-            font-size: 0.7rem;
+            background: rgba(42, 157, 143, 0.1) !important;
+            border: 2px dashed var(--racing-green) !important;
+            color: var(--racing-green) !important;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 0.8rem;
             text-align: center;
-            margin-top: 3px;
+            margin-top: 5px;
+            font-weight: bold;
         }
         
         .accompagnatore-actions {
             display: flex;
-            gap: 4px;
-            margin-top: 4px;
-            max-width: 180px;
+            gap: 6px;
+            margin-top: 6px;
+            max-width: 200px;
         }
         
         .btn-modify {
-            background: #ffc107;
-            color: black;
+            background: var(--racing-yellow);
+            color: var(--racing-blue);
             border: none;
-            padding: 3px 6px;
-            border-radius: 3px;
+            padding: 6px 10px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 0.6rem;
+            font-size: 0.7rem;
+            font-weight: bold;
             flex: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-modify:hover {
+            background: #FFC043;
+            transform: translateY(-2px);
         }
         
         .btn-remove {
-            background: #dc3545;
+            background: var(--racing-red);
             color: white;
             border: none;
-            padding: 3px 6px;
-            border-radius: 3px;
+            padding: 6px 10px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 0.6rem;
+            font-size: 0.7rem;
+            font-weight: bold;
             flex: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-remove:hover {
+            background: #D32F2F;
+            transform: translateY(-2px);
         }
         
         #riepilogoAccompagnatori {
             display: none;
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 12px;
-            margin: 15px 0;
-            border: 2px solid #17a2b8;
-            box-shadow: 0 4px 10px rgba(23, 162, 184, 0.1);
+            background: var(--racing-white);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 3px solid var(--racing-blue);
+            box-shadow: var(--shadow-medium);
+            flex-shrink: 0;
         }
         
         .riepilogo-header {
             font-weight: 800;
-            font-size: 0.75rem;
-            color: #17a2b8;
-            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--racing-blue);
+            margin-bottom: 15px;
             text-transform: uppercase;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            letter-spacing: 1px;
         }
         
         .riepilogo-row {
             display: flex;
             justify-content: space-between;
-            padding: 5px 8px;
-            border-bottom: 1px solid #eee;
-            font-size: 0.7rem;
+            padding: 10px 15px;
+            border-bottom: 2px solid var(--racing-light);
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .riepilogo-row:hover {
+            background: rgba(168, 218, 220, 0.1);
+            transform: translateX(5px);
         }
         
         .riepilogo-row:nth-child(even) {
-            background: #f8f9fa;
+            background: rgba(168, 218, 220, 0.05);
         }
 
         /* Pulsante toggle accompagnatori */
         #toggleAccompagnatoriBtn {
             display: none;
-            background: #17a2b8;
+            background: var(--gradient-primary);
             color: white;
             border: none;
-            padding: 12px 15px;
-            border-radius: 12px;
+            padding: 12px 18px;
+            border-radius: 50px;
             cursor: pointer;
             font-weight: bold;
             font-size: 0.75rem;
             white-space: nowrap;
-            transition: 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+            min-width: 150px;
+            flex-shrink: 0;
         }
         
         #toggleAccompagnatoriBtn:hover {
-            background: #138496;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
         }
-
-        @media screen and (max-width: 600px) {
-            .table-wrapper { background: transparent; border: none; max-height: none; overflow: visible; }
-            table { border-spacing: 0 12px; }
-            thead { display: none; }
-            tr { display: block; margin-bottom: 15px; border: 2px solid var(--row-border); border-radius: 16px; overflow: hidden; background: var(--bg-card); box-shadow: 0 4px 8px rgba(0,0,0,0.08); border-left-width: 0px; }
+        
+        /* Footer tematico */
+        .racing-footer {
+            margin-top: 20px;
+            padding: 15px;
+            text-align: center;
+            color: var(--racing-blue);
+            font-size: 0.75rem;
+            border-top: 3px solid var(--racing-light);
+            background: rgba(168, 218, 220, 0.1);
+            border-radius: 15px;
+            flex-shrink: 0;
+        }
+        
+        .footer-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 12px;
+        }
+        
+        .footer-icon {
+            font-size: 1.3rem;
+            color: var(--racing-blue);
+            transition: all 0.3s ease;
+        }
+        
+        .footer-icon:hover {
+            color: var(--racing-red);
+            transform: translateY(-5px) rotate(10deg);
+        }
+        
+        /* Riepilogo partecipanti */
+        #confirmedList {
+            display:none; 
+            background: var(--racing-white); 
+            border-radius: 20px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border: 3px solid var(--racing-light); 
+            box-shadow: var(--shadow-medium);
+            flex-shrink: 0;
+        }
+        
+        /* Responsive design - MOBILE */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 10px;
+                border-radius: 0;
+                max-width: 100%;
+            }
+            
+            .logo-container {
+                padding: 10px;
+                border-radius: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .logo-container img {
+                max-width: 95%;
+                border: 3px solid white;
+                padding: 5px;
+            }
+            
+            .top-btns {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                gap: 5px;
+            }
+            
+            .icon-btn {
+                font-size: 0.9rem;
+                padding: 6px;
+            }
+            
+            .logout-btn {
+                padding: 4px 8px;
+                font-size: 0.65rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+                margin: 10px 0 15px 0;
+                padding-bottom: 10px;
+            }
+            
+            h2::after {
+                width: 100px;
+                height: 3px;
+            }
+            
+            .countdown-container {
+                padding: 15px;
+                margin: 10px 0;
+                min-height: 45px;
+            }
+            
+            .timer {
+                font-size: 1rem;
+            }
+            
+            .search-container {
+                flex-direction: column;
+                align-items: stretch;
+                margin: 15px 0;
+                gap: 10px;
+            }
+            
+            .search-box {
+                padding: 14px 14px 14px 45px;
+                font-size: 0.9rem;
+            }
+            
+            #toggleAccompagnatoriBtn {
+                width: 100%;
+                min-width: auto;
+                padding: 12px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            #adminTotalBox {
+                grid-column: span 1;
+            }
+            
+            .stat-card {
+                padding: 15px;
+                border-radius: 15px;
+            }
+            
+            .stat-card div {
+                font-size: 1.5rem;
+            }
+            
+            .table-wrapper {
+                background: transparent;
+                border: none;
+                max-height: none;
+                overflow: visible;
+                box-shadow: none;
+                margin-bottom: 15px;
+            }
+            
+            table {
+                border-spacing: 0 10px;
+            }
+            
+            thead {
+                display: none;
+            }
+            
+            tr {
+                display: block;
+                margin-bottom: 15px;
+                border: 2px solid var(--racing-light);
+                border-radius: 15px;
+                overflow: hidden;
+                background: var(--bg-card);
+                box-shadow: var(--shadow-medium);
+                border-left-width: 0px;
+            }
+            
+            /* Bordi superiori per le categorie in mobile */
             .tr-senior { border-top: 8px solid var(--cat-senior); }
             .tr-junior { border-top: 8px solid var(--cat-junior); }
             .tr-allievi { border-top: 8px solid var(--cat-allievi); }
@@ -439,29 +1231,29 @@
             .tr-esordienti { border-top: 8px solid var(--cat-esordienti); }
             .tr-giovanissimi { border-top: 8px solid var(--cat-giovanissimi); }
             
-            /* CORREZIONE MODIFICATA: Centra tutte le celle nella versione mobile */
-            td { 
-                display: flex; 
-                justify-content: center; 
-                align-items: center; 
-                border-bottom: 1px solid #f0f0f0; 
-                padding: 10px 15px; 
-                text-align: center !important; 
+            td {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-bottom: 1px solid #f0f0f0;
+                padding: 12px 15px;
+                text-align: center !important;
+                width: 100%;
+                box-sizing: border-box;
             }
             
-            /* CORREZIONE MODIFICATA: Nome centrato con contenuti interni allineati al centro */
-            .nome-cell { 
-                background: rgba(0,0,0,0.02); 
-                justify-content: center !important; 
+            .nome-cell {
+                background: rgba(168, 218, 220, 0.1);
+                justify-content: center !important;
                 align-items: center !important;
-                padding: 15px !important; 
-                border-radius: 0; 
-                font-size: 1rem; 
+                padding: 15px !important;
+                border-radius: 0;
+                font-size: 1rem;
                 flex-direction: column;
                 text-align: center !important;
+                width: 100%;
             }
             
-            /* CORREZIONE MODIFICATA: Per i contenuti dentro nome-cell, allinea al centro */
             .nome-cell > div {
                 width: 100%;
                 text-align: center;
@@ -470,34 +1262,36 @@
                 align-items: center;
             }
             
-            /* CORREZIONE MODIFICATA: Allinea al centro il testo del nome e del badge */
             .nome-cell > div > div:first-child {
                 text-align: center;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 flex-wrap: wrap;
-                gap: 5px;
+                gap: 6px;
+                margin-bottom: 8px;
             }
             
-            .badge-btn, .btn-reset { 
-                width: auto; 
-                min-width: 160px; 
-                padding: 18px 20px; 
-                font-size: 0.95rem; 
-                border-radius: 14px; 
-                white-space: nowrap; 
+            .badge-btn, .btn-reset {
+                width: auto;
+                min-width: 160px;
+                padding: 15px 20px;
+                font-size: 0.9rem;
+                border-radius: 12px;
+                white-space: nowrap;
                 justify-content: center !important;
             }
             
             /* Forza testo NON PARTECIPA su una riga sola */
-            .badge-no { white-space: nowrap !important; }
+            .badge-no {
+                white-space: nowrap !important;
+            }
             
             /* Responsive per accompagnatori */
             .accompagnatore-box {
                 max-width: 100%;
                 width: 100%;
-                margin-top: 8px;
+                margin-top: 10px;
                 text-align: center !important;
             }
             
@@ -514,7 +1308,6 @@
                 justify-content: center;
             }
             
-            /* CORREZIONE MODIFICATA: Allinea al centro il contenuto degli accompagnatori */
             .accompagnatore-content {
                 text-align: center !important;
                 align-items: center !important;
@@ -523,78 +1316,103 @@
             /* Responsive per riepilogo accompagnatori */
             .riepilogo-row {
                 flex-direction: column;
-                gap: 3px;
-                padding: 8px 10px;
+                gap: 5px;
+                padding: 10px 12px;
             }
             
             #riepilogoAccompagnatori {
-                padding: 10px;
-                margin: 10px 0;
-            }
-            
-            /* Responsive per search container */
-            .search-container {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            #toggleAccompagnatoriBtn {
-                width: 100%;
-            }
-            
-            /* CORREZIONE MODIFICATA: Allinea al centro i bottoni radio e badge */
-            td[data-label="Partecipa"],
-            td[data-label="Non Partecipa"],
-            td[data-label="Reset"] {
-                justify-content: center !important;
-            }
-            
-            /* CORREZIONE MODIFICATA: Assicura che i label siano centrati */
-            td[data-label="Partecipa"] label,
-            td[data-label="Non Partecipa"] label {
-                display: flex;
-                justify-content: center;
-                width: 100%;
-            }
-            
-            /* CORREZIONE MODIFICATA: Allinea al centro i bottoni data e gender in modalità admin */
-            .col-admin[style*="display:table-cell"] {
-                justify-content: center !important;
-                text-align: center !important;
-            }
-            
-            .col-admin[style*="display:table-cell"] > div {
-                justify-content: center !important;
-                text-align: center !important;
-                width: 100%;
-            }
-            
-            /* CORREZIONE MODIFICATA: Allinea al centro il contenuto dei bottoni data e gender */
-            .col-admin[style*="display:table-cell"] .btn-date-small,
-            .col-admin[style*="display:table-cell"] .btn-gender-small {
-                display: inline-flex;
-                justify-content: center;
-                align-items: center;
-            }
-            
-            /* CORREZIONE MODIFICATA: Allinea al centro il label della data */
-            .date-label {
-                display: inline-block;
-                text-align: center;
-                margin: 5px auto;
+                padding: 15px;
+                margin: 15px 0;
             }
             
             /* Animazioni responsive */
             .celebration-title {
-                font-size: 2rem;
+                font-size: 2.5rem;
             }
             
             .celebration-subtitle {
-                font-size: 1rem;
+                font-size: 1.2rem;
             }
             
             .celebration-icon {
-                font-size: 5rem;
+                font-size: 6rem;
+            }
+            
+            /* Admin buttons responsive */
+            #adminButtons {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .admin-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            
+            .admin-row input, .admin-row select, .admin-row button {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .top-btns {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                justify-content: flex-end;
+            }
+            
+            .footer-icons {
+                gap: 12px;
+            }
+            
+            .footer-icon {
+                font-size: 1.1rem;
+            }
+            
+            /* Fix per admin row in mobile */
+            .admin-row button {
+                padding: 10px 15px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Desktop - ottimizzazione schermi grandi */
+        @media screen and (min-width: 1400px) {
+            .container {
+                max-width: 1600px;
+            }
+            
+            .table-wrapper {
+                max-height: 600px;
+            }
+            
+            .logo-container img {
+                max-width: 900px;
+            }
+        }
+        
+        /* Schermi molto piccoli */
+        @media screen and (max-width: 480px) {
+            .logo-container img {
+                max-width: 100%;
+            }
+            
+            h2 {
+                font-size: 1.1rem;
+                letter-spacing: 1px;
+            }
+            
+            .badge-btn, .btn-reset {
+                min-width: 140px;
+                padding: 12px 15px;
+                font-size: 0.8rem;
+            }
+            
+            .categoria-badge {
+                min-width: 80px;
+                font-size: 0.65rem;
+                padding: 4px 8px;
             }
         }
     </style>
@@ -603,66 +1421,65 @@
 
 <div id="toast">Operazione riuscita!</div>
 
-<!-- Nuova animazione scenografica -->
+<!-- Animazione tematica pattinaggio -->
 <div id="celebrationEffect">
     <div class="celebration-content">
-        <span class="celebration-icon">🏆</span>
+        <span class="celebration-icon">🛼</span>
         <h1 class="celebration-title">ISCRITTO!</h1>
-        <p class="celebration-subtitle">Partecipazione confermata con successo</p>
+        <p class="celebration-subtitle">Pronto per la gara!</p>
     </div>
 </div>
 
 <div class="container">
     <div class="logo-container">
         <div class="top-btns">
-            <button class="logout-btn" id="logoutBtn" onclick="logoutAdmin()">LOGOUT</button>
-            <button class="icon-btn" id="adminIcon" onclick="toggleAdmin()">⚙️</button>
+            <button class="logout-btn" id="logoutBtn" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> LOGOUT</button>
+            <button class="icon-btn" id="adminIcon" onclick="toggleAdmin()"><i class="fas fa-cog"></i></button>
         </div>
-        <img src="logo.png" alt="Logo Juvenilia" onerror="this.style.display='none'">
+        <img src="logo.png" alt="Logo Juvenilia Racing Team" onerror="this.style.display='none'">
     </div>
 
-    <h2 id="mainTitle">Sincronizzazione Gara 3...</h2>
+    <h2 id="mainTitle">Juvenilia Racing Team - Iscrizioni Gara</h2>
     
     <div id="countdownBox" class="countdown-container">
-        <div id="timerDisplay" class="timer">Inizializzazione...</div>
+        <div id="timerDisplay" class="timer"><i class="fas fa-clock"></i> Inizializzazione...</div>
     </div>
 
     <div id="docLinksContainer" class="doc-links-user"></div>
 
+    <!-- Sezioni admin (nascoste di default) -->
     <div id="docsBox">
-        <div style="font-size: 12px; font-weight: bold; color: var(--orange); margin-left: 5px;">📄 DOCUMENTI E LINK ESTERNI:</div>
+        <div style="font-size: 14px; font-weight: bold; color: var(--racing-orange); margin-left: 5px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-file-alt"></i> DOCUMENTI E LINK ESTERNI:</div>
         <div class="admin-row">
             <input type="text" id="docLink1_URL" placeholder="Link Documento 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
             <input type="text" id="docLink1_Text" placeholder="Testo Pulsante 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
-            <button onclick="salvaDoc(1)" style="background:var(--success);">Salva 1</button>
-            <button onclick="azzeraDoc(1)" style="background:var(--danger);">Azzera 1</button>
+            <button onclick="salvaDoc(1)" style="background:var(--racing-green);"><i class="fas fa-save"></i> Salva 1</button>
+            <button onclick="azzeraDoc(1)" style="background:var(--racing-red);"><i class="fas fa-trash"></i> Azzera 1</button>
         </div>
         <div class="admin-row">
             <input type="text" id="docLink2_URL" placeholder="Link Documento 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
             <input type="text" id="docLink2_Text" placeholder="Testo Pulsante 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
-            <button onclick="salvaDoc(2)" style="background:var(--success);">Salva 2</button>
-            <button onclick="azzeraDoc(2)" style="background:var(--danger);">Azzera 2</button>
+            <button onclick="salvaDoc(2)" style="background:var(--racing-green);"><i class="fas fa-save"></i> Salva 2</button>
+            <button onclick="azzeraDoc(2)" style="background:var(--racing-red);"><i class="fas fa-trash"></i> Azzera 2</button>
         </div>
     </div>
 
     <div id="addAtletaBox">
         <div class="admin-row">
             <input type="text" id="editTitleInput" placeholder="Titolo della gara..." onfocus="isEditingOther=true" onblur="isEditingOther=false" style="text-transform: uppercase;">
-            <!-- MODIFICA: Il tasto reset ora chiama una funzione per salvare -->
-            <button onclick="resetTitolo()" class="btn-clear-input">reset</button>
-            <button onclick="salvaTitolo()" style="background:var(--purple);">Aggiorna Titolo</button>
+            <button onclick="resetTitolo()" class="btn-clear-input"><i class="fas fa-undo"></i> reset</button>
+            <button onclick="salvaTitolo()" style="background:var(--racing-purple);"><i class="fas fa-edit"></i> Aggiorna Titolo</button>
         </div>
         <div class="admin-row">
             <input type="text" id="dateA_Label" placeholder="Data A" onfocus="isEditingOther=true" onblur="isEditingOther=false" style="text-transform: uppercase;">
             <input type="text" id="dateB_Label" placeholder="Data B" onfocus="isEditingOther=true" onblur="isEditingOther=false" style="text-transform: uppercase;">
             <input type="text" id="dateC_Label" placeholder="Data C" onfocus="isEditingOther=true" onblur="isEditingOther=false" style="text-transform: uppercase;">
-            <!-- MODIFICA: Il tasto reset ora chiama una funzione per salvare -->
-            <button onclick="resetDateLabels()" class="btn-clear-input">reset</button>
-            <button onclick="salvaEtichetteDate()" style="background:var(--orange);">Salva</button>
+            <button onclick="resetDateLabels()" class="btn-clear-input"><i class="fas fa-undo"></i> reset</button>
+            <button onclick="salvaEtichetteDate()" style="background:var(--racing-orange);"><i class="fas fa-calendar-check"></i> Salva Date</button>
         </div>
         <div class="admin-row">
             <input type="text" id="newNome" placeholder="Cognome e Nome" oninput="this.value = this.value.toUpperCase()" style="text-transform: uppercase;">
-            <button onclick="document.getElementById('newNome').value=''" class="btn-clear-input">reset</button>
+            <button onclick="document.getElementById('newNome').value=''" class="btn-clear-input"><i class="fas fa-times"></i> reset</button>
             <select id="newCat">
                 <option value="">Categoria</option>
                 <option value="SENIOR">SENIOR</option>
@@ -673,69 +1490,73 @@
                 <option value="ESORDIENTI">ESORDIENTI</option>
                 <option value="GIOVANISSIMI">GIOVANISSIMI</option>
             </select>
-            <select id="newGender" style="flex: 0.3; min-width: 60px;">
+            <select id="newGender" style="flex: 0.3; min-width: 70px;">
                 <option value="">M/F</option>
                 <option value="M">M</option>
                 <option value="F">F</option>
             </select>
-            <button onclick="aggiungiAtleta()" style="background:var(--primary);">+ Aggiungi</button>
+            <button onclick="aggiungiAtleta()" style="background:var(--racing-blue);"><i class="fas fa-user-plus"></i> Aggiungi Atleta</button>
         </div>
         <div class="admin-row">
-            <div style="font-size: 12px; font-weight: bold; margin-left: 5px;">SCADENZA:</div>
+            <div style="font-size: 12px; font-weight: bold; margin-left: 5px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-hourglass-end"></i> SCADENZA:</div>
             <input type="datetime-local" id="deadlineInput">
-            <button onclick="confermaScadenzaDB()" style="background:var(--success);">CONFERMA</button>
-            <button onclick="resetScadenzaDB()" style="background:var(--danger);">RESET</button>
+            <button onclick="confermaScadenzaDB()" style="background:var(--racing-green);"><i class="fas fa-check-circle"></i> CONFERMA</button>
+            <button onclick="resetScadenzaDB()" style="background:var(--racing-red);"><i class="fas fa-ban"></i> RESET</button>
         </div>
     </div>
 
     <div id="costiBox">
-        <div id="costiInputs" class="admin-row" style="justify-content: center; gap: 15px;"></div>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 10px;">
-            <button onclick="salvaCosti()" style="background:var(--success); border:none; padding:12px 30px; color:white; border-radius:12px; font-weight:bold; cursor:pointer;">💾 Salva Quote</button>
-            <button onclick="azzeraTutteQuote()" style="background:var(--danger); border:none; padding:12px 30px; color:white; border-radius:12px; font-weight:bold; cursor:pointer;">🗑️ Azzera Quote</button>
+        <div id="costiInputs" class="admin-row" style="justify-content: center; gap: 20px;"></div>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; margin-top: 20px;">
+            <button onclick="salvaCosti()" style="background:var(--racing-green); border:none; padding:12px 30px; color:white; border-radius:15px; font-weight:bold; cursor:pointer; display: flex; align-items: center; gap: 10px;"><i class="fas fa-save"></i> 💾 Salva Quote</button>
+            <button onclick="azzeraTutteQuote()" style="background:var(--racing-red); border:none; padding:12px 30px; color:white; border-radius:15px; font-weight:bold; cursor:pointer; display: flex; align-items: center; gap: 10px;"><i class="fas fa-trash-alt"></i> 🗑️ Azzera Quote</button>
         </div>
     </div>
 
+    <!-- Statistiche -->
     <div class="stats-grid">
-        <div class="stat-card stat-presenti"><span>✅ PARTECIPA</span><div id="count-si" style="font-size: 1.5rem;">0</div></div>
-        <div class="stat-card stat-assenti"><span>❌ NON PARTECIPA</span><div id="count-no" style="font-size: 1.5rem;">0</div></div>
+        <div class="stat-card stat-presenti"><span><i class="fas fa-check-circle"></i> PARTECIPA</span><div id="count-si" style="font-size: 2.5rem;">0</div></div>
+        <div class="stat-card stat-assenti"><span><i class="fas fa-times-circle"></i> NON PARTECIPA</span><div id="count-no" style="font-size: 2.5rem;">0</div></div>
         <div id="adminTotalBox" class="stat-card">
-            <span>TOTALE QUOTE (ADMIN)</span>
-            <div id="totaleEuro" style="font-size: 1.8rem;">0.00 €</div>
+            <span><i class="fas fa-euro-sign"></i> TOTALE QUOTE (ADMIN)</span>
+            <div id="totaleEuro" style="font-size: 2.8rem;">0.00 €</div>
         </div>
     </div>
 
-    <div id="confirmedList" style="display:none; background: #ffffff; border-radius: 16px; padding: 20px; margin-bottom: 25px; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-        <div style="font-weight:800; font-size:0.85rem; color:#555; margin-bottom:10px; text-transform: uppercase;">👥 RIEPILOGO PARTECIPANTI:</div>
+    <!-- Riepilogo partecipanti -->
+    <div id="confirmedList">
+        <div style="font-weight:800; font-size:1rem; color:var(--racing-blue); margin-bottom:15px; text-transform: uppercase; display: flex; align-items: center; gap: 10px;"><i class="fas fa-users"></i> RIEPILOGO PARTECIPANTI:</div>
         <div id="listContent"></div>
     </div>
     
-    <!-- NUOVA SEZIONE RIEPILOGO ACCOMPAGNATORI - SEMPLIFICATA -->
+    <!-- Riepilogo accompagnatori -->
     <div id="riepilogoAccompagnatori">
         <div class="riepilogo-header">
-            <span>👥 ACCOMPAGNATORI (ADMIN)</span>
+            <span><i class="fas fa-user-friends"></i> ACCOMPAGNATORI (ADMIN)</span>
         </div>
         <div id="riepilogoContent"></div>
     </div>
     
+    <!-- Ricerca e toggle -->
     <div class="search-container">
-        <span class="search-icon">🔍</span>
+        <span class="search-icon"><i class="fas fa-search"></i></span>
         <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="Cerca il tuo nome o la tua categoria..." style="text-transform: uppercase;">
         <button id="toggleAccompagnatoriBtn" onclick="toggleVisibilitaAccompagnatori()">
-            👁️ Nascondi Box
+            <i class="fas fa-eye"></i> Nascondi Box
         </button>
     </div>
 
+    <!-- Tabella principale -->
     <div class="table-wrapper">
         <table>
             <thead>
                 <tr>
                     <th class="col-admin" style="display:none;"><input type="checkbox" onclick="selectAll(this)"></th>
-                    <th onclick="setSort('nome')" style="cursor:pointer;">Atleta ↕</th>
-                    <th onclick="setSort('categoria')" style="cursor:pointer;">Categoria ↕</th>
-                    <th>Partecipa</th>
-                    <th>Non Partecipa</th>
-                    <th>Reset</th>
+                    <th onclick="setSort('nome')" style="cursor:pointer;"><i class="fas fa-user"></i> Atleta ↕</th>
+                    <th onclick="setSort('categoria')" style="cursor:pointer;"><i class="fas fa-medal"></i> Categoria ↕</th>
+                    <th><i class="fas fa-check"></i> Partecipa</th>
+                    <th><i class="fas fa-times"></i> Non Partecipa</th>
+                    <th><i class="fas fa-redo"></i> Reset</th>
                     <th class="col-admin" style="display:none;">Azioni</th>
                 </tr>
             </thead>
@@ -743,17 +1564,32 @@
         </table>
     </div>
 
+    <!-- Bottoni admin -->
     <div id="adminButtons">
-        <button onclick="bulkAction(true)" style="background:var(--purple)">🔒 Nascondi Selezionati</button>
-        <button onclick="exportToExcel()" style="background:var(--success)">📊 Esporta Excel</button>
-        <button onclick="resetTutti()" style="background:var(--danger)">🔄 Reset Scelte</button>
-        <button onclick="unlockEverything()" style="background:var(--orange)">🔓 Mostra Tutti</button>
-        <button onclick="exportAccompagnatoriExcel()" style="background:#17a2b8">📋 Export Accompagnatori</button>
-        <button onclick="inviaRiepilogoTelegram()" style="background:var(--primary); grid-column: span 2;">📢 Invia Riepilogo Telegram</button>
+        <button onclick="bulkAction(true)" style="background:var(--racing-purple)"><i class="fas fa-lock"></i> Nascondi Selezionati</button>
+        <button onclick="exportToExcel()" style="background:var(--racing-green)"><i class="fas fa-file-excel"></i> Esporta Excel</button>
+        <button onclick="resetTutti()" style="background:var(--racing-red)"><i class="fas fa-redo"></i> Reset Scelte</button>
+        <button onclick="unlockEverything()" style="background:var(--racing-orange)"><i class="fas fa-lock-open"></i> Mostra Tutti</button>
+        <button onclick="exportAccompagnatoriExcel()" style="background:var(--racing-blue)"><i class="fas fa-users"></i> Export Accompagnatori</button>
+        <button onclick="inviaRiepilogoTelegram()" style="background:var(--gradient-racing); grid-column: span 2;"><i class="fas fa-paper-plane"></i> Invia Riepilogo Telegram</button>
+    </div>
+    
+    <!-- Footer tematico -->
+    <div class="racing-footer">
+        <p>Juvenilia Racing Team - Sistema Iscrizioni Gare di Pattinaggio Corsa</p>
+        <div class="footer-icons">
+            <i class="fas fa-trophy footer-icon"></i>
+            <i class="fas fa-medal footer-icon"></i>
+            <i class="fas fa-flag-checkered footer-icon"></i>
+            <i class="fas fa-stopwatch footer-icon"></i>
+            <i class="fas fa-running footer-icon"></i>
+        </div>
+        <p style="margin-top: 15px; font-size: 0.7rem; opacity: 0.7;">Pronti, partenza... via!</p>
     </div>
 </div>
 
 <script>
+    // SUPABASE CONFIGURATION
     const SUPABASE_URL = 'https://jnfnfszekfstuoiemkgf.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuZm5mc3pla2ZzdHVvaWVta2dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODkzOTEsImV4cCI6MjA4MzQ2NTM5MX0.lh7eRFlg7nnI7kEzVPBL9kNyZWX-XFeWQxVbvmzRlvA';
     const TELEGRAM_TOKEN = '8441085660:AAEui_yfGnT_quKPHVx_wsslcuJtm3KbTOI';
@@ -770,7 +1606,7 @@
     let costiCategorie = {};
     let isEditingCosti = false, isEditingDocs = false, isEditingOther = false;
     let selectedIds = new Set();
-    let mostraAccompagnatori = true; // Impostazione di default
+    let mostraAccompagnatori = true;
     let tempAccompagnatoriValues = {};
     let isTypingInAccompagnatore = false;
     let refreshInterval = null;
@@ -819,141 +1655,6 @@
                 input.value = tempAccompagnatoriValues[id];
             }
         });
-    }
-
-    // NUOVE FUNZIONI PER ANIMAZIONE SCENOGRAFICA CON DISSOLVENZA
-    function showCelebrationEffect() {
-        const effect = document.getElementById('celebrationEffect');
-        const content = document.querySelector('.celebration-content');
-        
-        // Resetta le classi di dissolvenza
-        effect.classList.remove('fade-out');
-        content.classList.remove('fade-out');
-        
-        // Mostra l'effetto
-        effect.style.display = 'block';
-        
-        // Crea fuochi d'artificio
-        createFireworks();
-        
-        // Crea confetti
-        createConfetti();
-        
-        // Crea scintille
-        createSparkles();
-        
-        // Dopo 2.5 secondi, inizia la dissolvenza
-        setTimeout(() => {
-            // Aggiungi la classe di dissolvenza a tutti gli elementi
-            effect.classList.add('fade-out');
-            content.classList.add('fade-out');
-            
-            // Aggiungi dissolvenza a tutte le particelle
-            document.querySelectorAll('.firework-particle, .confetti, .sparkle').forEach(el => {
-                el.classList.add('fade-out');
-            });
-            
-            // Nascondi completamente dopo la dissolvenza
-            setTimeout(() => {
-                effect.style.display = 'none';
-                // Rimuovi tutte le particelle
-                document.querySelectorAll('.firework-particle, .confetti, .sparkle').forEach(el => el.remove());
-                // Rimuovi le classi di dissolvenza
-                effect.classList.remove('fade-out');
-                content.classList.remove('fade-out');
-            }, 800); // Tempo della dissolvenza
-        }, 2500); // Tempo prima di iniziare la dissolvenza
-    }
-    
-    function createFireworks() {
-        const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#FF1493'];
-        
-        for (let i = 0; i < 12; i++) {
-            setTimeout(() => {
-                const centerX = Math.random() * window.innerWidth;
-                const centerY = Math.random() * window.innerHeight * 0.5;
-                
-                for (let j = 0; j < 40; j++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'firework-particle';
-                    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    particle.style.left = centerX + 'px';
-                    particle.style.top = centerY + 'px';
-                    
-                    const angle = Math.random() * Math.PI * 2;
-                    const velocity = 2 + Math.random() * 4;
-                    const tx = Math.cos(angle) * velocity * 100;
-                    const ty = Math.sin(angle) * velocity * 100;
-                    
-                    particle.style.setProperty('--tx', tx + 'px');
-                    particle.style.setProperty('--ty', ty + 'px');
-                    
-                    particle.style.animation = `explode 1.5s ease-out forwards`;
-                    particle.style.animationDelay = (Math.random() * 0.3) + 's';
-                    
-                    document.getElementById('celebrationEffect').appendChild(particle);
-                    
-                    // Rimuovi dopo l'animazione + dissolvenza
-                    setTimeout(() => {
-                        if (particle.parentNode) {
-                            particle.parentNode.removeChild(particle);
-                        }
-                    }, 2500); // Tempo più lungo per permettere la dissolvenza
-                }
-            }, i * 250);
-        }
-    }
-    
-    function createConfetti() {
-        const shapes = ['●', '■', '▲', '◆', '★'];
-        const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#FF1493'];
-        
-        for (let i = 0; i < 150; i++) {
-            const confetti = document.createElement('div');
-            confetti.className = 'confetti';
-            confetti.textContent = shapes[Math.floor(Math.random() * shapes.length)];
-            confetti.style.color = colors[Math.floor(Math.random() * colors.length)];
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.fontSize = (10 + Math.random() * 20) + 'px';
-            confetti.style.animation = `floatDown ${3.5 + Math.random() * 2}s linear forwards`;
-            confetti.style.animationDelay = (Math.random() * 0.5) + 's';
-            
-            document.getElementById('celebrationEffect').appendChild(confetti);
-            
-            // Rimuovi dopo l'animazione + dissolvenza
-            setTimeout(() => {
-                if (confetti.parentNode) {
-                    confetti.parentNode.removeChild(confetti);
-                }
-            }, 3500); // Tempo più lungo per permettere la dissolvenza
-        }
-    }
-    
-    function createSparkles() {
-        for (let i = 0; i < 80; i++) {
-            const sparkle = document.createElement('div');
-            sparkle.className = 'sparkle';
-            sparkle.style.left = Math.random() * 100 + 'vw';
-            sparkle.style.top = Math.random() * 100 + 'vh';
-            
-            const sparkleX = (Math.random() - 0.5) * 200;
-            const sparkleY = (Math.random() - 0.5) * 200;
-            
-            sparkle.style.setProperty('--sparkle-x', sparkleX + 'px');
-            sparkle.style.setProperty('--sparkle-y', sparkleY + 'px');
-            
-            sparkle.style.animation = `sparkleMove ${1.5 + Math.random()}s ease-out forwards`;
-            sparkle.style.animationDelay = (Math.random() * 0.5) + 's';
-            
-            document.getElementById('celebrationEffect').appendChild(sparkle);
-            
-            // Rimuovi dopo l'animazione + dissolvenza
-            setTimeout(() => {
-                if (sparkle.parentNode) {
-                    sparkle.parentNode.removeChild(sparkle);
-                }
-            }, 2500); // Tempo più lungo per permettere la dissolvenza
-        }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -1038,19 +1739,36 @@
             }
             document.getElementById('deadlineInput').value = sca?.valore || "";
         }
+        
+        // Aggiorna titolo della pagina
         const docCont = document.getElementById('docLinksContainer');
         docCont.innerHTML = "";
-        if(url1) docCont.innerHTML += `<a href="${url1}" target="_blank" class="btn-doc-link">📄 ${txt1 || 'Link 1'}</a>`;
-        if(url2) docCont.innerHTML += `<a href="${url2}" target="_blank" class="btn-doc-link">📄 ${txt2 || 'Link 2'}</a>`;
+        if(url1) docCont.innerHTML += `<a href="${url1}" target="_blank" class="btn-doc-link"><i class="fas fa-file-pdf"></i> ${txt1 || 'Link 1'}</a>`;
+        if(url2) docCont.innerHTML += `<a href="${url2}" target="_blank" class="btn-doc-link"><i class="fas fa-file-pdf"></i> ${txt2 || 'Link 2'}</a>`;
+        
         costiCategorie = {};
-        data.filter(c => c.chiave.startsWith('costo_')).forEach(c => { costiCategorie[c.chiave.replace('costo_', '').toUpperCase()] = parseFloat(c.valore) || 0; });
-        document.getElementById('mainTitle').innerText = tit?.valore || "Gara 3 Juvenilia";
+        data.filter(c => c.chiave.startsWith('costo_')).forEach(c => { 
+            costiCategorie[c.chiave.replace('costo_', '').toUpperCase()] = parseFloat(c.valore) || 0; 
+        });
+        
+        document.getElementById('mainTitle').innerText = tit?.valore || "Juvenilia Racing Team - Iscrizioni Gara";
+        
         const cBox = document.getElementById('countdownBox');
         if(sca?.valore && sca.valore !== "") {
             const diff = new Date(sca.valore).getTime() - new Date().getTime();
             cBox.style.display = 'flex';
-            if(diff <= 0) { isExpired = true; mostraTimerChiuso(); } else { isExpired = false; startCountdown(sca.valore); }
-        } else { isExpired = false; cBox.style.display = 'none'; }
+            if(diff <= 0) { 
+                isExpired = true; 
+                mostraTimerChiuso(); 
+            } else { 
+                isExpired = false; 
+                startCountdown(sca.valore); 
+            }
+        } else { 
+            isExpired = false; 
+            cBox.style.display = 'none'; 
+        }
+        
         if(isAdmin && !isEditingCosti) renderCostiInputs();
     }
 
@@ -1064,13 +1782,26 @@
     async function salvaDoc(num) {
         const url = document.getElementById(`docLink${num}_URL`).value;
         const txt = document.getElementById(`docLink${num}_Text`).value;
-        await _supabase.from(T_CONF).upsert([{ chiave: `doc_url_${num}`, valore: url }, { chiave: `doc_txt_${num}`, valore: txt }], { onConflict: 'chiave' });
-        showToast(`Documento ${num} salvato!`); isEditingDocs = false; caricaConfig();
+        await _supabase.from(T_CONF).upsert([
+            { chiave: `doc_url_${num}`, valore: url }, 
+            { chiave: `doc_txt_${num}`, valore: txt }
+        ], { onConflict: 'chiave' });
+        showToast(`Documento ${num} salvato!`); 
+        isEditingDocs = false; 
+        caricaConfig();
     }
 
-    async function azzeraDoc(num) { if(confirm(`Cancellare?`)) { await _supabase.from(T_CONF).upsert([{ chiave: `doc_url_${num}`, valore: "" }, { chiave: `doc_txt_${num}`, valore: "" }], { onConflict: 'chiave' }); showToast(`Azzerato!`); caricaConfig(); } }
+    async function azzeraDoc(num) { 
+        if(confirm(`Cancellare il documento ${num}?`)) { 
+            await _supabase.from(T_CONF).upsert([
+                { chiave: `doc_url_${num}`, valore: "" }, 
+                { chiave: `doc_txt_${num}`, valore: "" }
+            ], { onConflict: 'chiave' }); 
+            showToast(`Documento ${num} azzerato!`); 
+            caricaConfig(); 
+        } 
+    }
     
-    // MODIFICA: Funzione per resettare il titolo salvando nel database
     async function resetTitolo() {
         if (confirm("Resettare il titolo della gara?")) {
             await _supabase.from(T_CONF).upsert({ chiave: 'titolo_gara', valore: "" }, { onConflict: 'chiave' });
@@ -1080,7 +1811,6 @@
         }
     }
     
-    // MODIFICA: Funzione per resettare le etichette date salvando nel database
     async function resetDateLabels() {
         if (confirm("Resettare tutte le etichette date?")) {
             await _supabase.from(T_CONF).upsert([
@@ -1109,12 +1839,22 @@
         if (!container) return;
         const cats = [...new Set(currentData.map(a => a.categoria.toUpperCase()))].sort((a, b) => (customCatOrder[a] || 999) - (customCatOrder[b] || 999));
         if (container.children.length > 0) {
-            cats.forEach(c => { const input = container.querySelector(`input[data-cat="${c}"]`); if (input && document.activeElement !== input) { input.value = costiCategorie[c] || 0; } });
+            cats.forEach(c => { 
+                const input = container.querySelector(`input[data-cat="${c}"]`); 
+                if (input && document.activeElement !== input) { 
+                    input.value = costiCategorie[c] || 0; 
+                } 
+            });
         } else {
             cats.forEach(c => {
                 const val = costiCategorie[c] || 0;
-                container.innerHTML += `<div style="text-align:center;"><label style="font-size:10px; display:block; font-weight:bold;">${c}</label>
-                <input type="number" step="0.5" class="costo-in" data-cat="${c}" value="${val}" onfocus="isEditingCosti=true" onblur="isEditingCosti=false" style="width:60px; padding:8px; border-radius:8px; border:1px solid #ddd;"></div>`;
+                container.innerHTML += `
+                    <div style="text-align:center;">
+                        <label style="font-size:12px; display:block; font-weight:bold; color:var(--racing-blue); margin-bottom:5px;">${c}</label>
+                        <input type="number" step="0.5" class="costo-in" data-cat="${c}" value="${val}" 
+                               onfocus="isEditingCosti=true" onblur="isEditingCosti=false" 
+                               style="width:80px; padding:10px; border-radius:10px; border:2px solid var(--racing-light); text-align:center; font-weight:bold;">
+                    </div>`;
             });
         }
     }
@@ -1123,7 +1863,9 @@
         const inputs = Array.from(document.querySelectorAll('.costo-in'));
         const upserts = inputs.map(i => ({ chiave: `costo_${i.dataset.cat}`, valore: i.value }));
         await _supabase.from(T_CONF).upsert(upserts, { onConflict: 'chiave' });
-        showToast("Quote salvate!"); isEditingCosti = false; await caricaConfig();
+        showToast("Quote salvate!"); 
+        isEditingCosti = false; 
+        await caricaConfig();
     }
 
     async function azzeraTutteQuote() {
@@ -1132,238 +1874,33 @@
             const upserts = cats.map(c => ({ chiave: `costo_${c}`, valore: "0" }));
             await _supabase.from(T_CONF).upsert(upserts, { onConflict: 'chiave' });
             document.querySelectorAll('.costo-in').forEach(i => i.value = 0);
-            showToast("Quote azzerate!"); await caricaConfig();
+            showToast("Quote azzerate!"); 
+            await caricaConfig();
         }
     }
 
     function setSort(type) { sortBy = type; renderData(); }
 
-    function renderData() {
-        const tbody = document.getElementById('tabella-body');
-        const listContent = document.getElementById('listContent');
-        const riepilogoContent = document.getElementById('riepilogoContent');
-        
-        if (!tbody) return; 
-        
-        tbody.innerHTML = ''; 
-        listContent.innerHTML = '';
-        riepilogoContent.innerHTML = '';
-        
-        let cSi = 0, cNo = 0, totaleEuro = 0, partPerCat = {};
-        let riepilogoArray = [];
-        
-        let sorted = [...currentData].sort((a,b) => {
-            if (sortBy === 'categoria') {
-                const orderA = customCatOrder[a.categoria.toUpperCase()] || 999;
-                const orderB = customCatOrder[b.categoria.toUpperCase()] || 999;
-                if (orderA !== orderB) return orderA - orderB;
-                return a.nome.localeCompare(b.nome);
-            }
-            return a.nome.localeCompare(b.nome);
-        });
-        
-        sorted.forEach(p => {
-            if (p.bloccato && !isAdmin) return;
-            
-            let note = p.note || "";
-            let dataUf = note.includes('B') ? labelB : (note.includes('C') ? labelC : labelA);
-            const gender = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : '');
-            
-            // Aggiungi al riepilogo admin solo se ha un accompagnatore
-            if (isAdmin && p.accompagnatore && p.accompagnatore.trim() !== "") {
-                riepilogoArray.push({
-                    nome: p.nome,
-                    accompagnatore: p.accompagnatore,
-                    stato: p.stato
-                });
-            }
-            
-            if(p.stato === 'si') {
-                cSi++; 
-                totaleEuro += (costiCategorie[p.categoria.toUpperCase()] || 0);
-                
-                if(!partPerCat[p.categoria]) partPerCat[p.categoria] = { M: [], F: [], U: [] };
-                const atletaObj = {
-                    nome: p.nome, 
-                    data: dataUf, 
-                    gender: gender,
-                    accompagnatore: p.accompagnatore || ""
-                };
-                
-                if(gender === 'M') partPerCat[p.categoria].M.push(atletaObj); 
-                else if(gender === 'F') partPerCat[p.categoria].F.push(atletaObj); 
-                else partPerCat[p.categoria].U.push(atletaObj);
-            }
-            
-            if(p.stato === 'no') cNo++;
-            
-            const tr = document.createElement('tr'); 
-            tr.classList.add("tr-" + p.categoria.toLowerCase());
-            
-            const disabled = isExpired && !isAdmin ? 'disabled' : '';
-            const displayAdmin = isAdmin ? 'table-cell' : 'none';
-            const labelHtml = dataUf ? `<span class="date-label" style="background:var(--orange); color:white; padding:2px 6px; border-radius:4px; font-size:0.7rem;">${dataUf}</span>` : "";
-            const genderHtml = gender ? `<span class="badge-gender bg-${gender.toLowerCase()}">${gender}</span>` : "";
-            const isChecked = selectedIds.has(p.id.toString()) ? 'checked' : '';
-            
-            const hasAccompagnatore = p.accompagnatore && p.accompagnatore.trim() !== "";
-            const showInput = !hasAccompagnatore || isAdmin;
-            
-            // Box accompagnatore - compatto
-            const accompagnatoreBox = `
-                <div class="accompagnatore-box ${mostraAccompagnatori ? 'show' : ''}">
-                    ${showInput ? 
-                        `<div class="accompagnatore-content">
-                            <input type="text" class="accompagnatore-input" id="acc_input_${p.id}" 
-                                   placeholder="${hasAccompagnatore ? 'Modifica accompagnatore...' : 'Nome accompagnatore...'}" 
-                                   ${disabled ? 'disabled' : ''}
-                                   value="${hasAccompagnatore ? p.accompagnatore : ''}"
-                                   style="text-transform: uppercase;">
-                            <button class="btn-accompagnatore" id="acc_btn_${p.id}" 
-                                    onclick="salvaAccompagnatore('${p.id}')" 
-                                    ${disabled ? 'disabled' : ''}>
-                                ${hasAccompagnatore ? 'Aggiorna' : 'Conferma'}
-                            </button>
-                            ${hasAccompagnatore && isAdmin ? 
-                                `<div class="accompagnatore-actions">
-                                    <button class="btn-modify" onclick="modificaAccompagnatore('${p.id}')">Modifica</button>
-                                    <button class="btn-remove" onclick="rimuoviAccompagnatore('${p.id}')">Rimuovi</button>
-                                </div>` 
-                                : ''}
-                        </div>` 
-                        : 
-                        `<div class="accompagnatore-confirmed">
-                            ✅ Accompagnatore registrato
-                        </div>`
-                    }
-                </div>
-            `;
-            
-            tr.innerHTML = `
-                <td class="col-admin" style="display:${displayAdmin}"><input type="checkbox" class="bulk-cb" value="${p.id}" ${isChecked}></td>
-                <td class="nome-cell">
-                    <div style="display:flex; flex-direction:column; gap:5px;">
-                        <div>${p.nome}${genderHtml}${p.bloccato ? ' 🔒' : ''}</div>
-                        ${labelHtml}
-                        ${accompagnatoreBox}
-                        <div class="col-admin" style="display:${displayAdmin}; gap:4px; margin-top:8px;">
-                            <div style="display:inline-flex; gap:3px; margin-right:12px;">
-                                <button class="btn-date-small ${!note || (!note.includes('B') && !note.includes('C')) ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'A')">A</button>
-                                <button class="btn-date-small ${note.includes('B') ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'B')">B</button>
-                                <button class="btn-date-small ${note.includes('C') ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'C')">C</button>
-                            </div>
-                            <div style="display:inline-flex; gap:3px;">
-                                <button class="btn-gender-small ${gender==='M'?'active-m':''}" onclick="assegnaDettaglio('${p.id}', 'gender', 'M')">M</button>
-                                <button class="btn-gender-small ${gender==='F'?'active-f':''}" onclick="assegnaDettaglio('${p.id}', 'gender', 'F')">F</button>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-                <td data-label="Categoria" style="font-weight:bold;">${p.categoria}</td>
-                <td data-label="Partecipa"><label><input type="radio" name="r_${p.id}" value="si" ${p.stato==='si'?'checked':''} ${disabled} onclick="salva('${p.id}','si')"><span class="badge-btn badge-si">PARTECIPA</span></label></td>
-                <td data-label="Non Partecipa"><label><input type="radio" name="r_${p.id}" value="no" ${p.stato==='no'?'checked':''} ${disabled} onclick="salva('${p.id}','no')"><span class="badge-btn badge-no">NON PARTECIPA</span></label></td>
-                <td data-label="Reset"><button class="btn-reset" onclick="salva('${p.id}','vuoto')" ${disabled}>Reset</button></td>
-                <td class="col-admin" style="display:${displayAdmin}">
-                    <button onclick="toggleLock('${p.id}', ${p.bloccato})" style="background:none; border:none; cursor:pointer;">🔒</button>
-                    <button onclick="eliminaAtleta('${p.id}','${p.nome}')" style="background:none; border:none; cursor:pointer;">🗑️</button>
-                </td>
-            `;
-            
-            tbody.appendChild(tr);
-        });
-        
-        document.getElementById('totaleEuro').innerText = totaleEuro.toFixed(2) + " €";
-        document.getElementById('count-si').innerText = cSi; 
-        document.getElementById('count-no').innerText = cNo;
-        
-        // RENDER RIEPILOGO ACCOMPAGNATORI (solo admin)
-        if (isAdmin) {
-            document.getElementById('riepilogoAccompagnatori').style.display = 'block';
-            
-            if (riepilogoArray.length > 0) {
-                riepilogoArray.sort((a,b) => a.nome.localeCompare(b.nome));
-                
-                riepilogoContent.innerHTML = `
-                    <div class="riepilogo-row" style="font-weight:bold; background:#17a2b8; color:white;">
-                        <span>Atleta</span>
-                        <span>Accompagnatore</span>
-                    </div>
-                `;
-                
-                riepilogoArray.forEach(item => {
-                    riepilogoContent.innerHTML += `
-                        <div class="riepilogo-row">
-                            <span>${item.nome}</span>
-                            <span>${item.accompagnatore}</span>
-                        </div>
-                    `;
-                });
-            } else {
-                riepilogoContent.innerHTML = `<div style="text-align:center; padding:10px; color:#666; font-size:0.8rem;">Nessun accompagnatore registrato</div>`;
-            }
-        } else {
-            document.getElementById('riepilogoAccompagnatori').style.display = 'none';
-        }
-        
-        // RENDER LISTA PARTECIPANTI (SOLO NOME ATLETA, SENZA ACCOMPAGNATORE NE DATA)
-        Object.keys(partPerCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(cat => {
-            const catDiv = document.createElement('div'); 
-            catDiv.style.marginBottom = "15px";
-            
-            catDiv.innerHTML = `<div style="font-weight:bold; color:var(--primary); margin-top:10px; border-bottom:1px solid #eee; padding-bottom:5px; text-transform:uppercase;">${cat}</div>`;
-            
-            const renderGroup = (label, list, colorClass, titleClass) => {
-                if(list.length === 0) return "";
-                list.sort((a,b) => a.nome.localeCompare(b.nome));
-                let html = `<div class="gender-section"><span class="gender-title ${titleClass}">${label} (${list.length}):</span>`;
-                list.forEach(obj => { 
-                    // SOLO NOME ATLETA, niente data nè accompagnatore
-                    html += `<span style="display:inline-block; background:#f0f7ff; padding:5px 10px; border-radius:20px; font-size:0.75rem; margin:3px; border:1px solid #d0e3ff;">${obj.nome}</span>`; 
-                });
-                html += `</div>`; 
-                return html;
-            };
-            
-            catDiv.innerHTML += renderGroup("Maschi", partPerCat[cat].M, "bg-m", "title-m");
-            catDiv.innerHTML += renderGroup("Femmine", partPerCat[cat].F, "bg-f", "title-f");
-            catDiv.innerHTML += renderGroup("Non specificati", partPerCat[cat].U, "", "");
-            
-            listContent.appendChild(catDiv);
-        });
-        
-        document.getElementById('confirmedList').style.display = cSi > 0 ? 'block' : 'none';
-        filterTable();
-        
-        // Aggiorna il pulsante toggle
-        const toggleBtn = document.getElementById('toggleAccompagnatoriBtn');
-        if (isAdmin) {
-            toggleBtn.style.display = 'inline-block';
-            toggleBtn.textContent = mostraAccompagnatori ? '👁️ Nascondi Box' : '👁️ Mostra Box';
-        } else {
-            toggleBtn.style.display = 'none';
-        }
-    }
-
     async function salva(id, val) { 
         const atleta = currentData.find(a => a.id == id);
         if (!isAdmin && !confirm(`Sei veramente tu ${atleta.nome}?`)) { renderData(); return; }
         if (val === 'si' && !isAdmin) {
-            // Mostra l'animazione scenografica invece del semplice popup
+            // Mostra l'animazione tematica pattinaggio
             showCelebrationEffect();
         }
         
         // Creiamo l'oggetto di aggiornamento
         const updateData = { stato: val };
         
-        // MODIFICA 1: SOLO ADMIN può resettare anche l'accompagnatore quando resetta lo stato
+        // SOLO ADMIN può resettare anche l'accompagnatore quando resetta lo stato
         if (val === 'vuoto' && isAdmin) {
             updateData.accompagnatore = "";
         }
         
         await _supabase.from(T_DATA).update(updateData).eq('id', id);
-        showToast("Scelta salvata");
+        showToast("Scelta salvata!");
         
-        // MODIFICA 2: INVIA TELEGRAM SOLO SE NON ADMIN
+        // INVIA TELEGRAM SOLO SE NON ADMIN
         if (val !== 'vuoto' && !isAdmin) {
             let note = atleta.note || "";
             let d = note.includes('B') ? labelB : (note.includes('C') ? labelC : labelA);
@@ -1448,9 +1985,9 @@
         // Aggiorna il testo del pulsante
         const btn = document.getElementById('toggleAccompagnatoriBtn');
         if (mostraAccompagnatori) {
-            btn.textContent = '👁️ Nascondi Box';
+            btn.innerHTML = '<i class="fas fa-eye-slash"></i> Nascondi Box';
         } else {
-            btn.textContent = '👁️ Mostra Box';
+            btn.innerHTML = '<i class="fas fa-eye"></i> Mostra Box';
         }
         
         // Ricarica i dati per applicare la visibilità
@@ -1477,15 +2014,23 @@
         const ws = XLSX.utils.json_to_sheet(dataExp);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Accompagnatori");
-        XLSX.writeFile(wb, `Accompagnatori_Gara3.xlsx`);
+        XLSX.writeFile(wb, `Accompagnatori_Gara_Juvenilia.xlsx`);
         showToast("Excel esportato!");
     }
 
     async function inviaTelegram(nome, scelta, gara, dataGara) {
         const scTxt = scelta === 'si' ? 'PARTECIPA' : 'NON PARTECIPA';
         const dataTxt = dataGara ? `\n📅 *Data:* ${dataGara}` : "";
-        const testo = `🏆 *Evento:* ${gara}\n👤 *Atleta:* ${nome}${dataTxt}\n📝 *Scelta:* ${scTxt}`;
-        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: testo, parse_mode: 'Markdown' }) });
+        const testo = `🏆 *Juvenilia Racing Team*\n*Evento:* ${gara}\n👤 *Atleta:* ${nome}${dataTxt}\n📝 *Scelta:* ${scTxt}\n🛼 *Pronto per la gara!*`;
+        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ 
+                chat_id: TELEGRAM_CHAT_ID, 
+                text: testo, 
+                parse_mode: 'Markdown' 
+            }) 
+        });
     }
 
     async function inviaRiepilogoTelegram() {
@@ -1501,7 +2046,7 @@
                 if(g === 'M') pCat[p.categoria].M.push(info); else if(g === 'F') pCat[p.categoria].F.push(info); else pCat[p.categoria].U.push(info);
             } 
         });
-        let msg = `📝 *RIEPILOGO ISCRIZIONI*\n🏆 *Evento:* ${gara}\n\n`;
+        let msg = `🛼 *JUVENILIA RACING TEAM - RIEPILOGO ISCRIZIONI*\n🏆 *Evento:* ${gara}\n\n`;
         Object.keys(pCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(c => {
             msg += `*${c.toUpperCase()}*\n`;
             if(pCat[c].M.length > 0) { pCat[c].M.sort(); msg += `♂️ Maschi: ${pCat[c].M.join(', ')}\n`; }
@@ -1509,8 +2054,17 @@
             if(pCat[c].U.length > 0) { pCat[c].U.sort(); msg += `? Altri: ${pCat[c].U.join(', ')}\n`; }
             msg += `\n`;
         });
-        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'Markdown' }) });
-        showToast("Riepilogo inviato");
+        msg += `🛼 *Pronti per la gara!*`;
+        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, { 
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' }, 
+            body: JSON.stringify({ 
+                chat_id: TELEGRAM_CHAT_ID, 
+                text: msg, 
+                parse_mode: 'Markdown' 
+            }) 
+        });
+        showToast("Riepilogo inviato al team!");
     }
 
     async function exportToExcel() {
@@ -1519,16 +2073,18 @@
             Categoria: p.categoria, 
             Sesso: p.note?.includes('F')?'F':'M', 
             Scelta: p.stato === 'si' ? 'partecipa' : (p.stato === 'no' ? 'non partecipa' : 'da definire'),
-            Accompagnatore: p.accompagnatore || ""
+            Accompagnatore: p.accompagnatore || "",
+            Data_Prescelta: p.note?.includes('B') ? labelB : (p.note?.includes('C') ? labelC : labelA)
         }));
         const ws = XLSX.utils.json_to_sheet(dataExp);
         const wb = XLSX.utils.book_new(); 
-        XLSX.utils.book_append_sheet(wb, ws, "Iscrizioni"); 
-        XLSX.writeFile(wb, `Report_Juvenilia_Gara3.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, "Iscrizioni Juvenilia"); 
+        XLSX.writeFile(wb, `Iscrizioni_Juvenilia_Racing_Team.xlsx`);
+        showToast("Excel esportato!");
     }
 
     function toggleAdmin() {
-        const pass = prompt("Password:");
+        const pass = prompt("Password amministratore:");
         if (!pass) return;
         
         if (btoa(pass) === O_P) {
@@ -1546,7 +2102,7 @@
             
             caricaConfig(); 
             renderData(); 
-            showToast("Admin Attivo");
+            showToast("Modalità Admin Attiva");
         } else { 
             alert("Password Errata"); 
         }
@@ -1556,44 +2112,128 @@
         if(timerInterval) clearInterval(timerInterval);
         timerInterval = setInterval(() => {
             const distance = new Date(endTime).getTime() - new Date().getTime();
-            if (distance <= 0) { clearInterval(timerInterval); isExpired = true; mostraTimerChiuso(); return; }
-            const d = Math.floor(distance/86400000), h = Math.floor((distance%86400000)/3600000), m = Math.floor((distance%3600000)/60000), s = Math.floor((distance%60000)/1000);
-            document.getElementById('timerDisplay').innerText = `SCADENZA: ${d}g ${h}h ${m}m ${s}s`;
+            if (distance <= 0) { 
+                clearInterval(timerInterval); 
+                isExpired = true; 
+                mostraTimerChiuso(); 
+                return; 
+            }
+            const d = Math.floor(distance/86400000);
+            const h = Math.floor((distance%86400000)/3600000);
+            const m = Math.floor((distance%3600000)/60000);
+            const s = Math.floor((distance%60000)/1000);
+            document.getElementById('timerDisplay').innerHTML = `<i class="fas fa-hourglass-half"></i> SCADENZA: ${d}g ${h}h ${m}m ${s}s`;
         }, 1000);
     }
 
-    function mostraTimerChiuso() { const d = document.getElementById('timerDisplay'); d.innerText = "ISCRIZIONI CHIUSE"; d.style.color = "var(--danger)"; }
-    async function salvaTitolo() { const t = document.getElementById('editTitleInput').value; await _supabase.from(T_CONF).upsert({ chiave: 'titolo_gara', valore: t }, { onConflict: 'chiave' }); showToast("Titolo Salvato"); isEditingOther = false; caricaConfig(); }
-    async function confermaScadenzaDB() { const v = document.getElementById('deadlineInput').value; if(v) await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: v }, { onConflict: 'chiave' }); caricaConfig(); }
-    async function resetScadenzaDB() { await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: "" }, { onConflict: 'chiave' }); caricaConfig(); }
+    function mostraTimerChiuso() { 
+        const d = document.getElementById('timerDisplay'); 
+        d.innerHTML = `<i class="fas fa-hourglass-end"></i> ISCRIZIONI CHIUSE`; 
+        d.style.color = "var(--racing-red)"; 
+    }
+    
+    async function salvaTitolo() { 
+        const t = document.getElementById('editTitleInput').value; 
+        await _supabase.from(T_CONF).upsert({ chiave: 'titolo_gara', valore: t }, { onConflict: 'chiave' }); 
+        showToast("Titolo Salvato!"); 
+        isEditingOther = false; 
+        caricaConfig(); 
+    }
+    
+    async function confermaScadenzaDB() { 
+        const v = document.getElementById('deadlineInput').value; 
+        if(v) {
+            await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: v }, { onConflict: 'chiave' });
+            showToast("Scadenza confermata!");
+        }
+        caricaConfig(); 
+    }
+    
+    async function resetScadenzaDB() { 
+        await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: "" }, { onConflict: 'chiave' }); 
+        showToast("Scadenza resettata!");
+        caricaConfig(); 
+    }
+    
     async function aggiungiAtleta() { 
         const n = document.getElementById('newNome').value.trim().toUpperCase();
-        const c = document.getElementById('newCat').value; const g = document.getElementById('newGender').value;
-        if(n && c && g) { await _supabase.from(T_DATA).insert([{ nome: n, categoria: c, stato: 'vuoto', note: g, bloccato: false, accompagnatore: "" }]); document.getElementById('newNome').value = ""; await caricaTabella(); }
-        else { alert("Inserisci Nome, Categoria e Genere"); }
+        const c = document.getElementById('newCat').value; 
+        const g = document.getElementById('newGender').value;
+        if(n && c && g) { 
+            await _supabase.from(T_DATA).insert([{ 
+                nome: n, 
+                categoria: c, 
+                stato: 'vuoto', 
+                note: g, 
+                bloccato: false, 
+                accompagnatore: "" 
+            }]); 
+            document.getElementById('newNome').value = ""; 
+            showToast("Atleta aggiunto!");
+            await caricaTabella(); 
+        } else { 
+            alert("Inserisci Nome, Categoria e Genere"); 
+        }
     }
+    
     async function salvaEtichetteDate() { 
-        const a = document.getElementById('dateA_Label').value, b = document.getElementById('dateB_Label').value, c = document.getElementById('dateC_Label').value;
-        await _supabase.from(T_CONF).upsert([{ chiave: 'data_label_a', valore: a }, { chiave: 'data_label_b', valore: b }, { chiave: 'data_label_c', valore: c }], { onConflict: 'chiave' });
-        showToast("Etichette Salvate"); isEditingOther = false; caricaConfig(); 
+        const a = document.getElementById('dateA_Label').value, 
+              b = document.getElementById('dateB_Label').value, 
+              c = document.getElementById('dateC_Label').value;
+        await _supabase.from(T_CONF).upsert([
+            { chiave: 'data_label_a', valore: a }, 
+            { chiave: 'data_label_b', valore: b }, 
+            { chiave: 'data_label_c', valore: c }
+        ], { onConflict: 'chiave' });
+        showToast("Etichette Salvate!"); 
+        isEditingOther = false; 
+        caricaConfig(); 
     }
+    
     async function assegnaDettaglio(id, tipo, valore) { 
         const atleta = currentData.find(a => a.id == id);
-        let note = atleta.note || ""; let g = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : '');
+        let note = atleta.note || ""; 
+        let g = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : '');
         let d = note.includes('B') ? 'B' : (note.includes('C') ? 'C' : '');
         if(tipo === 'gender') g = valore;
         if(tipo === 'data') d = (valore === 'A' ? '' : valore);
         await _supabase.from(T_DATA).update({ note: g + d }).eq('id', id);
+        showToast("Dettaglio aggiornato!");
         caricaTabella(); 
     }
-    function selectAll(s) { document.querySelectorAll('.bulk-cb').forEach(cb => { cb.checked = s.checked; if(s.checked) selectedIds.add(cb.value); else selectedIds.delete(cb.value); }); }
-    async function bulkAction(l) { const ids = Array.from(document.querySelectorAll('.bulk-cb:checked')).map(cb => cb.value); if (ids.length) { await _supabase.from(T_DATA).update({ bloccato: l }).in('id', ids); selectedIds.clear(); caricaTabella(); } }
-    async function toggleLock(id, cur) { await _supabase.from(T_DATA).update({ bloccato: !cur }).eq('id', id); caricaTabella(); }
-    async function unlockEverything() { await _supabase.from(T_DATA).update({ bloccato: false }).neq('id', 0); caricaTabella(); }
     
-    // MODIFICA 4: Reset tutti resetta e salva immediatamente
+    function selectAll(s) { 
+        document.querySelectorAll('.bulk-cb').forEach(cb => { 
+            cb.checked = s.checked; 
+            if(s.checked) selectedIds.add(cb.value); 
+            else selectedIds.delete(cb.value); 
+        }); 
+    }
+    
+    async function bulkAction(l) { 
+        const ids = Array.from(document.querySelectorAll('.bulk-cb:checked')).map(cb => cb.value); 
+        if (ids.length) { 
+            await _supabase.from(T_DATA).update({ bloccato: l }).in('id', ids); 
+            selectedIds.clear(); 
+            showToast(l ? "Atleti nascosti" : "Atleti mostrati");
+            caricaTabella(); 
+        } 
+    }
+    
+    async function toggleLock(id, cur) { 
+        await _supabase.from(T_DATA).update({ bloccato: !cur }).eq('id', id); 
+        showToast(!cur ? "Atleta bloccato" : "Atleta sbloccato");
+        caricaTabella(); 
+    }
+    
+    async function unlockEverything() { 
+        await _supabase.from(T_DATA).update({ bloccato: false }).neq('id', 0); 
+        showToast("Tutti gli atleti sbloccati");
+        caricaTabella(); 
+    }
+    
     async function resetTutti() { 
-        if(confirm("Resettare TUTTE le scelte e rimuovere TUTTI gli accompagnatori?")) { 
+        if(confirm("Resettare TUTTE le scelte e rimuovere TUTTI gli accompagnatori?\nQuesta operazione non può essere annullata.")) { 
             await _supabase.from(T_DATA).update({ 
                 stato: 'vuoto', 
                 accompagnatore: "" 
@@ -1603,11 +2243,410 @@
         } 
     }
     
-    async function eliminaAtleta(id, n) { if(confirm(`Eliminare ${n}?`)) { await _supabase.from(T_DATA).delete().eq('id', id); caricaTabella(); } }
-    function filterTable() { const s = document.getElementById("searchInput").value.toUpperCase(); document.querySelectorAll("#tabella-body tr").forEach(tr => { tr.style.display = tr.innerText.toUpperCase().includes(s) ? "" : "none"; }); }
-    function showToast(m) { const t = document.getElementById("toast"); t.innerText = m; t.className = "show"; setTimeout(() => t.className = "", 3000); }
-    function logoutAdmin() { location.reload(); }
+    async function eliminaAtleta(id, n) { 
+        if(confirm(`Eliminare l'atleta ${n}?\nQuesta operazione non può essere annullata.`)) { 
+            await _supabase.from(T_DATA).delete().eq('id', id); 
+            showToast("Atleta eliminato");
+            caricaTabella(); 
+        } 
+    }
+    
+    function filterTable() { 
+        const s = document.getElementById("searchInput").value.toUpperCase(); 
+        document.querySelectorAll("#tabella-body tr").forEach(tr => { 
+            tr.style.display = tr.innerText.toUpperCase().includes(s) ? "" : "none"; 
+        }); 
+    }
+    
+    function showToast(m) { 
+        const t = document.getElementById("toast"); 
+        t.innerText = m; 
+        t.className = "show"; 
+        setTimeout(() => t.className = "", 3000); 
+    }
+    
+    function logoutAdmin() { 
+        if(confirm("Uscire dalla modalità amministratore?")) {
+            location.reload(); 
+        }
+    }
 
+    // ==================== ANIMAZIONE CELEBRAZIONE ====================
+    function showCelebrationEffect() {
+        const effect = document.getElementById('celebrationEffect');
+        const content = document.querySelector('.celebration-content');
+        
+        // Resetta le classi di dissolvenza
+        effect.classList.remove('fade-out');
+        content.classList.remove('fade-out');
+        
+        // Mostra l'effetto
+        effect.style.display = 'block';
+        
+        // Crea particelle a tema pattinaggio
+        createSkateParticles();
+        createSpeedLines();
+        createRacingConfetti();
+        
+        // Dopo 2.5 secondi, inizia la dissolvenza
+        setTimeout(() => {
+            // Aggiungi la classe di dissolvenza a tutti gli elementi
+            effect.classList.add('fade-out');
+            content.classList.add('fade-out');
+            
+            // Aggiungi dissolvenza a tutte le particelle
+            document.querySelectorAll('.skate-particle, .speed-line, .racing-confetti').forEach(el => {
+                el.classList.add('fade-out');
+            });
+            
+            // Nascondi completamente dopo la dissolvenza
+            setTimeout(() => {
+                effect.style.display = 'none';
+                // Rimuovi tutte le particelle
+                document.querySelectorAll('.skate-particle, .speed-line, .racing-confetti').forEach(el => el.remove());
+                // Rimuovi le classi di dissolvenza
+                effect.classList.remove('fade-out');
+                content.classList.remove('fade-out');
+            }, 800); // Tempo della dissolvenza
+        }, 2500); // Tempo prima di iniziare la dissolvenza
+    }
+    
+    function createSkateParticles() {
+        const colors = ['#E63946', '#1D3557', '#FFD166', '#2A9D8F', '#6A4C93'];
+        
+        for (let i = 0; i < 20; i++) {
+            setTimeout(() => {
+                for (let j = 0; j < 5; j++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'skate-particle';
+                    particle.style.left = Math.random() * 100 + 'vw';
+                    particle.style.top = Math.random() * 100 + 'vh';
+                    
+                    const skateX = (Math.random() - 0.5) * 300;
+                    const skateY = (Math.random() - 0.5) * 300;
+                    const skateRotate = Math.random() * 360;
+                    
+                    particle.style.setProperty('--skate-x', skateX + 'px');
+                    particle.style.setProperty('--skate-y', skateY + 'px');
+                    particle.style.setProperty('--skate-rotate', skateRotate + 'deg');
+                    
+                    // Colore casuale
+                    particle.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
+                    
+                    particle.style.animation = `skateMove ${2 + Math.random()}s ease-out forwards`;
+                    particle.style.animationDelay = (Math.random() * 0.5) + 's';
+                    
+                    document.getElementById('celebrationEffect').appendChild(particle);
+                    
+                    // Rimuovi dopo l'animazione + dissolvenza
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 3000);
+                }
+            }, i * 150);
+        }
+    }
+    
+    function createSpeedLines() {
+        for (let i = 0; i < 30; i++) {
+            const line = document.createElement('div');
+            line.className = 'speed-line';
+            line.style.top = Math.random() * 100 + 'vh';
+            line.style.left = '-100px';
+            
+            const lineAngle = (Math.random() - 0.5) * 30;
+            line.style.setProperty('--line-angle', lineAngle + 'deg');
+            
+            line.style.animation = `speedLineMove ${1 + Math.random() * 2}s linear forwards`;
+            line.style.animationDelay = (Math.random() * 1) + 's';
+            
+            // Opacità e colore variabile
+            line.style.opacity = 0.3 + Math.random() * 0.5;
+            line.style.background = `linear-gradient(90deg, transparent, ${
+                Math.random() > 0.5 ? 'rgba(255,255,255,0.8)' : 'rgba(255,209,102,0.8)'
+            }, transparent)`;
+            
+            document.getElementById('celebrationEffect').appendChild(line);
+            
+            // Rimuovi dopo l'animazione
+            setTimeout(() => {
+                if (line.parentNode) {
+                    line.parentNode.removeChild(line);
+                }
+            }, 4000);
+        }
+    }
+    
+    function createRacingConfetti() {
+        const colors = ['#E63946', '#1D3557', '#FFD166', '#2A9D8F', '#6A4C93', '#F4A261', '#A8DADC'];
+        
+        for (let i = 0; i < 200; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'racing-confetti';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = '-20px';
+            
+            // Dimensione variabile
+            const size = 5 + Math.random() * 15;
+            confetti.style.width = size + 'px';
+            confetti.style.height = size + 'px';
+            
+            // Animazione personalizzata
+            const fallDuration = 2 + Math.random() * 3;
+            const fallDistance = 100 + Math.random() * 50;
+            const swayAmount = 50 + Math.random() * 100;
+            
+            confetti.style.animation = `
+                floatDown ${fallDuration}s cubic-bezier(0.1, 0.8, 0.2, 1) forwards,
+                sway ${1 + Math.random()}s ease-in-out infinite alternate
+            `;
+            confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+            
+            // Definire animazioni inline
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes floatDown {
+                    0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+                    80% { transform: translate(${Math.random() > 0.5 ? swayAmount : -swayAmount}px, ${fallDistance}vh) rotate(${360 + Math.random() * 360}deg); opacity: 0.8; }
+                    100% { transform: translate(${Math.random() > 0.5 ? swayAmount : -swayAmount}px, ${fallDistance + 20}vh) rotate(${720 + Math.random() * 360}deg); opacity: 0; }
+                }
+                @keyframes sway {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(${Math.random() > 0.5 ? 10 : -10}px); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.getElementById('celebrationEffect').appendChild(confetti);
+            
+            // Rimuovi dopo l'animazione
+            setTimeout(() => {
+                if (confetti.parentNode) {
+                    confetti.parentNode.removeChild(confetti);
+                }
+            }, (fallDuration + 0.5) * 1000);
+        }
+    }
+
+    // ==================== RENDER DATA ====================
+    function renderData() {
+        const tbody = document.getElementById('tabella-body');
+        const listContent = document.getElementById('listContent');
+        const riepilogoContent = document.getElementById('riepilogoContent');
+        
+        if (!tbody) return; 
+        
+        tbody.innerHTML = ''; 
+        listContent.innerHTML = '';
+        riepilogoContent.innerHTML = '';
+        
+        let cSi = 0, cNo = 0, totaleEuro = 0, partPerCat = {};
+        let riepilogoArray = [];
+        
+        let sorted = [...currentData].sort((a,b) => {
+            if (sortBy === 'categoria') {
+                const orderA = customCatOrder[a.categoria.toUpperCase()] || 999;
+                const orderB = customCatOrder[b.categoria.toUpperCase()] || 999;
+                if (orderA !== orderB) return orderA - orderB;
+                return a.nome.localeCompare(b.nome);
+            }
+            return a.nome.localeCompare(b.nome);
+        });
+        
+        sorted.forEach(p => {
+            if (p.bloccato && !isAdmin) return;
+            
+            let note = p.note || "";
+            let dataUf = note.includes('B') ? labelB : (note.includes('C') ? labelC : labelA);
+            const gender = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : '');
+            
+            // Aggiungi al riepilogo admin solo se ha un accompagnatore
+            if (isAdmin && p.accompagnatore && p.accompagnatore.trim() !== "") {
+                riepilogoArray.push({
+                    nome: p.nome,
+                    accompagnatore: p.accompagnatore,
+                    stato: p.stato
+                });
+            }
+            
+            if(p.stato === 'si') {
+                cSi++; 
+                totaleEuro += (costiCategorie[p.categoria.toUpperCase()] || 0);
+                
+                if(!partPerCat[p.categoria]) partPerCat[p.categoria] = { M: [], F: [], U: [] };
+                const atletaObj = {
+                    nome: p.nome, 
+                    data: dataUf, 
+                    gender: gender,
+                    accompagnatore: p.accompagnatore || ""
+                };
+                
+                if(gender === 'M') partPerCat[p.categoria].M.push(atletaObj); 
+                else if(gender === 'F') partPerCat[p.categoria].F.push(atletaObj); 
+                else partPerCat[p.categoria].U.push(atletaObj);
+            }
+            
+            if(p.stato === 'no') cNo++;
+            
+            const tr = document.createElement('tr'); 
+            tr.classList.add("tr-" + p.categoria.toLowerCase());
+            
+            const disabled = isExpired && !isAdmin ? 'disabled' : '';
+            const displayAdmin = isAdmin ? 'table-cell' : 'none';
+            const labelHtml = dataUf ? `<span class="date-label" style="background:var(--racing-orange); color:white; padding:5px 10px; border-radius:18px; font-size:0.75rem; font-weight:bold; display:inline-block; margin-top:5px;">${dataUf}</span>` : "";
+            const genderHtml = gender ? `<span class="badge-gender bg-${gender.toLowerCase()}">${gender}</span>` : "";
+            const isChecked = selectedIds.has(p.id.toString()) ? 'checked' : '';
+            
+            // Badge categoria
+            const categoriaBadge = `<span class="categoria-badge cat-${p.categoria.toLowerCase()}">${p.categoria}</span>`;
+            
+            const hasAccompagnatore = p.accompagnatore && p.accompagnatore.trim() !== "";
+            const showInput = !hasAccompagnatore || isAdmin;
+            
+            // Box accompagnatore - compatto
+            const accompagnatoreBox = `
+                <div class="accompagnatore-box ${mostraAccompagnatori ? 'show' : ''}">
+                    ${showInput ? 
+                        `<div class="accompagnatore-content">
+                            <input type="text" class="accompagnatore-input" id="acc_input_${p.id}" 
+                                   placeholder="${hasAccompagnatore ? 'Modifica accompagnatore...' : 'Nome accompagnatore...'}" 
+                                   ${disabled ? 'disabled' : ''}
+                                   value="${hasAccompagnatore ? p.accompagnatore : ''}"
+                                   style="text-transform: uppercase;">
+                            <button class="btn-accompagnatore" id="acc_btn_${p.id}" 
+                                    onclick="salvaAccompagnatore('${p.id}')" 
+                                    ${disabled ? 'disabled' : ''}>
+                                <i class="fas fa-${hasAccompagnatore ? 'edit' : 'check'}"></i> ${hasAccompagnatore ? 'Aggiorna' : 'Conferma'}
+                            </button>
+                            ${hasAccompagnatore && isAdmin ? 
+                                `<div class="accompagnatore-actions">
+                                    <button class="btn-modify" onclick="modificaAccompagnatore('${p.id}')"><i class="fas fa-edit"></i> Modifica</button>
+                                    <button class="btn-remove" onclick="rimuoviAccompagnatore('${p.id}')"><i class="fas fa-trash"></i> Rimuovi</button>
+                                </div>` 
+                                : ''}
+                        </div>` 
+                        : 
+                        `<div class="accompagnatore-confirmed">
+                            <i class="fas fa-check-circle"></i> Accompagnatore registrato
+                        </div>`
+                    }
+                </div>
+            `;
+            
+            tr.innerHTML = `
+                <td class="col-admin" style="display:${displayAdmin}"><input type="checkbox" class="bulk-cb" value="${p.id}" ${isChecked}></td>
+                <td class="nome-cell">
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <div style="display:flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                            <span>${p.nome}</span>
+                            ${genderHtml}
+                            ${p.bloccato ? ' <i class="fas fa-lock" style="color:var(--racing-red); font-size:0.9rem;"></i>' : ''}
+                        </div>
+                        ${labelHtml}
+                        ${accompagnatoreBox}
+                        <div class="col-admin" style="display:${displayAdmin}; gap:5px; margin-top:10px;">
+                            <div style="display:inline-flex; gap:3px; margin-right:12px;">
+                                <button class="btn-date-small ${!note || (!note.includes('B') && !note.includes('C')) ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'A')">A</button>
+                                <button class="btn-date-small ${note.includes('B') ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'B')">B</button>
+                                <button class="btn-date-small ${note.includes('C') ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'C')">C</button>
+                            </div>
+                            <div style="display:inline-flex; gap:3px;">
+                                <button class="btn-gender-small ${gender==='M'?'active-m':''}" onclick="assegnaDettaglio('${p.id}', 'gender', 'M')">M</button>
+                                <button class="btn-gender-small ${gender==='F'?'active-f':''}" onclick="assegnaDettaglio('${p.id}', 'gender', 'F')">F</button>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td data-label="Categoria" style="font-weight:bold;">${categoriaBadge}</td>
+                <td data-label="Partecipa"><label><input type="radio" name="r_${p.id}" value="si" ${p.stato==='si'?'checked':''} ${disabled} onclick="salva('${p.id}','si')"><span class="badge-btn badge-si"><i class="fas fa-check"></i> PARTECIPA</span></label></td>
+                <td data-label="Non Partecipa"><label><input type="radio" name="r_${p.id}" value="no" ${p.stato==='no'?'checked':''} ${disabled} onclick="salva('${p.id}','no')"><span class="badge-btn badge-no"><i class="fas fa-times"></i> NON PARTECIPA</span></label></td>
+                <td data-label="Reset"><button class="btn-reset" onclick="salva('${p.id}','vuoto')" ${disabled}><i class="fas fa-redo"></i> Reset</button></td>
+                <td class="col-admin" style="display:${displayAdmin}">
+                    <button onclick="toggleLock('${p.id}', ${p.bloccato})" style="background:none; border:none; cursor:pointer; font-size:1.1rem; color:${p.bloccato?'var(--racing-red)':'var(--racing-blue)'};"><i class="fas fa-${p.bloccato?'lock':'lock-open'}"></i></button>
+                    <button onclick="eliminaAtleta('${p.id}','${p.nome}')" style="background:none; border:none; cursor:pointer; font-size:1.1rem; color:var(--racing-red);"><i class="fas fa-trash-alt"></i></button>
+                </td>
+            `;
+            
+            tbody.appendChild(tr);
+        });
+        
+        // Aggiorna statistiche
+        document.getElementById('totaleEuro').innerText = totaleEuro.toFixed(2) + " €";
+        document.getElementById('count-si').innerText = cSi; 
+        document.getElementById('count-no').innerText = cNo;
+        
+        // RENDER RIEPILOGO ACCOMPAGNATORI (solo admin)
+        if (isAdmin) {
+            document.getElementById('riepilogoAccompagnatori').style.display = 'block';
+            
+            if (riepilogoArray.length > 0) {
+                riepilogoArray.sort((a,b) => a.nome.localeCompare(b.nome));
+                
+                riepilogoContent.innerHTML = `
+                    <div class="riepilogo-row" style="font-weight:bold; background:var(--racing-blue); color:white;">
+                        <span><i class="fas fa-user"></i> Atleta</span>
+                        <span><i class="fas fa-user-friends"></i> Accompagnatore</span>
+                    </div>
+                `;
+                
+                riepilogoArray.forEach(item => {
+                    riepilogoContent.innerHTML += `
+                        <div class="riepilogo-row">
+                            <span>${item.nome}</span>
+                            <span>${item.accompagnatore}</span>
+                        </div>
+                    `;
+                });
+            } else {
+                riepilogoContent.innerHTML = `<div style="text-align:center; padding:20px; color:#666; font-size:0.9rem; font-style:italic;"><i class="fas fa-user-slash"></i> Nessun accompagnatore registrato</div>`;
+            }
+        } else {
+            document.getElementById('riepilogoAccompagnatori').style.display = 'none';
+        }
+        
+        // RENDER LISTA PARTECIPANTI (SOLO NOME ATLETA, SENZA ACCOMPAGNATORE NE DATA)
+        Object.keys(partPerCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(cat => {
+            const catDiv = document.createElement('div'); 
+            catDiv.style.marginBottom = "15px";
+            
+            catDiv.innerHTML = `<div style="font-weight:bold; color:var(--racing-blue); margin-top:12px; border-bottom:2px solid var(--racing-light); padding-bottom:8px; text-transform:uppercase; display: flex; align-items: center; gap: 8px;"><i class="fas fa-medal"></i> ${cat}</div>`;
+            
+            const renderGroup = (label, list, colorClass, titleClass) => {
+                if(list.length === 0) return "";
+                list.sort((a,b) => a.nome.localeCompare(b.nome));
+                let html = `<div class="gender-section"><span class="gender-title ${titleClass}"><i class="fas fa-${label === 'Maschi' ? 'mars' : label === 'Femmine' ? 'venus' : 'question'}"></i> ${label} (${list.length}):</span>`;
+                list.forEach(obj => { 
+                    // SOLO NOME ATLETA, niente data nè accompagnatore
+                    html += `<span style="display:inline-block; background:rgba(168, 218, 220, 0.2); padding:6px 12px; border-radius:18px; font-size:0.8rem; margin:4px; border:2px solid var(--racing-light); font-weight:500;">${obj.nome}</span>`; 
+                });
+                html += `</div>`; 
+                return html;
+            };
+            
+            catDiv.innerHTML += renderGroup("Maschi", partPerCat[cat].M, "bg-m", "title-m");
+            catDiv.innerHTML += renderGroup("Femmine", partPerCat[cat].F, "bg-f", "title-f");
+            catDiv.innerHTML += renderGroup("Non specificati", partPerCat[cat].U, "", "");
+            
+            listContent.appendChild(catDiv);
+        });
+        
+        document.getElementById('confirmedList').style.display = cSi > 0 ? 'block' : 'none';
+        filterTable();
+        
+        // Aggiorna il pulsante toggle
+        const toggleBtn = document.getElementById('toggleAccompagnatoriBtn');
+        if (isAdmin) {
+            toggleBtn.style.display = 'inline-block';
+            toggleBtn.innerHTML = mostraAccompagnatori ? '<i class="fas fa-eye-slash"></i> Nascondi Box' : '<i class="fas fa-eye"></i> Mostra Box';
+        } else {
+            toggleBtn.style.display = 'none';
+        }
+    }
+
+    // Inizializzazione
     init();
 </script>
 </body>
