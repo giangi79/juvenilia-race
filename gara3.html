@@ -138,6 +138,12 @@
             z-index: 9999;
             pointer-events: none;
             overflow: hidden;
+            opacity: 1;
+            transition: opacity 0.8s ease-out;
+        }
+        
+        #celebrationEffect.fade-out {
+            opacity: 0;
         }
         
         .celebration-content {
@@ -149,6 +155,12 @@
             color: white;
             z-index: 10001;
             animation: zoomIn 0.8s ease-out;
+            opacity: 1;
+            transition: opacity 0.8s ease-out;
+        }
+        
+        .celebration-content.fade-out {
+            opacity: 0;
         }
         
         .celebration-title {
@@ -185,6 +197,12 @@
             border-radius: 50%;
             pointer-events: none;
             z-index: 10000;
+            opacity: 1;
+            transition: opacity 0.8s ease-out;
+        }
+        
+        .firework-particle.fade-out {
+            opacity: 0;
         }
         
         .confetti {
@@ -194,6 +212,11 @@
             pointer-events: none;
             opacity: 0.8;
             z-index: 10000;
+            transition: opacity 0.8s ease-out;
+        }
+        
+        .confetti.fade-out {
+            opacity: 0;
         }
         
         .sparkle {
@@ -205,6 +228,12 @@
             pointer-events: none;
             box-shadow: 0 0 10px 2px rgba(255,255,255,0.8);
             z-index: 10000;
+            opacity: 1;
+            transition: opacity 0.8s ease-out;
+        }
+        
+        .sparkle.fade-out {
+            opacity: 0;
         }
         
         /* Animazioni */
@@ -231,16 +260,19 @@
         
         @keyframes explode {
             0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            70% { transform: translate(var(--tx), var(--ty)) scale(0.8); opacity: 0.8; }
             100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
         }
         
         @keyframes floatDown {
             0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+            80% { transform: translateY(80vh) rotate(360deg); opacity: 0.8; }
+            100% { transform: translateY(100vh) rotate(450deg); opacity: 0; }
         }
         
         @keyframes sparkleMove {
             0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            70% { transform: translate(var(--sparkle-x), var(--sparkle-y)) scale(0.8); opacity: 0.8; }
             100% { transform: translate(var(--sparkle-x), var(--sparkle-y)) scale(0); opacity: 0; }
         }
 
@@ -602,14 +634,14 @@
         <div class="admin-row">
             <input type="text" id="docLink1_URL" placeholder="Link Documento 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
             <input type="text" id="docLink1_Text" placeholder="Testo Pulsante 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
-            <button onclick="salvaDoc(1)" style="background:var(--success);">SALVA</button>
-            <button onclick="azzeraDoc(1)" style="background:var(--danger);">RESET</button>
+            <button onclick="salvaDoc(1)" style="background:var(--success);">Salva 1</button>
+            <button onclick="azzeraDoc(1)" style="background:var(--danger);">Azzera 1</button>
         </div>
         <div class="admin-row">
             <input type="text" id="docLink2_URL" placeholder="Link Documento 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
             <input type="text" id="docLink2_Text" placeholder="Testo Pulsante 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
-            <button onclick="salvaDoc(2)" style="background:var(--success);">SALVA</button>
-            <button onclick="azzeraDoc(2)" style="background:var(--danger);">RESET</button>
+            <button onclick="salvaDoc(2)" style="background:var(--success);">Salva 2</button>
+            <button onclick="azzeraDoc(2)" style="background:var(--danger);">Azzera 2</button>
         </div>
     </div>
 
@@ -789,9 +821,16 @@
         });
     }
 
-    // NUOVE FUNZIONI PER ANIMAZIONE SCENOGRAFICA
+    // NUOVE FUNZIONI PER ANIMAZIONE SCENOGRAFICA CON DISSOLVENZA
     function showCelebrationEffect() {
         const effect = document.getElementById('celebrationEffect');
+        const content = document.querySelector('.celebration-content');
+        
+        // Resetta le classi di dissolvenza
+        effect.classList.remove('fade-out');
+        content.classList.remove('fade-out');
+        
+        // Mostra l'effetto
         effect.style.display = 'block';
         
         // Crea fuochi d'artificio
@@ -803,12 +842,27 @@
         // Crea scintille
         createSparkles();
         
-        // Nascondi dopo 3 secondi
+        // Dopo 2.5 secondi, inizia la dissolvenza
         setTimeout(() => {
-            effect.style.display = 'none';
-            // Rimuovi tutte le particelle
-            document.querySelectorAll('.firework-particle, .confetti, .sparkle').forEach(el => el.remove());
-        }, 3000);
+            // Aggiungi la classe di dissolvenza a tutti gli elementi
+            effect.classList.add('fade-out');
+            content.classList.add('fade-out');
+            
+            // Aggiungi dissolvenza a tutte le particelle
+            document.querySelectorAll('.firework-particle, .confetti, .sparkle').forEach(el => {
+                el.classList.add('fade-out');
+            });
+            
+            // Nascondi completamente dopo la dissolvenza
+            setTimeout(() => {
+                effect.style.display = 'none';
+                // Rimuovi tutte le particelle
+                document.querySelectorAll('.firework-particle, .confetti, .sparkle').forEach(el => el.remove());
+                // Rimuovi le classi di dissolvenza
+                effect.classList.remove('fade-out');
+                content.classList.remove('fade-out');
+            }, 800); // Tempo della dissolvenza
+        }, 2500); // Tempo prima di iniziare la dissolvenza
     }
     
     function createFireworks() {
@@ -834,17 +888,17 @@
                     particle.style.setProperty('--tx', tx + 'px');
                     particle.style.setProperty('--ty', ty + 'px');
                     
-                    particle.style.animation = `explode 1s ease-out forwards`;
+                    particle.style.animation = `explode 1.5s ease-out forwards`;
                     particle.style.animationDelay = (Math.random() * 0.3) + 's';
                     
                     document.getElementById('celebrationEffect').appendChild(particle);
                     
-                    // Rimuovi dopo l'animazione
+                    // Rimuovi dopo l'animazione + dissolvenza
                     setTimeout(() => {
                         if (particle.parentNode) {
                             particle.parentNode.removeChild(particle);
                         }
-                    }, 1300);
+                    }, 2500); // Tempo più lungo per permettere la dissolvenza
                 }
             }, i * 250);
         }
@@ -861,17 +915,17 @@
             confetti.style.color = colors[Math.floor(Math.random() * colors.length)];
             confetti.style.left = Math.random() * 100 + 'vw';
             confetti.style.fontSize = (10 + Math.random() * 20) + 'px';
-            confetti.style.animation = `floatDown ${3 + Math.random() * 2}s linear forwards`;
+            confetti.style.animation = `floatDown ${3.5 + Math.random() * 2}s linear forwards`;
             confetti.style.animationDelay = (Math.random() * 0.5) + 's';
             
             document.getElementById('celebrationEffect').appendChild(confetti);
             
-            // Rimuovi dopo l'animazione
+            // Rimuovi dopo l'animazione + dissolvenza
             setTimeout(() => {
                 if (confetti.parentNode) {
                     confetti.parentNode.removeChild(confetti);
                 }
-            }, 5000);
+            }, 3500); // Tempo più lungo per permettere la dissolvenza
         }
     }
     
@@ -888,17 +942,17 @@
             sparkle.style.setProperty('--sparkle-x', sparkleX + 'px');
             sparkle.style.setProperty('--sparkle-y', sparkleY + 'px');
             
-            sparkle.style.animation = `sparkleMove ${1 + Math.random()}s ease-out forwards`;
+            sparkle.style.animation = `sparkleMove ${1.5 + Math.random()}s ease-out forwards`;
             sparkle.style.animationDelay = (Math.random() * 0.5) + 's';
             
             document.getElementById('celebrationEffect').appendChild(sparkle);
             
-            // Rimuovi dopo l'animazione
+            // Rimuovi dopo l'animazione + dissolvenza
             setTimeout(() => {
                 if (sparkle.parentNode) {
                     sparkle.parentNode.removeChild(sparkle);
                 }
-            }, 2000);
+            }, 2500); // Tempo più lungo per permettere la dissolvenza
         }
     }
 
