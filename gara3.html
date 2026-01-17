@@ -21,8 +21,8 @@
             --cat-giovanissimi: #16a085; --cat-default: #7f8c8d;
         }
 
-        body { margin: 0; padding: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-        .container { max-width: 1000px; margin: 0 auto; padding: 15px; background: var(--bg-card); min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
+        body { margin: 0; padding: 0; background-color: var(--bg-body); color: var(--text-main); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; overflow-x: hidden; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 15px; background: var(--bg-card); min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); position: relative; z-index: 1; }
 
         .logo-container { text-align: center; margin-bottom: 20px; position: relative; display: flex; justify-content: center; align-items: center; padding: 10px; }
         .logo-container img { width: 100%; max-width: 600px; height: auto; border-radius: 12px; display: block; }
@@ -126,9 +126,123 @@
         #toast { visibility: hidden; min-width: 250px; background: #333; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); }
         #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
 
-        #confettiPopup { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; justify-content: center; align-items: center; pointer-events: none; }
-        .pop-animation { animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes popIn { 0% { transform: scale(0.3); opacity: 0; } 70% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        /* ANIMAZIONE SCENOGRAFICA MIGLIORATA */
+        #celebrationEffect {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .celebration-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 10001;
+            animation: zoomIn 0.8s ease-out;
+        }
+        
+        .celebration-title {
+            font-size: 3rem;
+            font-weight: 900;
+            text-shadow: 0 0 20px rgba(255,255,255,0.8);
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF4500, #FF1493);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: pulse 2s infinite;
+        }
+        
+        .celebration-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255,215,0,0.8);
+        }
+        
+        .celebration-icon {
+            font-size: 8rem;
+            margin-bottom: 20px;
+            display: block;
+            animation: bounce 1s infinite alternate, rotate 3s linear infinite;
+        }
+        
+        /* Particelle di fuochi d'artificio */
+        .firework-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            pointer-events: none;
+            opacity: 0.8;
+            z-index: 10000;
+        }
+        
+        .sparkle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 10px 2px rgba(255,255,255,0.8);
+            z-index: 10000;
+        }
+        
+        /* Animazioni */
+        @keyframes zoomIn {
+            0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-20px); }
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes explode {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+        
+        @keyframes floatDown {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        @keyframes sparkleMove {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--sparkle-x), var(--sparkle-y)) scale(0); opacity: 0; }
+        }
 
         /* NUOVI STILI PER ACCOMPAGNATORI - COMPATTI */
         .accompagnatore-box {
@@ -437,6 +551,19 @@
                 text-align: center;
                 margin: 5px auto;
             }
+            
+            /* Animazioni responsive */
+            .celebration-title {
+                font-size: 2rem;
+            }
+            
+            .celebration-subtitle {
+                font-size: 1rem;
+            }
+            
+            .celebration-icon {
+                font-size: 5rem;
+            }
         }
     </style>
 </head>
@@ -444,10 +571,12 @@
 
 <div id="toast">Operazione riuscita!</div>
 
-<div id="confettiPopup">
-    <div style="text-align: center;">
-        <div class="pop-animation" style="font-size: 150px;">🎉</div>
-        <h2 style="color: white; margin-top: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); font-weight: 800;">ISCRITTO!</h2>
+<!-- Nuova animazione scenografica -->
+<div id="celebrationEffect">
+    <div class="celebration-content">
+        <span class="celebration-icon">🏆</span>
+        <h1 class="celebration-title">ISCRITTO!</h1>
+        <p class="celebration-subtitle">Partecipazione confermata con successo</p>
     </div>
 </div>
 
@@ -473,14 +602,14 @@
         <div class="admin-row">
             <input type="text" id="docLink1_URL" placeholder="Link Documento 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
             <input type="text" id="docLink1_Text" placeholder="Testo Pulsante 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
-            <button onclick="salvaDoc(1)" style="background:var(--success);">Salva 1</button>
-            <button onclick="azzeraDoc(1)" style="background:var(--danger);">Azzera 1</button>
+            <button onclick="salvaDoc(1)" style="background:var(--success);">SALVA</button>
+            <button onclick="azzeraDoc(1)" style="background:var(--danger);">RESET</button>
         </div>
         <div class="admin-row">
             <input type="text" id="docLink2_URL" placeholder="Link Documento 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
             <input type="text" id="docLink2_Text" placeholder="Testo Pulsante 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
-            <button onclick="salvaDoc(2)" style="background:var(--success);">Salva 2</button>
-            <button onclick="azzeraDoc(2)" style="background:var(--danger);">Azzera 2</button>
+            <button onclick="salvaDoc(2)" style="background:var(--success);">SALVA</button>
+            <button onclick="azzeraDoc(2)" style="background:var(--danger);">RESET</button>
         </div>
     </div>
 
@@ -658,6 +787,119 @@
                 input.value = tempAccompagnatoriValues[id];
             }
         });
+    }
+
+    // NUOVE FUNZIONI PER ANIMAZIONE SCENOGRAFICA
+    function showCelebrationEffect() {
+        const effect = document.getElementById('celebrationEffect');
+        effect.style.display = 'block';
+        
+        // Crea fuochi d'artificio
+        createFireworks();
+        
+        // Crea confetti
+        createConfetti();
+        
+        // Crea scintille
+        createSparkles();
+        
+        // Nascondi dopo 3 secondi
+        setTimeout(() => {
+            effect.style.display = 'none';
+            // Rimuovi tutte le particelle
+            document.querySelectorAll('.firework-particle, .confetti, .sparkle').forEach(el => el.remove());
+        }, 3000);
+    }
+    
+    function createFireworks() {
+        const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#FF1493'];
+        
+        for (let i = 0; i < 12; i++) {
+            setTimeout(() => {
+                const centerX = Math.random() * window.innerWidth;
+                const centerY = Math.random() * window.innerHeight * 0.5;
+                
+                for (let j = 0; j < 40; j++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'firework-particle';
+                    particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.left = centerX + 'px';
+                    particle.style.top = centerY + 'px';
+                    
+                    const angle = Math.random() * Math.PI * 2;
+                    const velocity = 2 + Math.random() * 4;
+                    const tx = Math.cos(angle) * velocity * 100;
+                    const ty = Math.sin(angle) * velocity * 100;
+                    
+                    particle.style.setProperty('--tx', tx + 'px');
+                    particle.style.setProperty('--ty', ty + 'px');
+                    
+                    particle.style.animation = `explode 1s ease-out forwards`;
+                    particle.style.animationDelay = (Math.random() * 0.3) + 's';
+                    
+                    document.getElementById('celebrationEffect').appendChild(particle);
+                    
+                    // Rimuovi dopo l'animazione
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 1300);
+                }
+            }, i * 250);
+        }
+    }
+    
+    function createConfetti() {
+        const shapes = ['●', '■', '▲', '◆', '★'];
+        const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#FF1493'];
+        
+        for (let i = 0; i < 150; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+            confetti.style.color = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.fontSize = (10 + Math.random() * 20) + 'px';
+            confetti.style.animation = `floatDown ${3 + Math.random() * 2}s linear forwards`;
+            confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+            
+            document.getElementById('celebrationEffect').appendChild(confetti);
+            
+            // Rimuovi dopo l'animazione
+            setTimeout(() => {
+                if (confetti.parentNode) {
+                    confetti.parentNode.removeChild(confetti);
+                }
+            }, 5000);
+        }
+    }
+    
+    function createSparkles() {
+        for (let i = 0; i < 80; i++) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.left = Math.random() * 100 + 'vw';
+            sparkle.style.top = Math.random() * 100 + 'vh';
+            
+            const sparkleX = (Math.random() - 0.5) * 200;
+            const sparkleY = (Math.random() - 0.5) * 200;
+            
+            sparkle.style.setProperty('--sparkle-x', sparkleX + 'px');
+            sparkle.style.setProperty('--sparkle-y', sparkleY + 'px');
+            
+            sparkle.style.animation = `sparkleMove ${1 + Math.random()}s ease-out forwards`;
+            sparkle.style.animationDelay = (Math.random() * 0.5) + 's';
+            
+            document.getElementById('celebrationEffect').appendChild(sparkle);
+            
+            // Rimuovi dopo l'animazione
+            setTimeout(() => {
+                if (sparkle.parentNode) {
+                    sparkle.parentNode.removeChild(sparkle);
+                }
+            }, 2000);
+        }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -1052,9 +1294,8 @@
         const atleta = currentData.find(a => a.id == id);
         if (!isAdmin && !confirm(`Sei veramente tu ${atleta.nome}?`)) { renderData(); return; }
         if (val === 'si' && !isAdmin) {
-            const popup = document.getElementById('confettiPopup');
-            popup.style.display = 'flex';
-            setTimeout(() => { popup.style.display = 'none'; }, 2000);
+            // Mostra l'animazione scenografica invece del semplice popup
+            showCelebrationEffect();
         }
         
         // Creiamo l'oggetto di aggiornamento
