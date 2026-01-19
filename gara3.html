@@ -17,6 +17,7 @@
             --gradient-primary: linear-gradient(135deg, #1D3557 0%, #457B9D 100%);
             --gradient-success: linear-gradient(135deg, #2A9D8F 0%, #4ECDC4 100%);
             --gradient-danger: linear-gradient(135deg, #E63946 0%, #FF6B6B 100%);
+            --gradient-warning: linear-gradient(135deg, #F4A261 0%, #FFB347 100%);
             --gradient-racing: linear-gradient(90deg, #1D3557, #E63946, #FFD166);
             --text-main: #1D3557; --bg-body: #f8f9fa; --bg-card: #ffffff;
             --shadow-light: 0 8px 25px rgba(29, 53, 87, 0.08);
@@ -725,7 +726,7 @@
             to { bottom: 40px; opacity: 1; }
         }
 
-        /* ANIMAZIONE SCENOGRAFICA MIGLIORATA - TEMA PATTINAGGIO CORSIA */
+        /* ANIMAZIONI PARTECIPA E NON PARTECIPA */
         #celebrationEffect {
             display: none;
             position: fixed;
@@ -733,7 +734,6 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #0a1929 0%, #1D3557 100%);
             z-index: 9999;
             pointer-events: none;
             overflow: hidden;
@@ -778,7 +778,6 @@
         .celebration-subtitle {
             font-size: 1.8rem;
             margin-bottom: 30px;
-            color: #FFD700;
             font-weight: 600;
         }
         
@@ -786,11 +785,11 @@
             font-size: 10rem;
             margin-bottom: 20px;
             display: block;
-            animation: bounce 1s infinite alternate, rotate 3s linear infinite;
+            animation: bounce 1s infinite alternate;
             filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
         }
         
-        /* Particelle a tema pattinaggio corsia */
+        /* Particelle per PARTECIPA */
         .skate-particle {
             position: absolute;
             width: 30px;
@@ -799,12 +798,30 @@
             z-index: 10000;
             opacity: 1;
             transition: opacity 0.8s ease-out;
-            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 24" width="32" height="24"><path d="M4,12 L12,4 L20,4 L28,12 L20,20 L12,20 Z" fill="%23E63946"/><circle cx="8" cy="18" r="3" fill="%231D3557"/><circle cx="24" cy="18" r="3" fill="%231D3557"/><path d="M10,8 L14,8 L16,12" stroke="%23FFFFFF" stroke-width="1.5" fill="none"/></svg>');
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 24" width="32" height="24"><path d="M4,12 L12,4 L20,4 L28,12 L20,20 L12,20 Z" fill="%232A9D8F"/><circle cx="8" cy="18" r="3" fill="%231D3557"/><circle cx="24" cy="18" r="3" fill="%231D3557"/><path d="M10,8 L14,8 L16,12" stroke="%23FFFFFF" stroke-width="1.5" fill="none"/></svg>');
             background-size: contain;
             background-repeat: no-repeat;
         }
         
         .skate-particle.fade-out {
+            opacity: 0;
+        }
+        
+        /* Particelle per NON PARTECIPA */
+        .sad-particle {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+            z-index: 10000;
+            opacity: 1;
+            transition: opacity 0.8s ease-out;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><circle cx="50" cy="50" r="45" fill="%23E63946"/><circle cx="35" cy="40" r="8" fill="%23FFFFFF"/><circle cx="65" cy="40" r="8" fill="%23FFFFFF"/><path d="M35,70 Q50,55 65,70" stroke="%23FFFFFF" stroke-width="6" fill="none" stroke-linecap="round"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+        
+        .sad-particle.fade-out {
             opacity: 0;
         }
         
@@ -843,6 +860,12 @@
             0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
             70% { transform: translate(var(--skate-x), var(--skate-y)) rotate(var(--skate-rotate)) scale(0.8); opacity: 0.8; }
             100% { transform: translate(var(--skate-x), var(--skate-y)) rotate(var(--skate-rotate)) scale(0); opacity: 0; }
+        }
+        
+        @keyframes sadMove {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            70% { transform: translate(var(--sad-x), var(--sad-y)) scale(0.8); opacity: 0.8; }
+            100% { transform: translate(var(--sad-x), var(--sad-y)) scale(0); opacity: 0; }
         }
         
         @keyframes speedLineMove {
@@ -1426,7 +1449,7 @@
     <div class="celebration-content">
         <span class="celebration-icon">🛼</span>
         <h1 class="celebration-title">ISCRITTO!</h1>
-        <p class="celebration-subtitle">Pronto per la gara!</p>
+        <p class="celebration-subtitle" id="celebrationSubtitle">Pronto per la gara!</p>
     </div>
 </div>
 
@@ -1884,9 +1907,12 @@
     async function salva(id, val) { 
         const atleta = currentData.find(a => a.id == id);
         if (!isAdmin && !confirm(`Sei veramente tu ${atleta.nome}?`)) { renderData(); return; }
+        
+        // Mostra l'animazione appropriata
         if (val === 'si' && !isAdmin) {
-            // Mostra l'animazione tematica pattinaggio
-            showCelebrationEffect();
+            showCelebrationEffect('si');
+        } else if (val === 'no' && !isAdmin) {
+            showCelebrationEffect('no');
         }
         
         // Creiamo l'oggetto di aggiornamento
@@ -2271,10 +2297,29 @@
         }
     }
 
-    // ==================== ANIMAZIONE CELEBRAZIONE ====================
-    function showCelebrationEffect() {
+    // ==================== ANIMAZIONI PARTECIPA E NON PARTECIPA ====================
+    function showCelebrationEffect(scelta) {
         const effect = document.getElementById('celebrationEffect');
         const content = document.querySelector('.celebration-content');
+        const subtitle = document.getElementById('celebrationSubtitle');
+        const icon = document.querySelector('.celebration-icon');
+        
+        // Imposta tema in base alla scelta
+        if (scelta === 'si') {
+            // Tema PARTECIPA: verde/azzurro, pattini
+            effect.style.background = 'linear-gradient(135deg, #0a1929 0%, #1D3557 50%, #2A9D8F 100%)';
+            subtitle.innerText = 'Pronto per la gara!';
+            subtitle.style.color = '#FFD700';
+            icon.innerText = '🛼';
+            icon.style.animation = 'bounce 1s infinite alternate, rotate 3s linear infinite';
+        } else {
+            // Tema NON PARTECIPA: rosso/arancione, faccina triste
+            effect.style.background = 'linear-gradient(135deg, #2a0a0a 0%, #E63946 50%, #F4A261 100%)';
+            subtitle.innerText = 'Ci vediamo alla prossima!';
+            subtitle.style.color = '#FFFFFF';
+            icon.innerText = '😢';
+            icon.style.animation = 'bounce 1s infinite alternate';
+        }
         
         // Resetta le classi di dissolvenza
         effect.classList.remove('fade-out');
@@ -2283,10 +2328,14 @@
         // Mostra l'effetto
         effect.style.display = 'block';
         
-        // Crea particelle a tema pattinaggio
-        createSkateParticles();
-        createSpeedLines();
-        createRacingConfetti();
+        // Crea particelle appropriate
+        if (scelta === 'si') {
+            createSkateParticles();
+        } else {
+            createSadParticles();
+        }
+        createSpeedLines(scelta);
+        createRacingConfetti(scelta);
         
         // Dopo 2.5 secondi, inizia la dissolvenza
         setTimeout(() => {
@@ -2295,7 +2344,7 @@
             content.classList.add('fade-out');
             
             // Aggiungi dissolvenza a tutte le particelle
-            document.querySelectorAll('.skate-particle, .speed-line, .racing-confetti').forEach(el => {
+            document.querySelectorAll('.skate-particle, .sad-particle, .speed-line, .racing-confetti').forEach(el => {
                 el.classList.add('fade-out');
             });
             
@@ -2303,7 +2352,7 @@
             setTimeout(() => {
                 effect.style.display = 'none';
                 // Rimuovi tutte le particelle
-                document.querySelectorAll('.skate-particle, .speed-line, .racing-confetti').forEach(el => el.remove());
+                document.querySelectorAll('.skate-particle, .sad-particle, .speed-line, .racing-confetti').forEach(el => el.remove());
                 // Rimuovi le classi di dissolvenza
                 effect.classList.remove('fade-out');
                 content.classList.remove('fade-out');
@@ -2312,7 +2361,7 @@
     }
     
     function createSkateParticles() {
-        const colors = ['#E63946', '#1D3557', '#FFD166', '#2A9D8F', '#6A4C93'];
+        const colors = ['#2A9D8F', '#1D3557', '#FFD166', '#4ECDC4', '#A8DADC'];
         
         for (let i = 0; i < 20; i++) {
             setTimeout(() => {
@@ -2349,7 +2398,38 @@
         }
     }
     
-    function createSpeedLines() {
+    function createSadParticles() {
+        for (let i = 0; i < 15; i++) {
+            setTimeout(() => {
+                for (let j = 0; j < 3; j++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'sad-particle';
+                    particle.style.left = Math.random() * 100 + 'vw';
+                    particle.style.top = Math.random() * 100 + 'vh';
+                    
+                    const sadX = (Math.random() - 0.5) * 200;
+                    const sadY = (Math.random() - 0.5) * 200;
+                    
+                    particle.style.setProperty('--sad-x', sadX + 'px');
+                    particle.style.setProperty('--sad-y', sadY + 'px');
+                    
+                    particle.style.animation = `sadMove ${3 + Math.random()}s ease-out forwards`;
+                    particle.style.animationDelay = (Math.random() * 0.5) + 's';
+                    
+                    document.getElementById('celebrationEffect').appendChild(particle);
+                    
+                    // Rimuovi dopo l'animazione + dissolvenza
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 3500);
+                }
+            }, i * 200);
+        }
+    }
+    
+    function createSpeedLines(scelta) {
         for (let i = 0; i < 30; i++) {
             const line = document.createElement('div');
             line.className = 'speed-line';
@@ -2362,11 +2442,17 @@
             line.style.animation = `speedLineMove ${1 + Math.random() * 2}s linear forwards`;
             line.style.animationDelay = (Math.random() * 1) + 's';
             
-            // Opacità e colore variabile
+            // Opacità e colore variabile in base alla scelta
             line.style.opacity = 0.3 + Math.random() * 0.5;
-            line.style.background = `linear-gradient(90deg, transparent, ${
-                Math.random() > 0.5 ? 'rgba(255,255,255,0.8)' : 'rgba(255,209,102,0.8)'
-            }, transparent)`;
+            if (scelta === 'si') {
+                line.style.background = `linear-gradient(90deg, transparent, ${
+                    Math.random() > 0.5 ? 'rgba(255,255,255,0.8)' : 'rgba(42,157,143,0.8)'
+                }, transparent)`;
+            } else {
+                line.style.background = `linear-gradient(90deg, transparent, ${
+                    Math.random() > 0.5 ? 'rgba(255,255,255,0.8)' : 'rgba(230,57,70,0.8)'
+                }, transparent)`;
+            }
             
             document.getElementById('celebrationEffect').appendChild(line);
             
@@ -2379,10 +2465,15 @@
         }
     }
     
-    function createRacingConfetti() {
-        const colors = ['#E63946', '#1D3557', '#FFD166', '#2A9D8F', '#6A4C93', '#F4A261', '#A8DADC'];
+    function createRacingConfetti(scelta) {
+        let colors;
+        if (scelta === 'si') {
+            colors = ['#2A9D8F', '#1D3557', '#FFD166', '#4ECDC4', '#A8DADC', '#457B9D'];
+        } else {
+            colors = ['#E63946', '#F4A261', '#FF6B6B', '#8B0000', '#FFD166', '#6A4C93'];
+        }
         
-        for (let i = 0; i < 200; i++) {
+        for (let i = 0; i < 150; i++) {
             const confetti = document.createElement('div');
             confetti.className = 'racing-confetti';
             confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
