@@ -1448,7 +1448,7 @@
 <div id="celebrationEffect">
     <div class="celebration-content">
         <span class="celebration-icon">🛼</span>
-        <h1 class="celebration-title">ISCRITTO!</h1>
+        <h1 class="celebration-title" id="celebrationTitle">ISCRITTO!</h1>
         <p class="celebration-subtitle" id="celebrationSubtitle">Pronto per la gara!</p>
     </div>
 </div>
@@ -2301,6 +2301,7 @@
     function showCelebrationEffect(scelta) {
         const effect = document.getElementById('celebrationEffect');
         const content = document.querySelector('.celebration-content');
+        const title = document.getElementById('celebrationTitle');
         const subtitle = document.getElementById('celebrationSubtitle');
         const icon = document.querySelector('.celebration-icon');
         
@@ -2308,14 +2309,16 @@
         if (scelta === 'si') {
             // Tema PARTECIPA: verde/azzurro, pattini
             effect.style.background = 'linear-gradient(135deg, #0a1929 0%, #1D3557 50%, #2A9D8F 100%)';
-            subtitle.innerText = 'Pronto per la gara!';
+            title.innerText = 'IN PISTA! 🛼';
+            subtitle.innerText = 'Obiettivo podio!';
             subtitle.style.color = '#FFD700';
             icon.innerText = '🛼';
             icon.style.animation = 'bounce 1s infinite alternate, rotate 3s linear infinite';
         } else {
             // Tema NON PARTECIPA: rosso/arancione, faccina triste
             effect.style.background = 'linear-gradient(135deg, #2a0a0a 0%, #E63946 50%, #F4A261 100%)';
-            subtitle.innerText = 'Ci vediamo alla prossima!';
+            title.innerText = 'SALTA QUESTA 🛑';
+            subtitle.innerText = 'Alla prossima gara! 🏁';
             subtitle.style.color = '#FFFFFF';
             icon.innerText = '😢';
             icon.style.animation = 'bounce 1s infinite alternate';
