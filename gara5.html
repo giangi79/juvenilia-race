@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Juvenilia Racing Team - Iscrizioni Gara 4</title>
+    <title>Juvenilia Racing Team - Iscrizioni Gara 5</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1923,7 +1923,7 @@
         <img src="logo.png" alt="Logo Juvenilia Racing Team" onerror="this.style.display='none'">
     </div>
 
-    <h2 id="mainTitle">Juvenilia Racing Team - Iscrizioni Gara 4</h2>
+    <h2 id="mainTitle">Juvenilia Racing Team - Iscrizioni Gara 5</h2>
     
     <!-- Timer principale -->
     <div id="countdownBox" class="countdown-container">
@@ -2079,7 +2079,7 @@
     
     <!-- Footer tematico -->
     <div class="racing-footer">
-        <p>Juvenilia Racing Team - Sistema Iscrizioni Gara 4 - Pattinaggio Corsa</p>
+        <p>Juvenilia Racing Team - Sistema Iscrizioni Gara 5 - Pattinaggio Corsa</p>
         <div class="footer-icons">
             <i class="fas fa-trophy footer-icon"></i>
             <i class="fas fa-medal footer-icon"></i>
@@ -2104,9 +2104,9 @@
     const O_P = "anV2ZW5pbGlhMTE3OQ==";
     
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const T_DATA = 'presenze_gara4';
-    const T_CONF = 'configurazione_gara4';
-    const T_TIMERS = 'timers_gara4';
+    const T_DATA = 'presenze_gara5';
+    const T_CONF = 'configurazione_gara5';
+    const T_TIMERS = 'timers_gara5';
 
     let isAdmin = false, isExpired = false, currentData = [], timerInterval;
     let labelA = "", labelB = "", labelC = "", sortBy = 'nome'; 
@@ -2342,7 +2342,7 @@
             costiCategorie[c.chiave.replace('costo_', '').toUpperCase()] = parseFloat(c.valore) || 0; 
         });
         
-        document.getElementById('mainTitle').innerText = tit?.valore || "Juvenilia Racing Team - Iscrizioni Gara 4";
+        document.getElementById('mainTitle').innerText = tit?.valore || "Juvenilia Racing Team - Iscrizioni Gara 5";
         
         const cBox = document.getElementById('countdownBox');
         if(sca?.valore && sca.valore !== "") {
@@ -2988,7 +2988,7 @@
         const ws = XLSX.utils.json_to_sheet(dataExp);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Accompagnatori");
-        XLSX.writeFile(wb, `Accompagnatori_Gara4_Juvenilia.xlsx`);
+        XLSX.writeFile(wb, `Accompagnatori_Gara5_Juvenilia.xlsx`);
         showToast("Excel esportato!");
     }
 
@@ -3044,7 +3044,7 @@
         });
         
         // Crea il messaggio
-        let messaggio = `*JUVENILIA RACING TEAM - RIEPILOGO QUOTE GARA 4*\n\n`;
+        let messaggio = `*JUVENILIA RACING TEAM - RIEPILOGO QUOTE GARA 5*\n\n`;
         messaggio += `🏆 *Evento:* ${document.getElementById('mainTitle').innerText}\n`;
         messaggio += `📅 *Data generazione:* ${new Date().toLocaleDateString('it-IT')}\n\n`;
         messaggio += `*📋 RIEPILOGO QUOTE:*\n`;
@@ -3106,7 +3106,7 @@
                 if(g === 'M') pCat[p.categoria].M.push(info); else if(g === 'F') pCat[p.categoria].F.push(info); else pCat[p.categoria].U.push(info);
             } 
         });
-        let msg = `🛼 *JUVENILIA RACING TEAM - RIEPILOGO ISCRIZIONI GARA 4*\n🏆 *Evento:* ${gara}\n\n`;
+        let msg = `🛼 *JUVENILIA RACING TEAM - RIEPILOGO ISCRIZIONI GARA 5*\n🏆 *Evento:* ${gara}\n\n`;
         Object.keys(pCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(c => {
             msg += `*${c.toUpperCase()}*\n`;
             if(pCat[c].M.length > 0) { pCat[c].M.sort(); msg += `♂️ Maschi: ${pCat[c].M.join(', ')}\n`; }
@@ -3138,8 +3138,8 @@
         }));
         const ws = XLSX.utils.json_to_sheet(dataExp);
         const wb = XLSX.utils.book_new(); 
-        XLSX.utils.book_append_sheet(wb, ws, "Iscrizioni Gara 4"); 
-        XLSX.writeFile(wb, `Iscrizioni_Gara4_Juvenilia_Racing_Team.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, "Iscrizioni Gara 5"); 
+        XLSX.writeFile(wb, `Iscrizioni_Gara5_Juvenilia_Racing_Team.xlsx`);
         showToast("Excel esportato!");
     }
 

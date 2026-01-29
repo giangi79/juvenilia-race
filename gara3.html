@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Juvenilia Racing Team - Iscrizioni Gara</title>
+    <title>Juvenilia Racing Team - Iscrizioni Gara 3</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -11,6 +11,7 @@
     
     <style>
         :root { 
+            /* TEMA CHIARO */
             --racing-red: #E63946; --racing-blue: #1D3557; --racing-light: #A8DADC; 
             --racing-white: #F1FAEE; --racing-yellow: #FFD166; --racing-orange: #F4A261;
             --racing-green: #2A9D8F; --racing-purple: #6A4C93; --racing-silver: #C0C0C0;
@@ -28,6 +29,248 @@
             --cat-senior: #1D3557; --cat-junior: #E63946; --cat-allievi: #2A9D8F;
             --cat-ragazzi: #457B9D; --cat-r12: #6A4C93; --cat-esordienti: #F4A261;
             --cat-giovanissimi: #4ECDC4; --cat-default: #8A8D93;
+            
+            /* Variabili per Dark Mode */
+            --dark-bg-body: #0a1929;
+            --dark-bg-card: #1a2b3e;
+            --dark-text-main: #e9ecef;
+            --dark-shadow-light: 0 8px 25px rgba(0, 0, 0, 0.3);
+            --dark-shadow-medium: 0 12px 35px rgba(0, 0, 0, 0.4);
+            --dark-shadow-heavy: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Dark Mode Class */
+        .dark-mode {
+            --text-main: var(--dark-text-main);
+            --bg-body: var(--dark-bg-body);
+            --bg-card: var(--dark-bg-card);
+            --shadow-light: var(--dark-shadow-light);
+            --shadow-medium: var(--dark-shadow-medium);
+            --shadow-heavy: var(--dark-shadow-heavy);
+        }
+
+        .dark-mode .container {
+            background: var(--dark-bg-card);
+            color: var(--dark-text-main);
+        }
+
+        .dark-mode h2 {
+            color: white !important;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .dark-mode h2::after {
+            background: var(--gradient-racing);
+        }
+
+        .dark-mode .table-wrapper {
+            background: #2a3b4e;
+            border-color: #3a4b5e;
+        }
+
+        .dark-mode table {
+            color: var(--dark-text-main);
+        }
+
+        .dark-mode tbody tr {
+            background-color: #2a3b4e;
+            border-bottom: 1px solid #3a4b5e;
+        }
+
+        .dark-mode td {
+            border-bottom: 1px solid #3a4b5e;
+        }
+
+        .dark-mode .search-box {
+            background-color: #2a3b4e;
+            color: var(--dark-text-main);
+            border-color: #3a4b5e;
+        }
+
+        .dark-mode .search-box:focus {
+            border-color: var(--racing-blue);
+            box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.4), var(--dark-shadow-medium);
+        }
+
+        .dark-mode .search-icon {
+            color: var(--racing-light);
+        }
+
+        .dark-mode .stat-card {
+            color: white;
+        }
+
+        .dark-mode .badge-btn {
+            background: #2a3b4e;
+            color: var(--dark-text-main);
+            border-color: #3a4b5e;
+        }
+
+        .dark-mode .btn-reset {
+            background-color: #5a6268;
+            color: white;
+        }
+
+        .dark-mode .btn-reset:hover {
+            background-color: #6c757d;
+        }
+
+        .dark-mode #addAtletaBox,
+        .dark-mode #costiBox,
+        .dark-mode #docsBox,
+        .dark-mode .timer-admin-section {
+            background: rgba(42, 59, 78, 0.5);
+            border-color: #3a4b5e;
+            backdrop-filter: blur(10px);
+        }
+
+        .dark-mode .admin-row input,
+        .dark-mode .admin-row select,
+        .dark-mode .timer-admin-row input,
+        .dark-mode .timer-admin-row select {
+            background: #2a3b4e;
+            color: var(--dark-text-main);
+            border-color: #3a4b5e;
+        }
+
+        .dark-mode .admin-row input:focus,
+        .dark-mode .admin-row select:focus,
+        .dark-mode .timer-admin-row input:focus,
+        .dark-mode .timer-admin-row select:focus {
+            border-color: var(--racing-blue);
+            box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3), 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .dark-mode .accompagnatore-input {
+            background: #2a3b4e;
+            color: var(--dark-text-main);
+            border-color: #3a4b5e;
+        }
+
+        .dark-mode .accompagnatore-input:focus {
+            border-color: var(--racing-blue);
+            box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.2);
+        }
+
+        .dark-mode .btn-date-small,
+        .dark-mode .btn-gender-small {
+            background: #2a3b4e;
+            color: var(--dark-text-main);
+            border-color: #3a4b5e;
+        }
+
+        .dark-mode .btn-date-small.active {
+            background-color: var(--racing-orange);
+            color: white;
+        }
+
+        .dark-mode .btn-gender-small.active-m {
+            background-color: var(--racing-blue);
+            color: white;
+        }
+
+        .dark-mode .btn-gender-small.active-f {
+            background-color: var(--racing-red);
+            color: white;
+        }
+
+        .dark-mode .timer-category-checkbox {
+            background: #2a3b4e;
+            color: var(--dark-text-main);
+            border-color: #3a4b5e;
+        }
+
+        .dark-mode .timer-category-checkbox:hover {
+            background: rgba(168, 218, 220, 0.2);
+        }
+
+        .dark-mode .riepilogo-header {
+            color: var(--racing-light);
+        }
+
+        .dark-mode .riepilogo-row {
+            border-bottom: 2px solid #3a4b5e;
+            color: var(--dark-text-main);
+        }
+
+        .dark-mode .riepilogo-row:hover {
+            background: rgba(168, 218, 220, 0.1);
+        }
+
+        .dark-mode .riepilogo-row:nth-child(even) {
+            background: rgba(168, 218, 220, 0.05);
+        }
+
+        .dark-mode .racing-footer {
+            background: rgba(42, 59, 78, 0.3);
+            border-top: 3px solid #3a4b5e;
+            color: var(--racing-light);
+        }
+
+        .dark-mode .footer-icon {
+            color: var(--racing-light);
+        }
+
+        .dark-mode .footer-icon:hover {
+            color: var(--racing-red);
+        }
+
+        .dark-mode #confirmedList,
+        .dark-mode #riepilogoAccompagnatori {
+            background: #2a3b4e;
+            color: var(--dark-text-main);
+            border-color: #3a4b5e;
+        }
+
+        .dark-mode .gender-title.title-m {
+            color: var(--racing-light);
+        }
+
+        .dark-mode .gender-title.title-f {
+            color: #ff9d9d;
+        }
+
+        .dark-mode .nome-cell {
+            color: var(--racing-light);
+        }
+
+        .dark-mode .nome-cell > div > div:first-child span {
+            color: var(--racing-light);
+        }
+
+        .dark-mode .accompagnatore-confirmed {
+            background: rgba(42, 157, 143, 0.2) !important;
+            border: 2px dashed var(--racing-green) !important;
+            color: var(--racing-light) !important;
+        }
+
+        .dark-mode .date-label {
+            background: var(--racing-orange);
+            color: white;
+        }
+
+        .dark-mode body::before {
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(168, 218, 220, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 209, 102, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(233, 196, 106, 0.02) 0%, transparent 50%);
+        }
+
+        /* AGGIUNTE PER DARK MODE COSTI */
+        .dark-mode .costo-label {
+            color: var(--racing-light) !important;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .dark-mode .costo-in {
+            background: #2a3b4e !important;
+            color: var(--dark-text-main) !important;
+            border-color: #3a4b5e !important;
+        }
+
+        .dark-mode .costo-in:focus {
+            border-color: var(--racing-blue) !important;
+            box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3) !important;
         }
 
         * {
@@ -43,6 +286,7 @@
             overflow-x: hidden;
             position: relative;
             min-height: 100vh;
+            transition: background 0.5s ease, color 0.3s ease;
         }
         
         body::before {
@@ -58,6 +302,7 @@
                 radial-gradient(circle at 40% 40%, rgba(233, 196, 106, 0.05) 0%, transparent 50%);
             z-index: -1;
             pointer-events: none;
+            transition: background 0.5s ease;
         }
 
         .container { 
@@ -73,6 +318,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            transition: background 0.5s ease, box-shadow 0.5s ease;
         }
         
         .container::before {
@@ -184,6 +430,7 @@
             position: relative;
             padding-bottom: 15px;
             flex-shrink: 0;
+            transition: color 0.3s ease;
         }
         
         h2::after {
@@ -198,6 +445,7 @@
             border-radius: 2px;
         }
 
+        /* STILI TIMER - DUPLICATI */
         .countdown-container { 
             text-align: center; 
             margin: 15px 0; 
@@ -229,7 +477,7 @@
             background-size: 200px 40px;
             z-index: 0;
         }
-        
+
         .timer { 
             font-family: 'Monaco', 'Consolas', monospace; 
             font-size: 1.3rem; 
@@ -244,6 +492,165 @@
         .timer i {
             margin-right: 8px;
             color: var(--racing-yellow);
+        }
+
+        /* TIMER PER CATEGORIE */
+        .timer-category-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .category-timer {
+            background: var(--gradient-warning);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: var(--shadow-light);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .category-timer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20" width="100" height="20" opacity="0.1"><path d="M0,10 Q25,5 50,10 T100,10" fill="none" stroke="white" stroke-width="1"/></svg>');
+            background-size: 150px 30px;
+            z-index: 0;
+        }
+        
+        .category-timer-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            color: var(--racing-white);
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .category-timer-header .categoria-badge {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            min-width: 70px;
+        }
+
+        /* NUOVI STILI PER TIMER ADMIN */
+        .timer-admin-section {
+            background: rgba(106, 76, 147, 0.05);
+            border: 2px solid var(--racing-purple);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: var(--shadow-light);
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+            transition: background 0.5s ease, border-color 0.5s ease;
+        }
+        
+        .timer-admin-section.show {
+            display: flex;
+        }
+        
+        .timer-admin-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 8px 0;
+        }
+        
+        .timer-admin-row input, .timer-admin-row select {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--racing-light);
+            border-radius: 8px;
+            min-width: 110px;
+            font-size: 13px;
+            background: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+        
+        .timer-admin-row input:focus, .timer-admin-row select:focus {
+            outline: none;
+            border-color: var(--racing-blue);
+            box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.1), 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .timer-admin-row button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .timer-admin-row button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .timer-category-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .timer-category-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--racing-blue);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 6px 12px;
+            border-radius: 15px;
+            border: 2px solid var(--racing-light);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .timer-category-checkbox input[type="checkbox"] {
+            margin: 0;
+            width: 14px;
+            height: 14px;
+            cursor: pointer;
+            accent-color: var(--racing-blue);
+        }
+        
+        .timer-category-checkbox:hover {
+            background: rgba(168, 218, 220, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+        
+        .timer-category-checkbox input[type="checkbox"]:checked {
+            accent-color: var(--racing-green);
         }
 
         .search-container { 
@@ -698,6 +1105,17 @@
             transform: translateY(-5px);
             box-shadow: var(--shadow-medium);
         }
+        
+        /* Stile specifico per pulsante WhatsApp */
+        #adminButtons button[onclick*="WhatsApp"] {
+            background: linear-gradient(135deg, #25D366 0%, #128C7E 100%) !important;
+        }
+        
+        #adminButtons button[onclick*="WhatsApp"]:hover {
+            background: linear-gradient(135deg, #128C7E 0%, #075E54 100%) !important;
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4);
+        }
 
         #toast { 
             visibility: hidden; 
@@ -1071,7 +1489,7 @@
             white-space: nowrap;
             transition: all 0.3s ease;
             box-shadow: var(--shadow-light);
-            min-width: 150px;
+            min-width: 180px;
             flex-shrink: 0;
         }
         
@@ -1181,6 +1599,19 @@
                 font-size: 1rem;
             }
             
+            /* Timer per categorie in mobile */
+            .category-timer {
+                padding: 12px;
+                gap: 8px;
+            }
+            
+            .category-timer-header {
+                font-size: 0.9rem;
+                flex-direction: column;
+                gap: 5px;
+                text-align: center;
+            }
+            
             .search-container {
                 flex-direction: column;
                 align-items: stretch;
@@ -1197,6 +1628,7 @@
                 width: 100%;
                 min-width: auto;
                 padding: 12px;
+                font-size: 0.8rem;
             }
             
             .stats-grid {
@@ -1378,6 +1810,26 @@
                 margin-bottom: 5px;
             }
             
+            /* Timer admin responsive */
+            .timer-admin-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            
+            .timer-admin-row input, .timer-admin-row select, .timer-admin-row button {
+                width: 100%;
+            }
+            
+            .timer-category-selector {
+                justify-content: center;
+            }
+            
+            .timer-category-checkbox {
+                font-size: 0.7rem;
+                padding: 4px 8px;
+            }
+            
             .top-btns {
                 position: absolute;
                 top: 10px;
@@ -1395,6 +1847,11 @@
             
             /* Fix per admin row in mobile */
             .admin-row button {
+                padding: 10px 15px;
+                font-size: 0.8rem;
+            }
+            
+            .timer-admin-row button {
                 padding: 10px 15px;
                 font-size: 0.8rem;
             }
@@ -1437,6 +1894,10 @@
                 font-size: 0.65rem;
                 padding: 4px 8px;
             }
+            
+            .category-timer-header {
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -1462,13 +1923,31 @@
         <img src="logo.png" alt="Logo Juvenilia Racing Team" onerror="this.style.display='none'">
     </div>
 
-    <h2 id="mainTitle">Juvenilia Racing Team - Iscrizioni Gara</h2>
+    <h2 id="mainTitle">Juvenilia Racing Team - Iscrizioni Gara 3</h2>
     
+    <!-- Timer principale -->
     <div id="countdownBox" class="countdown-container">
         <div id="timerDisplay" class="timer"><i class="fas fa-clock"></i> Inizializzazione...</div>
     </div>
 
+    <!-- Timer per categorie -->
+    <div id="timerCategoryContainer" class="timer-category-container"></div>
+
     <div id="docLinksContainer" class="doc-links-user"></div>
+
+    <!-- Sezione admin timer (nascosta di default) -->
+    <div id="timerAdminBox" class="timer-admin-section">
+        <div style="font-size: 14px; font-weight: bold; color: var(--racing-purple); margin-left: 5px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-stopwatch"></i> GESTIONE TIMER PER CATEGORIE:</div>
+        
+        <!-- Form per aggiungere nuovo timer -->
+        <div class="timer-admin-row">
+            <input type="datetime-local" id="newTimerDeadline">
+            <input type="text" id="newTimerLabel" placeholder="Nome timer (es: Scadenza Senior)" style="text-transform: uppercase;">
+            <button onclick="addNewTimer()" style="background:var(--racing-blue);"><i class="fas fa-plus-circle"></i> Nuovo Timer</button>
+        </div>
+        
+        <div id="timersAdminContent"></div>
+    </div>
 
     <!-- Sezioni admin (nascoste di default) -->
     <div id="docsBox">
@@ -1489,14 +1968,14 @@
 
     <div id="addAtletaBox">
         <div class="admin-row">
-            <input type="text" id="editTitleInput" placeholder="Titolo della gara..." onfocus="isEditingOther=true" onblur="isEditingOther=false" style="text-transform: uppercase;">
+            <input type="text" id="editTitleInput" placeholder="Titolo della gara..." onfocus="isEditingTitolo=true" onblur="isEditingTitolo=false" style="text-transform: uppercase;">
             <button onclick="resetTitolo()" class="btn-clear-input"><i class="fas fa-undo"></i> reset</button>
             <button onclick="salvaTitolo()" style="background:var(--racing-purple);"><i class="fas fa-edit"></i> Aggiorna Titolo</button>
         </div>
         <div class="admin-row">
-            <input type="text" id="dateA_Label" placeholder="Data A" onfocus="isEditingOther=true" onblur="isEditingOther=false" style="text-transform: uppercase;">
-            <input type="text" id="dateB_Label" placeholder="Data B" onfocus="isEditingOther=true" onblur="isEditingOther=false" style="text-transform: uppercase;">
-            <input type="text" id="dateC_Label" placeholder="Data C" onfocus="isEditingOther=true" onblur="isEditingOther=false" style="text-transform: uppercase;">
+            <input type="text" id="dateA_Label" placeholder="Data A" onfocus="isEditingDateLabels=true" onblur="isEditingDateLabels=false" style="text-transform: uppercase;">
+            <input type="text" id="dateB_Label" placeholder="Data B" onfocus="isEditingDateLabels=true" onblur="isEditingDateLabels=false" style="text-transform: uppercase;">
+            <input type="text" id="dateC_Label" placeholder="Data C" onfocus="isEditingDateLabels=true" onblur="isEditingDateLabels=false" style="text-transform: uppercase;">
             <button onclick="resetDateLabels()" class="btn-clear-input"><i class="fas fa-undo"></i> reset</button>
             <button onclick="salvaEtichetteDate()" style="background:var(--racing-orange);"><i class="fas fa-calendar-check"></i> Salva Date</button>
         </div>
@@ -1521,7 +2000,7 @@
             <button onclick="aggiungiAtleta()" style="background:var(--racing-blue);"><i class="fas fa-user-plus"></i> Aggiungi Atleta</button>
         </div>
         <div class="admin-row">
-            <div style="font-size: 12px; font-weight: bold; margin-left: 5px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-hourglass-end"></i> SCADENZA:</div>
+            <div style="font-size: 12px; font-weight: bold; margin-left: 5px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-hourglass-end"></i> SCADENZA PRINCIPALE:</div>
             <input type="datetime-local" id="deadlineInput">
             <button onclick="confermaScadenzaDB()" style="background:var(--racing-green);"><i class="fas fa-check-circle"></i> CONFERMA</button>
             <button onclick="resetScadenzaDB()" style="background:var(--racing-red);"><i class="fas fa-ban"></i> RESET</button>
@@ -1565,7 +2044,7 @@
         <span class="search-icon"><i class="fas fa-search"></i></span>
         <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="Cerca il tuo nome o la tua categoria..." style="text-transform: uppercase;">
         <button id="toggleAccompagnatoriBtn" onclick="toggleVisibilitaAccompagnatori()">
-            <i class="fas fa-eye"></i> Nascondi Box
+            <i class="fas fa-eye"></i> Nascondi Box Accompagnatori
         </button>
     </div>
 
@@ -1591,6 +2070,7 @@
     <div id="adminButtons">
         <button onclick="bulkAction(true)" style="background:var(--racing-purple)"><i class="fas fa-lock"></i> Nascondi Selezionati</button>
         <button onclick="exportToExcel()" style="background:var(--racing-green)"><i class="fas fa-file-excel"></i> Esporta Excel</button>
+        <button onclick="inviaWhatsAppQuote()" style="background:#25D366; color:white;"><i class="fab fa-whatsapp"></i> WhatsApp Quote</button>
         <button onclick="resetTutti()" style="background:var(--racing-red)"><i class="fas fa-redo"></i> Reset Scelte</button>
         <button onclick="unlockEverything()" style="background:var(--racing-orange)"><i class="fas fa-lock-open"></i> Mostra Tutti</button>
         <button onclick="exportAccompagnatoriExcel()" style="background:var(--racing-blue)"><i class="fas fa-users"></i> Export Accompagnatori</button>
@@ -1599,7 +2079,7 @@
     
     <!-- Footer tematico -->
     <div class="racing-footer">
-        <p>Juvenilia Racing Team - Sistema Iscrizioni Gare di Pattinaggio Corsa</p>
+        <p>Juvenilia Racing Team - Sistema Iscrizioni Gara 3 - Pattinaggio Corsa</p>
         <div class="footer-icons">
             <i class="fas fa-trophy footer-icon"></i>
             <i class="fas fa-medal footer-icon"></i>
@@ -1618,31 +2098,68 @@
     const TELEGRAM_TOKEN = '8441085660:AAEui_yfGnT_quKPHVx_wsslcuJtm3KbTOI';
     const TELEGRAM_CHAT_ID = '691756250';
     
+    // AGGIUNTA: Numero WhatsApp per invio quote
+    const WHATSAPP_NUMBER = '393333061247'; // Sostituisci con il numero reale (es: 393331234567)
+    
     const O_P = "anV2ZW5pbGlhMTE3OQ==";
     
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const T_DATA = 'presenze_gara3'; 
+    const T_DATA = 'presenze_gara3';
     const T_CONF = 'configurazione_gara3';
+    const T_TIMERS = 'timers_gara3';
 
     let isAdmin = false, isExpired = false, currentData = [], timerInterval;
     let labelA = "", labelB = "", labelC = "", sortBy = 'nome'; 
     let costiCategorie = {};
-    let isEditingCosti = false, isEditingDocs = false, isEditingOther = false;
+    let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false;
     let selectedIds = new Set();
     let mostraAccompagnatori = true;
     let tempAccompagnatoriValues = {};
     let isTypingInAccompagnatore = false;
     let refreshInterval = null;
+    let categoryTimers = [];
+    let categoryTimerIntervals = {};
+    let isEditingCategoria = false;
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
+    // Funzione per controllare l'orario e attivare la dark mode
+    function checkTimeForDarkMode() {
+        const now = new Date();
+        const hour = now.getHours();
+        
+        // Attiva dark mode dalle 18:00 alle 8:00 (6 PM - 8 AM)
+        const isNightTime = hour >= 18 || hour < 8;
+        const body = document.body;
+        
+        if (isNightTime && !body.classList.contains('dark-mode')) {
+            body.classList.add('dark-mode');
+            console.log('Dark mode attivata (ore notturne)');
+        } else if (!isNightTime && body.classList.contains('dark-mode')) {
+            body.classList.remove('dark-mode');
+            console.log('Dark mode disattivata (ore diurne)');
+        }
+    }
+
+    // Funzione per avviare il controllo periodico dell'orario
+    function startTimeCheck() {
+        // Controlla immediatamente
+        checkTimeForDarkMode();
+        
+        // Controlla ogni minuto
+        setInterval(checkTimeForDarkMode, 60000);
+    }
+
     async function init() { 
+        // Avvia il controllo della dark mode
+        startTimeCheck();
+        
         await fullLoad(); 
         refreshInterval = setInterval(checkAndRefresh, 15000);
     }
 
     async function checkAndRefresh() {
-        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingOther) {
+        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingTitolo && !isEditingDateLabels && !isEditingTimers && !isEditingCategoria) {
             await fullLoad();
         }
     }
@@ -1658,6 +2175,7 @@
         }
         
         await caricaConfig(); 
+        await caricaTimers();
         await caricaTabella();
         
         restoreTempAccompagnatoriValues();
@@ -1681,7 +2199,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Event listener per input maiuscolo
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('accompagnatore-input') || 
                 e.target.classList.contains('search-box') ||
@@ -1693,15 +2210,30 @@
                 e.target.id === 'docLink1_URL' ||
                 e.target.id === 'docLink1_Text' ||
                 e.target.id === 'docLink2_URL' ||
-                e.target.id === 'docLink2_Text') {
+                e.target.id === 'docLink2_Text' ||
+                e.target.id === 'newTimerLabel' ||
+                e.target.classList.contains('categoria-select')) {
                 e.target.value = e.target.value.toUpperCase();
             }
         });
         
-        // Event listener per rilevare quando si sta scrivendo
         document.addEventListener('focusin', function(e) {
             if (e.target.classList.contains('accompagnatore-input')) {
                 isTypingInAccompagnatore = true;
+            }
+            if (e.target.id === 'editTitleInput') {
+                isEditingTitolo = true;
+            }
+            if (e.target.id === 'dateA_Label' || e.target.id === 'dateB_Label' || e.target.id === 'dateC_Label') {
+                isEditingDateLabels = true;
+            }
+            if (e.target.classList.contains('timer-cat-input') || 
+                e.target.id === 'newTimerDeadline' || 
+                e.target.id === 'newTimerLabel') {
+                isEditingTimers = true;
+            }
+            if (e.target.classList.contains('categoria-select')) {
+                isEditingCategoria = true;
             }
         });
         
@@ -1710,6 +2242,28 @@
                 setTimeout(() => {
                     isTypingInAccompagnatore = false;
                 }, 1000);
+            }
+            if (e.target.id === 'editTitleInput') {
+                setTimeout(() => {
+                    isEditingTitolo = false;
+                }, 500);
+            }
+            if (e.target.id === 'dateA_Label' || e.target.id === 'dateB_Label' || e.target.id === 'dateC_Label') {
+                setTimeout(() => {
+                    isEditingDateLabels = false;
+                }, 500);
+            }
+            if (e.target.classList.contains('timer-cat-input') || 
+                e.target.id === 'newTimerDeadline' || 
+                e.target.id === 'newTimerLabel') {
+                setTimeout(() => {
+                    isEditingTimers = false;
+                }, 500);
+            }
+            if (e.target.classList.contains('categoria-select')) {
+                setTimeout(() => {
+                    isEditingCategoria = false;
+                }, 500);
             }
         });
         
@@ -1741,29 +2295,43 @@
         const url2 = data.find(c => c.chiave === 'doc_url_2')?.valore || "";
         const txt2 = data.find(c => c.chiave === 'doc_txt_2')?.valore || "";
         
-        // Carica impostazione visibilità box accompagnatori
         const visibilitaAccompagnatori = data.find(c => c.chiave === 'mostra_accompagnatori');
         if (visibilitaAccompagnatori) {
             mostraAccompagnatori = visibilitaAccompagnatori.valore === 'true';
         }
         
         if(isAdmin) {
-            if(!isEditingOther) {
-                document.getElementById('dateA_Label').value = labelA;
-                document.getElementById('dateB_Label').value = labelB;
-                document.getElementById('dateC_Label').value = labelC;
+            // Salva i valori attuali prima di aggiornarli
+            const currentTitoloValue = document.getElementById('editTitleInput')?.value || "";
+            const currentDateAValue = document.getElementById('dateA_Label')?.value || "";
+            const currentDateBValue = document.getElementById('dateB_Label')?.value || "";
+            const currentDateCValue = document.getElementById('dateC_Label')?.value || "";
+            const currentDoc1URLValue = document.getElementById('docLink1_URL')?.value || "";
+            const currentDoc1TextValue = document.getElementById('docLink1_Text')?.value || "";
+            const currentDoc2URLValue = document.getElementById('docLink2_URL')?.value || "";
+            const currentDoc2TextValue = document.getElementById('docLink2_Text')?.value || "";
+            
+            // Aggiorna solo se non siamo in modalità editing
+            if(!isEditingTitolo && currentTitoloValue === "") {
                 document.getElementById('editTitleInput').value = tit?.valore || "";
             }
-            if(!isEditingDocs) {
-                document.getElementById('docLink1_URL').value = url1;
-                document.getElementById('docLink1_Text').value = txt1;
-                document.getElementById('docLink2_URL').value = url2;
-                document.getElementById('docLink2_Text').value = txt2;
+            
+            if(!isEditingDateLabels) {
+                if (currentDateAValue === "") document.getElementById('dateA_Label').value = labelA;
+                if (currentDateBValue === "") document.getElementById('dateB_Label').value = labelB;
+                if (currentDateCValue === "") document.getElementById('dateC_Label').value = labelC;
             }
+            
+            if(!isEditingDocs) {
+                if (currentDoc1URLValue === "") document.getElementById('docLink1_URL').value = url1;
+                if (currentDoc1TextValue === "") document.getElementById('docLink1_Text').value = txt1;
+                if (currentDoc2URLValue === "") document.getElementById('docLink2_URL').value = url2;
+                if (currentDoc2TextValue === "") document.getElementById('docLink2_Text').value = txt2;
+            }
+            
             document.getElementById('deadlineInput').value = sca?.valore || "";
         }
         
-        // Aggiorna titolo della pagina
         const docCont = document.getElementById('docLinksContainer');
         docCont.innerHTML = "";
         if(url1) docCont.innerHTML += `<a href="${url1}" target="_blank" class="btn-doc-link"><i class="fas fa-file-pdf"></i> ${txt1 || 'Link 1'}</a>`;
@@ -1774,7 +2342,7 @@
             costiCategorie[c.chiave.replace('costo_', '').toUpperCase()] = parseFloat(c.valore) || 0; 
         });
         
-        document.getElementById('mainTitle').innerText = tit?.valore || "Juvenilia Racing Team - Iscrizioni Gara";
+        document.getElementById('mainTitle').innerText = tit?.valore || "Juvenilia Racing Team - Iscrizioni Gara 3";
         
         const cBox = document.getElementById('countdownBox');
         if(sca?.valore && sca.valore !== "") {
@@ -1785,7 +2353,7 @@
                 mostraTimerChiuso(); 
             } else { 
                 isExpired = false; 
-                startCountdown(sca.valore); 
+                startCountdown(sca.valore, 'timerDisplay'); 
             }
         } else { 
             isExpired = false; 
@@ -1793,6 +2361,322 @@
         }
         
         if(isAdmin && !isEditingCosti) renderCostiInputs();
+    }
+
+    async function caricaTimers() {
+        const { data } = await _supabase.from(T_TIMERS).select('*');
+        if(data) {
+            categoryTimers = data;
+            renderCategoryTimers();
+        }
+    }
+
+    function renderCategoryTimers() {
+        const container = document.getElementById('timerCategoryContainer');
+        const adminContainer = document.getElementById('timersAdminContent');
+        
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        Object.keys(categoryTimerIntervals).forEach(timerId => {
+            clearInterval(categoryTimerIntervals[timerId]);
+        });
+        categoryTimerIntervals = {};
+        
+        const activeTimers = categoryTimers.filter(timer => {
+            const deadline = new Date(timer.deadline).getTime();
+            const now = new Date().getTime();
+            return deadline > now - (24 * 60 * 60 * 1000);
+        });
+        
+        if (activeTimers.length === 0) {
+            container.style.display = 'none';
+        } else {
+            container.style.display = 'flex';
+            
+            activeTimers.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+            
+            activeTimers.forEach(timer => {
+                const timerDiv = document.createElement('div');
+                timerDiv.className = 'category-timer';
+                timerDiv.id = `categoryTimer_${timer.id}`;
+                
+                const categories = timer.categories ? JSON.parse(timer.categories) : [];
+                const categoryLabels = categories.map(cat => 
+                    `<span class="categoria-badge cat-${cat.toLowerCase()}">${cat}</span>`
+                ).join(' ');
+                
+                timerDiv.innerHTML = `
+                    <div class="category-timer-header">
+                        <i class="fas fa-hourglass-half"></i>
+                        ${timer.label || 'Scadenza'}:
+                        ${categoryLabels}
+                    </div>
+                    <div class="timer" id="categoryTimerDisplay_${timer.id}">
+                        <i class="fas fa-clock"></i> Calcolo...
+                    </div>
+                `;
+                
+                container.appendChild(timerDiv);
+                timerDiv.style.display = 'flex';
+                
+                startCountdown(timer.deadline, `categoryTimerDisplay_${timer.id}`, timer.id);
+            });
+        }
+        
+        if (isAdmin && adminContainer && !isEditingTimers) {
+            adminContainer.innerHTML = '';
+            
+            if (categoryTimers.length === 0) {
+                adminContainer.innerHTML = `<div style="text-align:center; padding:20px; color:#666; font-size:0.9rem; font-style:italic;">
+                    <i class="fas fa-stopwatch"></i> Nessun timer configurato
+                </div>`;
+            } else {
+                const allCategories = ["SENIOR", "JUNIOR", "ALLIEVI", "RAGAZZI", "R12", "ESORDIENTI", "GIOVANISSIMI"];
+                
+                categoryTimers.forEach((timer, index) => {
+                    const timerDiv = document.createElement('div');
+                    timerDiv.className = 'timer-admin-row';
+                    timerDiv.style.border = '1px solid var(--racing-light)';
+                    timerDiv.style.borderRadius = '10px';
+                    timerDiv.style.padding = '15px';
+                    timerDiv.style.marginBottom = '10px';
+                    timerDiv.style.backgroundColor = 'rgba(255,255,255,0.05)';
+                    
+                    const categories = timer.categories ? JSON.parse(timer.categories) : [];
+                    
+                    const deadlineDate = new Date(timer.deadline);
+                    const formattedDate = deadlineDate.toISOString().slice(0, 16);
+                    
+                    timerDiv.innerHTML = `
+                        <div style="width:100%; display:flex; flex-direction:column; gap:10px;">
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <strong style="color:var(--racing-blue);">Timer ${index + 1}:</strong>
+                                <span style="font-weight:bold; color:var(--racing-purple);">${timer.label || 'Senza nome'}</span>
+                                <span style="font-size:0.8rem; color:#666;">
+                                    Scade: ${new Date(timer.deadline).toLocaleString('it-IT')}
+                                </span>
+                            </div>
+                            
+                            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                                <input type="datetime-local" class="timer-cat-input" 
+                                       data-timer-id="${timer.id}" 
+                                       value="${formattedDate}"
+                                       onfocus="isEditingTimers=true" 
+                                       onblur="isEditingTimers=false">
+                                
+                                <input type="text" class="timer-cat-input" 
+                                       data-timer-id="${timer.id}" 
+                                       placeholder="Nome timer" 
+                                       value="${timer.label || ''}"
+                                       onfocus="isEditingTimers=true" 
+                                       onblur="isEditingTimers=false"
+                                       style="text-transform: uppercase;">
+                                
+                                <button onclick="salvaTimer(${timer.id})" style="background:var(--racing-green);">
+                                    <i class="fas fa-save"></i> Salva
+                                </button>
+                                
+                                <button onclick="eliminaTimer(${timer.id})" style="background:var(--racing-red);">
+                                    <i class="fas fa-trash"></i> Elimina
+                                </button>
+                            </div>
+                            
+                            <div style="margin-top:10px;">
+                                <div style="font-size:0.8rem; font-weight:bold; color:var(--racing-blue); margin-bottom:5px;">
+                                    <i class="fas fa-filter"></i> Categorie associate:
+                                </div>
+                                <div class="timer-category-selector" data-timer-id="${timer.id}">
+                                    ${allCategories.map(cat => `
+                                        <label class="timer-category-checkbox">
+                                            <input type="checkbox" value="${cat}" 
+                                                   ${categories.includes(cat) ? 'checked' : ''}
+                                                   onchange="aggiornaCategorieTimer(${timer.id}, this)">
+                                            ${cat}
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    adminContainer.appendChild(timerDiv);
+                });
+            }
+        }
+    }
+
+    async function addNewTimer() {
+        const deadline = document.getElementById('newTimerDeadline').value;
+        const label = document.getElementById('newTimerLabel').value.trim().toUpperCase();
+        
+        if (!deadline) {
+            showToast("Inserisci una data di scadenza");
+            return;
+        }
+        
+        if (!label) {
+            showToast("Inserisci un nome per il timer");
+            return;
+        }
+        
+        const { data, error } = await _supabase.from(T_TIMERS).insert([{
+            deadline: deadline,
+            label: label,
+            categories: JSON.stringify([]),
+            created_at: new Date().toISOString()
+        }]).select();
+        
+        if (error) {
+            console.error("Errore aggiunta timer:", error);
+            showToast("Errore nell'aggiunta del timer");
+            return;
+        }
+        
+        showToast("Timer aggiunto!");
+        
+        document.getElementById('newTimerDeadline').value = '';
+        document.getElementById('newTimerLabel').value = '';
+        
+        await caricaTimers();
+    }
+
+    async function salvaTimer(timerId) {
+        const deadlineInput = document.querySelector(`.timer-cat-input[data-timer-id="${timerId}"][type="datetime-local"]`);
+        const labelInput = document.querySelector(`.timer-cat-input[data-timer-id="${timerId}"][type="text"]`);
+        
+        if (!deadlineInput || !labelInput) return;
+        
+        const deadline = deadlineInput.value;
+        const label = labelInput.value.trim().toUpperCase();
+        
+        if (!deadline) {
+            showToast("Inserisci una data di scadenza");
+            return;
+        }
+        
+        const categorySelector = document.querySelector(`.timer-category-selector[data-timer-id="${timerId}"]`);
+        const selectedCategories = [];
+        if (categorySelector) {
+            categorySelector.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+                selectedCategories.push(checkbox.value);
+            });
+        }
+        
+        const { error } = await _supabase.from(T_TIMERS).update({
+            deadline: deadline,
+            label: label,
+            categories: JSON.stringify(selectedCategories)
+        }).eq('id', timerId);
+        
+        if (error) {
+            console.error("Errore salvataggio timer:", error);
+            showToast("Errore nel salvataggio del timer");
+            return;
+        }
+        
+        showToast("Timer salvato!");
+        isEditingTimers = false;
+        await caricaTimers();
+    }
+
+    async function aggiornaCategorieTimer(timerId, checkbox) {
+        isEditingTimers = true;
+        showToast("Modifica in corso... salva per confermare");
+    }
+
+    async function eliminaTimer(timerId) {
+        if (!confirm("Eliminare questo timer? Questa operazione non può essere annullata.")) {
+            return;
+        }
+        
+        const { error } = await _supabase.from(T_TIMERS).delete().eq('id', timerId);
+        
+        if (error) {
+            console.error("Errore eliminazione timer:", error);
+            showToast("Errore nell'eliminazione del timer");
+            return;
+        }
+        
+        showToast("Timer eliminato!");
+        
+        if (categoryTimerIntervals[timerId]) {
+            clearInterval(categoryTimerIntervals[timerId]);
+            delete categoryTimerIntervals[timerId];
+        }
+        
+        await caricaTimers();
+    }
+
+    function startCountdown(endTime, displayId, timerId = null) {
+        if (timerId && categoryTimerIntervals[timerId]) {
+            clearInterval(categoryTimerIntervals[timerId]);
+        }
+        
+        const displayElement = document.getElementById(displayId);
+        if (!displayElement) return;
+        
+        function updateCountdown() {
+            const distance = new Date(endTime).getTime() - new Date().getTime();
+            
+            if (distance <= 0) { 
+                displayElement.innerHTML = `<i class="fas fa-hourglass-end"></i> SCADUTO`;
+                displayElement.style.color = "var(--racing-red)";
+                
+                if (timerId) {
+                    const timer = categoryTimers.find(t => t.id === timerId);
+                    if (timer) {
+                        const categories = timer.categories ? JSON.parse(timer.categories) : [];
+                        disabilitaCategorieScadute(categories);
+                    }
+                }
+                
+                return; 
+            }
+            
+            const d = Math.floor(distance/86400000);
+            const h = Math.floor((distance%86400000)/3600000);
+            const m = Math.floor((distance%3600000)/60000);
+            const s = Math.floor((distance%60000)/1000);
+            
+            displayElement.innerHTML = `<i class="fas fa-hourglass-half"></i> ${d}g ${h}h ${m}m ${s}s`;
+            displayElement.style.color = "var(--racing-white)";
+        }
+        
+        updateCountdown();
+        
+        const interval = setInterval(updateCountdown, 1000);
+        if (timerId) {
+            categoryTimerIntervals[timerId] = interval;
+        } else {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = interval;
+        }
+    }
+
+    function disabilitaCategorieScadute(categories) {
+        if (isAdmin) return;
+        
+        categories.forEach(cat => {
+            const rows = document.querySelectorAll(`.tr-${cat.toLowerCase()}`);
+            rows.forEach(row => {
+                const radioInputs = row.querySelectorAll('input[type="radio"]');
+                const resetButton = row.querySelector('.btn-reset');
+                const accompagnatoreInput = row.querySelector('.accompagnatore-input');
+                const accompagnatoreButton = row.querySelector('.btn-accompagnatore');
+                
+                radioInputs.forEach(input => {
+                    if (!input.checked) {
+                        input.disabled = true;
+                    }
+                });
+                
+                if (resetButton) resetButton.disabled = true;
+                if (accompagnatoreInput) accompagnatoreInput.disabled = true;
+                if (accompagnatoreButton) accompagnatoreButton.disabled = true;
+            });
+        });
     }
 
     async function salvaVisibilitaAccompagnatori() {
@@ -1861,25 +2745,28 @@
         const container = document.getElementById('costiInputs');
         if (!container) return;
         const cats = [...new Set(currentData.map(a => a.categoria.toUpperCase()))].sort((a, b) => (customCatOrder[a] || 999) - (customCatOrder[b] || 999));
-        if (container.children.length > 0) {
-            cats.forEach(c => { 
-                const input = container.querySelector(`input[data-cat="${c}"]`); 
-                if (input && document.activeElement !== input) { 
-                    input.value = costiCategorie[c] || 0; 
-                } 
-            });
-        } else {
-            cats.forEach(c => {
-                const val = costiCategorie[c] || 0;
-                container.innerHTML += `
-                    <div style="text-align:center;">
-                        <label style="font-size:12px; display:block; font-weight:bold; color:var(--racing-blue); margin-bottom:5px;">${c}</label>
-                        <input type="number" step="0.5" class="costo-in" data-cat="${c}" value="${val}" 
-                               onfocus="isEditingCosti=true" onblur="isEditingCosti=false" 
-                               style="width:80px; padding:10px; border-radius:10px; border:2px solid var(--racing-light); text-align:center; font-weight:bold;">
-                    </div>`;
-            });
-        }
+        
+        // Salva i valori attuali prima di aggiornare
+        const currentValues = {};
+        container.querySelectorAll('.costo-in').forEach(input => {
+            const cat = input.dataset.cat;
+            const value = input.value;
+            if (cat && value !== "") {
+                currentValues[cat] = value;
+            }
+        });
+        
+        container.innerHTML = '';
+        cats.forEach(c => {
+            const val = currentValues[c] || costiCategorie[c] || 0;
+            container.innerHTML += `
+                <div style="text-align:center;">
+                    <label class="costo-label" style="font-size:12px; display:block; font-weight:bold; color:var(--racing-blue); margin-bottom:5px;">${c}</label>
+                    <input type="number" step="0.5" class="costo-in" data-cat="${c}" value="${val}" 
+                           onfocus="isEditingCosti=true" onblur="isEditingCosti=false" 
+                           style="width:80px; padding:10px; border-radius:10px; border:2px solid var(--racing-light); text-align:center; font-weight:bold;">
+                </div>`;
+        });
     }
 
     async function salvaCosti() {
@@ -1904,21 +2791,60 @@
 
     function setSort(type) { sortBy = type; renderData(); }
 
+    // NUOVA FUNZIONE: Modifica categoria atleta
+    async function modificaCategoria(id, nuovaCategoria) {
+        const atleta = currentData.find(a => a.id == id);
+        
+        if (!nuovaCategoria) {
+            showToast("Seleziona una categoria valida");
+            return;
+        }
+        
+        if (nuovaCategoria === atleta.categoria) {
+            showToast("La categoria è già la stessa");
+            return;
+        }
+        
+        if (!confirm(`Modificare la categoria di ${atleta.nome} da ${atleta.categoria} a ${nuovaCategoria}?`)) {
+            return;
+        }
+        
+        const { error } = await _supabase.from(T_DATA).update({ categoria: nuovaCategoria }).eq('id', id);
+        
+        if (error) {
+            console.error("Errore modifica categoria:", error);
+            showToast("Errore nella modifica della categoria");
+            return;
+        }
+        
+        showToast(`Categoria modificata per ${atleta.nome}`);
+        await caricaTabella();
+    }
+
     async function salva(id, val) { 
         const atleta = currentData.find(a => a.id == id);
+        
+        if (!isAdmin) {
+            const categoriaAtleta = atleta.categoria.toUpperCase();
+            const isCategoriaScaduta = isCategoriaDisabilitata(categoriaAtleta);
+            
+            if (isCategoriaScaduta && val !== 'vuoto') {
+                showToast(`La scadenza per la categoria ${categoriaAtleta} è passata!`);
+                renderData();
+                return;
+            }
+        }
+        
         if (!isAdmin && !confirm(`Sei veramente tu ${atleta.nome}?`)) { renderData(); return; }
         
-        // Mostra l'animazione appropriata
         if (val === 'si' && !isAdmin) {
             showCelebrationEffect('si');
         } else if (val === 'no' && !isAdmin) {
             showCelebrationEffect('no');
         }
         
-        // Creiamo l'oggetto di aggiornamento
         const updateData = { stato: val };
         
-        // SOLO ADMIN può resettare anche l'accompagnatore quando resetta lo stato
         if (val === 'vuoto' && isAdmin) {
             updateData.accompagnatore = "";
         }
@@ -1926,13 +2852,28 @@
         await _supabase.from(T_DATA).update(updateData).eq('id', id);
         showToast("Scelta salvata!");
         
-        // INVIA TELEGRAM SOLO SE NON ADMIN
         if (val !== 'vuoto' && !isAdmin) {
             let note = atleta.note || "";
             let d = note.includes('B') ? labelB : (note.includes('C') ? labelC : labelA);
             inviaTelegram(atleta.nome, val, document.getElementById('mainTitle').innerText, d);
         }
         caricaTabella(); 
+    }
+
+    function isCategoriaDisabilitata(categoria) {
+        const now = new Date().getTime();
+        
+        for (const timer of categoryTimers) {
+            const deadline = new Date(timer.deadline).getTime();
+            if (deadline < now) {
+                const categories = timer.categories ? JSON.parse(timer.categories) : [];
+                if (categories.includes(categoria)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
 
     async function salvaAccompagnatore(id) {
@@ -1945,6 +2886,17 @@
         }
         
         const atleta = currentData.find(a => a.id == id);
+        
+        if (!isAdmin) {
+            const categoriaAtleta = atleta.categoria.toUpperCase();
+            const isCategoriaScaduta = isCategoriaDisabilitata(categoriaAtleta);
+            
+            if (isCategoriaScaduta) {
+                showToast(`La scadenza per la categoria ${categoriaAtleta} è passata!`);
+                renderData();
+                return;
+            }
+        }
         
         if (!isAdmin) {
             if (!confirm(`Confermi di voler ${atleta.accompagnatore ? 'modificare' : 'aggiungere'} "${valore}" come accompagnatore per ${atleta.nome}?\n\nQuesta scelta è definitiva e non può essere modificata senza contattare l'amministratore.`)) {
@@ -2001,22 +2953,18 @@
         }
     }
 
-    // FUNZIONE CORRETTA: Toggle visibilità box accompagnatori
     async function toggleVisibilitaAccompagnatori() {
         mostraAccompagnatori = !mostraAccompagnatori;
         
-        // Salva nel database
         await salvaVisibilitaAccompagnatori();
         
-        // Aggiorna il testo del pulsante
         const btn = document.getElementById('toggleAccompagnatoriBtn');
         if (mostraAccompagnatori) {
-            btn.innerHTML = '<i class="fas fa-eye-slash"></i> Nascondi Box';
+            btn.innerHTML = '<i class="fas fa-eye-slash"></i> Nascondi Box Accompagnatori';
         } else {
-            btn.innerHTML = '<i class="fas fa-eye"></i> Mostra Box';
+            btn.innerHTML = '<i class="fas fa-eye"></i> Mostra Box Accompagnatori';
         }
         
-        // Ricarica i dati per applicare la visibilità
         await caricaTabella();
         
         showToast(`Box accompagnatori ${mostraAccompagnatori ? 'mostrati' : 'nascosti'}`);
@@ -2040,7 +2988,7 @@
         const ws = XLSX.utils.json_to_sheet(dataExp);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Accompagnatori");
-        XLSX.writeFile(wb, `Accompagnatori_Gara_Juvenilia.xlsx`);
+        XLSX.writeFile(wb, `Accompagnatori_Gara3_Juvenilia.xlsx`);
         showToast("Excel esportato!");
     }
 
@@ -2059,6 +3007,92 @@
         });
     }
 
+    // AGGIUNTA: Funzione per inviare quote via WhatsApp
+    async function inviaWhatsAppQuote() {
+        // Calcola il totale per atleta
+        let quoteAtleti = [];
+        let totaleGenerale = 0;
+        
+        currentData.forEach(atleta => {
+            if (atleta.stato === 'si') {
+                const categoria = atleta.categoria.toUpperCase();
+                const quota = costiCategorie[categoria] || 0;
+                
+                if (quota > 0) {
+                    totaleGenerale += quota;
+                    quoteAtleti.push({
+                        nome: atleta.nome,
+                        categoria: categoria,
+                        quota: quota,
+                        accompagnatore: atleta.accompagnatore || ""
+                    });
+                }
+            }
+        });
+        
+        if (quoteAtleti.length === 0) {
+            showToast("Nessuna quota da pagare trovata!");
+            return;
+        }
+        
+        // Ordina per categoria e nome
+        quoteAtleti.sort((a, b) => {
+            const catOrderA = customCatOrder[a.categoria] || 999;
+            const catOrderB = customCatOrder[b.categoria] || 999;
+            if (catOrderA !== catOrderB) return catOrderA - catOrderB;
+            return a.nome.localeCompare(b.nome);
+        });
+        
+        // Crea il messaggio
+        let messaggio = `*JUVENILIA RACING TEAM - RIEPILOGO QUOTE GARA 3*\n\n`;
+        messaggio += `🏆 *Evento:* ${document.getElementById('mainTitle').innerText}\n`;
+        messaggio += `📅 *Data generazione:* ${new Date().toLocaleDateString('it-IT')}\n\n`;
+        messaggio += `*📋 RIEPILOGO QUOTE:*\n`;
+        
+        let categoriaCorrente = '';
+        quoteAtleti.forEach(item => {
+            if (item.categoria !== categoriaCorrente) {
+                categoriaCorrente = item.categoria;
+                messaggio += `\n*${categoriaCorrente}*\n`;
+            }
+            
+            let riga = `• ${item.nome}: ${item.quota.toFixed(2)}€`;
+            if (item.accompagnatore) {
+                riga += ` (+ accompagnatore: ${item.accompagnatore})`;
+            }
+            messaggio += riga + '\n';
+        });
+        
+        messaggio += `\n*💰 TOTALE GENERALE:* ${totaleGenerale.toFixed(2)}€\n\n`;
+        
+        // Codifica il messaggio per URL
+        const messaggioCodificato = encodeURIComponent(messaggio);
+        
+        // Crea il link WhatsApp
+        const linkWhatsApp = `https://wa.me/${WHATSAPP_NUMBER}?text=${messaggioCodificato}`;
+        
+        // Mostra anteprima e chiedi conferma
+        if (confirm(`Vuoi inviare il riepilogo quote a WhatsApp?\n\nTotale atleti: ${quoteAtleti.length}\nImporto totale: ${totaleGenerale.toFixed(2)}€\n\nIl messaggio verrà aperto in WhatsApp per l'invio.`)) {
+            // Apre WhatsApp in una nuova finestra
+            window.open(linkWhatsApp, '_blank');
+            
+            // Mostra anche una copia nel sistema
+            showToast(`Riepilogo quote pronto per WhatsApp! Totale: ${totaleGenerale.toFixed(2)}€`);
+            
+            // Opzionale: invia anche una copia via Telegram
+            const telegramMsg = `📊 *RIEPILOGO QUOTE GENERATO*\nAtleti: ${quoteAtleti.length}\nTotale: ${totaleGenerale.toFixed(2)}€\nGenerato da admin`;
+            fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    chat_id: TELEGRAM_CHAT_ID, 
+                    text: telegramMsg, 
+                    parse_mode: 'Markdown' 
+                })
+            });
+        }
+    }
+
     async function inviaRiepilogoTelegram() {
         const gara = document.getElementById('mainTitle').innerText;
         let pCat = {};
@@ -2072,7 +3106,7 @@
                 if(g === 'M') pCat[p.categoria].M.push(info); else if(g === 'F') pCat[p.categoria].F.push(info); else pCat[p.categoria].U.push(info);
             } 
         });
-        let msg = `🛼 *JUVENILIA RACING TEAM - RIEPILOGO ISCRIZIONI*\n🏆 *Evento:* ${gara}\n\n`;
+        let msg = `🛼 *JUVENILIA RACING TEAM - RIEPILOGO ISCRIZIONI GARA 3*\n🏆 *Evento:* ${gara}\n\n`;
         Object.keys(pCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(c => {
             msg += `*${c.toUpperCase()}*\n`;
             if(pCat[c].M.length > 0) { pCat[c].M.sort(); msg += `♂️ Maschi: ${pCat[c].M.join(', ')}\n`; }
@@ -2104,8 +3138,8 @@
         }));
         const ws = XLSX.utils.json_to_sheet(dataExp);
         const wb = XLSX.utils.book_new(); 
-        XLSX.utils.book_append_sheet(wb, ws, "Iscrizioni Juvenilia"); 
-        XLSX.writeFile(wb, `Iscrizioni_Juvenilia_Racing_Team.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, "Iscrizioni Gara 3"); 
+        XLSX.writeFile(wb, `Iscrizioni_Gara3_Juvenilia_Racing_Team.xlsx`);
         showToast("Excel esportato!");
     }
 
@@ -2120,6 +3154,7 @@
             document.getElementById('addAtletaBox').style.display = 'flex';
             document.getElementById('costiBox').style.display = 'flex';
             document.getElementById('docsBox').style.display = 'flex';
+            document.getElementById('timerAdminBox').style.display = 'flex';
             document.getElementById('adminTotalBox').style.display = 'block';
             document.getElementById('adminButtons').style.display = 'grid';
             document.getElementById('riepilogoAccompagnatori').style.display = 'block';
@@ -2127,29 +3162,12 @@
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
             
             caricaConfig(); 
+            caricaTimers();
             renderData(); 
             showToast("Modalità Admin Attiva");
         } else { 
             alert("Password Errata"); 
         }
-    }
-
-    function startCountdown(endTime) {
-        if(timerInterval) clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-            const distance = new Date(endTime).getTime() - new Date().getTime();
-            if (distance <= 0) { 
-                clearInterval(timerInterval); 
-                isExpired = true; 
-                mostraTimerChiuso(); 
-                return; 
-            }
-            const d = Math.floor(distance/86400000);
-            const h = Math.floor((distance%86400000)/3600000);
-            const m = Math.floor((distance%3600000)/60000);
-            const s = Math.floor((distance%60000)/1000);
-            document.getElementById('timerDisplay').innerHTML = `<i class="fas fa-hourglass-half"></i> SCADENZA: ${d}g ${h}h ${m}m ${s}s`;
-        }, 1000);
     }
 
     function mostraTimerChiuso() { 
@@ -2162,7 +3180,7 @@
         const t = document.getElementById('editTitleInput').value; 
         await _supabase.from(T_CONF).upsert({ chiave: 'titolo_gara', valore: t }, { onConflict: 'chiave' }); 
         showToast("Titolo Salvato!"); 
-        isEditingOther = false; 
+        isEditingTitolo = false; 
         caricaConfig(); 
     }
     
@@ -2212,7 +3230,7 @@
             { chiave: 'data_label_c', valore: c }
         ], { onConflict: 'chiave' });
         showToast("Etichette Salvate!"); 
-        isEditingOther = false; 
+        isEditingDateLabels = false; 
         caricaConfig(); 
     }
     
@@ -2222,7 +3240,7 @@
         let g = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : '');
         let d = note.includes('B') ? 'B' : (note.includes('C') ? 'C' : '');
         if(tipo === 'gender') g = valore;
-        if(tipo === 'data') d = (valore === 'A' ? '' : valore);
+        if(tipo === 'data') d = (valore === 'A' ? '' : valeur);
         await _supabase.from(T_DATA).update({ note: g + d }).eq('id', id);
         showToast("Dettaglio aggiornato!");
         caricaTabella(); 
@@ -2297,7 +3315,6 @@
         }
     }
 
-    // ==================== ANIMAZIONI PARTECIPA E NON PARTECIPA ====================
     function showCelebrationEffect(scelta) {
         const effect = document.getElementById('celebrationEffect');
         const content = document.querySelector('.celebration-content');
@@ -2305,9 +3322,7 @@
         const subtitle = document.getElementById('celebrationSubtitle');
         const icon = document.querySelector('.celebration-icon');
         
-        // Imposta tema in base alla scelta
         if (scelta === 'si') {
-            // Tema PARTECIPA: verde/azzurro, pattini
             effect.style.background = 'linear-gradient(135deg, #0a1929 0%, #1D3557 50%, #2A9D8F 100%)';
             title.innerText = 'IN PISTA! 🛼';
             subtitle.innerText = 'Obiettivo podio!';
@@ -2315,7 +3330,6 @@
             icon.innerText = '🛼';
             icon.style.animation = 'bounce 1s infinite alternate, rotate 3s linear infinite';
         } else {
-            // Tema NON PARTECIPA: rosso/arancione, faccina triste
             effect.style.background = 'linear-gradient(135deg, #2a0a0a 0%, #E63946 50%, #F4A261 100%)';
             title.innerText = 'SALTA QUESTA 🛑';
             subtitle.innerText = 'Alla prossima gara! 🏁';
@@ -2324,14 +3338,11 @@
             icon.style.animation = 'bounce 1s infinite alternate';
         }
         
-        // Resetta le classi di dissolvenza
         effect.classList.remove('fade-out');
         content.classList.remove('fade-out');
         
-        // Mostra l'effetto
         effect.style.display = 'block';
         
-        // Crea particelle appropriate
         if (scelta === 'si') {
             createSkateParticles();
         } else {
@@ -2340,27 +3351,21 @@
         createSpeedLines(scelta);
         createRacingConfetti(scelta);
         
-        // Dopo 2.5 secondi, inizia la dissolvenza
         setTimeout(() => {
-            // Aggiungi la classe di dissolvenza a tutti gli elementi
             effect.classList.add('fade-out');
             content.classList.add('fade-out');
             
-            // Aggiungi dissolvenza a tutte le particelle
             document.querySelectorAll('.skate-particle, .sad-particle, .speed-line, .racing-confetti').forEach(el => {
                 el.classList.add('fade-out');
             });
             
-            // Nascondi completamente dopo la dissolvenza
             setTimeout(() => {
                 effect.style.display = 'none';
-                // Rimuovi tutte le particelle
                 document.querySelectorAll('.skate-particle, .sad-particle, .speed-line, .racing-confetti').forEach(el => el.remove());
-                // Rimuovi le classi di dissolvenza
                 effect.classList.remove('fade-out');
                 content.classList.remove('fade-out');
-            }, 800); // Tempo della dissolvenza
-        }, 2500); // Tempo prima di iniziare la dissolvenza
+            }, 800);
+        }, 2500);
     }
     
     function createSkateParticles() {
@@ -2382,7 +3387,6 @@
                     particle.style.setProperty('--skate-y', skateY + 'px');
                     particle.style.setProperty('--skate-rotate', skateRotate + 'deg');
                     
-                    // Colore casuale
                     particle.style.filter = `hue-rotate(${Math.random() * 360}deg)`;
                     
                     particle.style.animation = `skateMove ${2 + Math.random()}s ease-out forwards`;
@@ -2390,7 +3394,6 @@
                     
                     document.getElementById('celebrationEffect').appendChild(particle);
                     
-                    // Rimuovi dopo l'animazione + dissolvenza
                     setTimeout(() => {
                         if (particle.parentNode) {
                             particle.parentNode.removeChild(particle);
@@ -2421,7 +3424,6 @@
                     
                     document.getElementById('celebrationEffect').appendChild(particle);
                     
-                    // Rimuovi dopo l'animazione + dissolvenza
                     setTimeout(() => {
                         if (particle.parentNode) {
                             particle.parentNode.removeChild(particle);
@@ -2445,7 +3447,6 @@
             line.style.animation = `speedLineMove ${1 + Math.random() * 2}s linear forwards`;
             line.style.animationDelay = (Math.random() * 1) + 's';
             
-            // Opacità e colore variabile in base alla scelta
             line.style.opacity = 0.3 + Math.random() * 0.5;
             if (scelta === 'si') {
                 line.style.background = `linear-gradient(90deg, transparent, ${
@@ -2459,7 +3460,6 @@
             
             document.getElementById('celebrationEffect').appendChild(line);
             
-            // Rimuovi dopo l'animazione
             setTimeout(() => {
                 if (line.parentNode) {
                     line.parentNode.removeChild(line);
@@ -2483,12 +3483,10 @@
             confetti.style.left = Math.random() * 100 + 'vw';
             confetti.style.top = '-20px';
             
-            // Dimensione variabile
             const size = 5 + Math.random() * 15;
             confetti.style.width = size + 'px';
             confetti.style.height = size + 'px';
             
-            // Animazione personalizzata
             const fallDuration = 2 + Math.random() * 3;
             const fallDistance = 100 + Math.random() * 50;
             const swayAmount = 50 + Math.random() * 100;
@@ -2499,7 +3497,6 @@
             `;
             confetti.style.animationDelay = (Math.random() * 0.5) + 's';
             
-            // Definire animazioni inline
             const style = document.createElement('style');
             style.textContent = `
                 @keyframes floatDown {
@@ -2516,7 +3513,6 @@
             
             document.getElementById('celebrationEffect').appendChild(confetti);
             
-            // Rimuovi dopo l'animazione
             setTimeout(() => {
                 if (confetti.parentNode) {
                     confetti.parentNode.removeChild(confetti);
@@ -2525,7 +3521,6 @@
         }
     }
 
-    // ==================== RENDER DATA ====================
     function renderData() {
         const tbody = document.getElementById('tabella-body');
         const listContent = document.getElementById('listContent');
@@ -2557,7 +3552,6 @@
             let dataUf = note.includes('B') ? labelB : (note.includes('C') ? labelC : labelA);
             const gender = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : '');
             
-            // Aggiungi al riepilogo admin solo se ha un accompagnatore
             if (isAdmin && p.accompagnatore && p.accompagnatore.trim() !== "") {
                 riepilogoArray.push({
                     nome: p.nome,
@@ -2588,19 +3582,33 @@
             const tr = document.createElement('tr'); 
             tr.classList.add("tr-" + p.categoria.toLowerCase());
             
-            const disabled = isExpired && !isAdmin ? 'disabled' : '';
+            const isCategoriaScaduta = isCategoriaDisabilitata(p.categoria.toUpperCase());
+            const disabled = (isExpired && !isAdmin) || (isCategoriaScaduta && !isAdmin) ? 'disabled' : '';
+            
             const displayAdmin = isAdmin ? 'table-cell' : 'none';
             const labelHtml = dataUf ? `<span class="date-label" style="background:var(--racing-orange); color:white; padding:5px 10px; border-radius:18px; font-size:0.75rem; font-weight:bold; display:inline-block; margin-top:5px;">${dataUf}</span>` : "";
             const genderHtml = gender ? `<span class="badge-gender bg-${gender.toLowerCase()}">${gender}</span>` : "";
             const isChecked = selectedIds.has(p.id.toString()) ? 'checked' : '';
             
-            // Badge categoria
-            const categoriaBadge = `<span class="categoria-badge cat-${p.categoria.toLowerCase()}">${p.categoria}</span>`;
+            // NUOVO: Selezione categoria per admin
+            const categoriaSelect = isAdmin ? `
+                <select class="categoria-select" style="font-size:0.7rem; padding:4px 8px; border-radius:6px; border:1px solid var(--racing-light); background:white; color:var(--racing-blue); font-weight:bold; margin-top:5px;" 
+                        onchange="modificaCategoria('${p.id}', this.value)"
+                        onfocus="isEditingCategoria=true" 
+                        onblur="isEditingCategoria=false">
+                    <option value="SENIOR" ${p.categoria === 'SENIOR' ? 'selected' : ''}>SENIOR</option>
+                    <option value="JUNIOR" ${p.categoria === 'JUNIOR' ? 'selected' : ''}>JUNIOR</option>
+                    <option value="ALLIEVI" ${p.categoria === 'ALLIEVI' ? 'selected' : ''}>ALLIEVI</option>
+                    <option value="RAGAZZI" ${p.categoria === 'RAGAZZI' ? 'selected' : ''}>RAGAZZI</option>
+                    <option value="R12" ${p.categoria === 'R12' ? 'selected' : ''}>R12</option>
+                    <option value="ESORDIENTI" ${p.categoria === 'ESORDIENTI' ? 'selected' : ''}>ESORDIENTI</option>
+                    <option value="GIOVANISSIMI" ${p.categoria === 'GIOVANISSIMI' ? 'selected' : ''}>GIOVANISSIMI</option>
+                </select>
+            ` : `<span class="categoria-badge cat-${p.categoria.toLowerCase()}">${p.categoria}</span>`;
             
             const hasAccompagnatore = p.accompagnatore && p.accompagnatore.trim() !== "";
             const showInput = !hasAccompagnatore || isAdmin;
             
-            // Box accompagnatore - compatto
             const accompagnatoreBox = `
                 <div class="accompagnatore-box ${mostraAccompagnatori ? 'show' : ''}">
                     ${showInput ? 
@@ -2630,6 +3638,11 @@
                 </div>
             `;
             
+            const scadutoIndicator = isCategoriaScaduta && !isAdmin ? 
+                `<div style="margin-top:5px; font-size:0.7rem; color:var(--racing-red); font-weight:bold;">
+                    <i class="fas fa-clock"></i> Scaduto per questa categoria
+                </div>` : '';
+            
             tr.innerHTML = `
                 <td class="col-admin" style="display:${displayAdmin}"><input type="checkbox" class="bulk-cb" value="${p.id}" ${isChecked}></td>
                 <td class="nome-cell">
@@ -2641,6 +3654,7 @@
                         </div>
                         ${labelHtml}
                         ${accompagnatoreBox}
+                        ${scadutoIndicator}
                         <div class="col-admin" style="display:${displayAdmin}; gap:5px; margin-top:10px;">
                             <div style="display:inline-flex; gap:3px; margin-right:12px;">
                                 <button class="btn-date-small ${!note || (!note.includes('B') && !note.includes('C')) ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'A')">A</button>
@@ -2654,7 +3668,9 @@
                         </div>
                     </div>
                 </td>
-                <td data-label="Categoria" style="font-weight:bold;">${categoriaBadge}</td>
+                <td data-label="Categoria" style="font-weight:bold;">
+                    ${categoriaSelect}
+                </td>
                 <td data-label="Partecipa"><label><input type="radio" name="r_${p.id}" value="si" ${p.stato==='si'?'checked':''} ${disabled} onclick="salva('${p.id}','si')"><span class="badge-btn badge-si"><i class="fas fa-check"></i> PARTECIPA</span></label></td>
                 <td data-label="Non Partecipa"><label><input type="radio" name="r_${p.id}" value="no" ${p.stato==='no'?'checked':''} ${disabled} onclick="salva('${p.id}','no')"><span class="badge-btn badge-no"><i class="fas fa-times"></i> NON PARTECIPA</span></label></td>
                 <td data-label="Reset"><button class="btn-reset" onclick="salva('${p.id}','vuoto')" ${disabled}><i class="fas fa-redo"></i> Reset</button></td>
@@ -2667,12 +3683,10 @@
             tbody.appendChild(tr);
         });
         
-        // Aggiorna statistiche
         document.getElementById('totaleEuro').innerText = totaleEuro.toFixed(2) + " €";
         document.getElementById('count-si').innerText = cSi; 
         document.getElementById('count-no').innerText = cNo;
         
-        // RENDER RIEPILOGO ACCOMPAGNATORI (solo admin)
         if (isAdmin) {
             document.getElementById('riepilogoAccompagnatori').style.display = 'block';
             
@@ -2701,7 +3715,6 @@
             document.getElementById('riepilogoAccompagnatori').style.display = 'none';
         }
         
-        // RENDER LISTA PARTECIPANTI (SOLO NOME ATLETA, SENZA ACCOMPAGNATORE NE DATA)
         Object.keys(partPerCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(cat => {
             const catDiv = document.createElement('div'); 
             catDiv.style.marginBottom = "15px";
@@ -2713,7 +3726,6 @@
                 list.sort((a,b) => a.nome.localeCompare(b.nome));
                 let html = `<div class="gender-section"><span class="gender-title ${titleClass}"><i class="fas fa-${label === 'Maschi' ? 'mars' : label === 'Femmine' ? 'venus' : 'question'}"></i> ${label} (${list.length}):</span>`;
                 list.forEach(obj => { 
-                    // SOLO NOME ATLETA, niente data nè accompagnatore
                     html += `<span style="display:inline-block; background:rgba(168, 218, 220, 0.2); padding:6px 12px; border-radius:18px; font-size:0.8rem; margin:4px; border:2px solid var(--racing-light); font-weight:500;">${obj.nome}</span>`; 
                 });
                 html += `</div>`; 
@@ -2730,17 +3742,15 @@
         document.getElementById('confirmedList').style.display = cSi > 0 ? 'block' : 'none';
         filterTable();
         
-        // Aggiorna il pulsante toggle
         const toggleBtn = document.getElementById('toggleAccompagnatoriBtn');
         if (isAdmin) {
             toggleBtn.style.display = 'inline-block';
-            toggleBtn.innerHTML = mostraAccompagnatori ? '<i class="fas fa-eye-slash"></i> Nascondi Box' : '<i class="fas fa-eye"></i> Mostra Box';
+            toggleBtn.innerHTML = mostraAccompagnatori ? '<i class="fas fa-eye-slash"></i> Nascondi Box Accompagnatori' : '<i class="fas fa-eye"></i> Mostra Box Accompagnatori';
         } else {
             toggleBtn.style.display = 'none';
         }
     }
 
-    // Inizializzazione
     init();
 </script>
 </body>
