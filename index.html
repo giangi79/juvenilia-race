@@ -11,10 +11,12 @@
             --secondary-color: #3498db;
             --success-color: #27ae60;
             --warning-color: #f39c12;
+            --danger-color: #e74c3c;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-color: #2d3748;
             --light-text: #718096;
+            --border-color: #e2e8f0;
         }
 
         body {
@@ -45,7 +47,7 @@
             align-items: center;
             justify-content: center;
             gap: 15px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .logo-placeholder {
@@ -74,11 +76,72 @@
             margin-top: 8px;
         }
 
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-color);
+            transform: translateY(-2px);
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        #search-gare {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        #search-gare:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
         .loading-container {
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 40px;
+            flex-direction: column;
+            gap: 15px;
         }
 
         .loading-spinner {
@@ -93,6 +156,35 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--light-text);
+            margin-top: 5px;
         }
 
         .grid {
@@ -166,7 +258,20 @@
             transform: translateX(5px);
         }
 
-        /* Pulsante Copia Link migliorato */
+        .status-indicator {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .status-active { background-color: var(--success-color); }
+        .status-warning { background-color: var(--warning-color); }
+        .status-error { background-color: var(--danger-color); }
+
         .copy-link-btn {
             position: absolute;
             top: 10px;
@@ -199,7 +304,6 @@
             border-color: var(--success-color);
         }
 
-        /* Toast notification */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -221,6 +325,34 @@
             opacity: 1;
         }
 
+        .skeleton-loader {
+            display: none;
+        }
+
+        .grid.loading .skeleton-loader {
+            display: block;
+        }
+
+        .skeleton-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            height: 90px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: var(--light-text);
+        }
+
         footer {
             margin-top: 50px;
             text-align: center;
@@ -228,7 +360,7 @@
             color: var(--light-text);
             padding: 20px 0;
             width: 100%;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid var(--border-color);
         }
 
         @media (max-width: 768px) {
@@ -245,7 +377,16 @@
             }
             
             .copy-link-btn {
-                opacity: 1; /* Sempre visibile su mobile */
+                opacity: 1;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .search-container {
+                max-width: 100%;
             }
         }
 
@@ -280,14 +421,41 @@
                 <div class="logo-placeholder">GG</div>
                 <div>
                     <h1>Dashboard Gestione Gare</h1>
-                    <p class="subtitle">Titoli aggiornati automaticamente dalle pagine</p>
+                    <p class="subtitle">Titoli recuperati dall'elemento #mainTitle delle pagine</p>
                 </div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" id="refresh-btn">
+                    🔄 Aggiorna Titoli
+                </button>
+                <div class="search-container">
+                    <input type="text" id="search-gare" placeholder="Cerca gara...">
+                </div>
+                <button class="btn btn-secondary" id="clear-cache-btn">
+                    🗑️ Pulisci Cache
+                </button>
             </div>
         </header>
 
+        <div class="stats" id="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="total-gare">0</div>
+                <div class="stat-label">Gare Totali</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="active-gare">0</div>
+                <div class="stat-label">Titoli Recuperati</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="cache-status">-</div>
+                <div class="stat-label">Cache</div>
+            </div>
+        </div>
+
         <div id="loading" class="loading-container">
             <div class="loading-spinner"></div>
-            <span style="margin-left: 15px;">Caricamento titoli delle gare...</span>
+            <span>Recupero titoli dalle pagine delle gare...</span>
         </div>
 
         <main class="grid" id="gare-grid">
@@ -295,7 +463,7 @@
         </main>
 
         <footer>
-            &copy; 2026 Sistema Gestione Gare | Dashboard v2.1 (Titoli automatici)
+            &copy; 2026 Sistema Gestione Gare | Dashboard v4.0 (Titoli da #mainTitle)
         </footer>
     </div>
 
@@ -303,7 +471,7 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // Configurazione delle gare - qui puoi aggiungere/rimuovere gare
+        // Configurazione delle gare
         const gare = [
             { id: 1, file: 'gara1.html', color: '#3498db', defaultTitle: 'Gara 1' },
             { id: 2, file: 'gara2.html', color: '#27ae60', defaultTitle: 'Gara 2' },
@@ -312,14 +480,74 @@
             { id: 5, file: 'gara5.html', color: '#9b59b6', defaultTitle: 'Gara 5' }
         ];
 
-        // Funzione per ottenere il titolo da una pagina HTML
-        async function getPageTitle(url) {
+        // Cache configuration
+        const TITLE_CACHE_KEY = 'gara_maintitle_cache';
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+        // Stato applicazione
+        let currentGare = [];
+        let searchTerm = '';
+
+        // Funzioni cache
+        function getCachedTitles() {
             try {
-                // Usiamo fetch per ottenere il contenuto della pagina
+                const cached = localStorage.getItem(TITLE_CACHE_KEY);
+                return cached ? JSON.parse(cached) : {};
+            } catch {
+                return {};
+            }
+        }
+
+        function setCachedTitle(file, title) {
+            try {
+                const cached = getCachedTitles();
+                cached[file] = {
+                    title,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem(TITLE_CACHE_KEY, JSON.stringify(cached));
+                updateCacheStatus();
+            } catch (error) {
+                console.warn('Impossibile salvare in cache:', error);
+            }
+        }
+
+        function clearCache() {
+            try {
+                localStorage.removeItem(TITLE_CACHE_KEY);
+                updateCacheStatus();
+                showToast('Cache pulita!');
+                return true;
+            } catch (error) {
+                console.error('Errore nella pulizia della cache:', error);
+                showToast('Errore nella pulizia della cache', true);
+                return false;
+            }
+        }
+
+        function updateCacheStatus() {
+            const cache = getCachedTitles();
+            const count = Object.keys(cache).length;
+            const element = document.getElementById('cache-status');
+            element.textContent = `${count}/${gare.length}`;
+            element.style.color = count === gare.length ? 'var(--success-color)' : 
+                                 count > 0 ? 'var(--warning-color)' : 'var(--danger-color)';
+        }
+
+        // Funzione per ottenere il titolo dall'elemento #mainTitle
+        async function getMainTitle(url) {
+            try {
+                // Timeout per evitare attese infinite
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
                 const response = await fetch(url, { 
                     method: 'GET',
-                    headers: { 'Content-Type': 'text/html' }
+                    headers: { 'Content-Type': 'text/html' },
+                    signal: controller.signal
                 });
+                
+                clearTimeout(timeoutId);
                 
                 if (!response.ok) {
                     throw new Error(`Errore ${response.status}: ${response.statusText}`);
@@ -327,39 +555,125 @@
                 
                 const html = await response.text();
                 
-                // Estraiamo il titolo dal tag <title>
-                const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+                // Usa DOMParser per analizzare l'HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
                 
-                if (titleMatch && titleMatch[1]) {
-                    // Puliamo il titolo rimuovendo spazi extra
-                    return titleMatch[1].trim();
+                // Cerca l'elemento #mainTitle
+                const mainTitleElement = doc.getElementById('mainTitle');
+                
+                if (mainTitleElement) {
+                    let title = mainTitleElement.textContent.trim();
+                    
+                    // Pulisci il titolo se necessario
+                    title = cleanTitle(title);
+                    
+                    console.log(`Trovato titolo in #mainTitle per ${url}: "${title}"`);
+                    return title;
+                }
+                
+                // Se #mainTitle non esiste, cerca alternative
+                console.log(`#mainTitle non trovato in ${url}, cercando alternative...`);
+                
+                // Cerca altri possibili elementi che potrebbero contenere il titolo
+                const alternativeSelectors = [
+                    'h1', 'h2', 'h3',
+                    '[id*="title"]',
+                    '[class*="title"]',
+                    '[id*="titolo"]',
+                    '[class*="titolo"]',
+                    '.main-title',
+                    '.page-title',
+                    '.race-title',
+                    '.gara-title'
+                ];
+                
+                for (const selector of alternativeSelectors) {
+                    const elements = doc.querySelectorAll(selector);
+                    for (const element of elements) {
+                        const text = element.textContent.trim();
+                        if (text && text.length > 0 && text.length < 100) {
+                            // Controlla se sembra un titolo di gara
+                            if (isLikelyRaceTitle(text)) {
+                                const title = cleanTitle(text);
+                                console.log(`Trovato titolo alternativo (${selector}) in ${url}: "${title}"`);
+                                return title;
+                            }
+                        }
+                    }
+                }
+                
+                // Se ancora non trovato, prova con il titolo della pagina
+                const pageTitle = doc.querySelector('title')?.textContent?.trim();
+                if (pageTitle) {
+                    const title = cleanTitle(pageTitle);
+                    console.log(`Usando titolo pagina per ${url}: "${title}"`);
+                    return title;
                 }
                 
                 return null;
+                
             } catch (error) {
                 console.warn(`Impossibile recuperare il titolo da ${url}:`, error.message);
                 return null;
             }
         }
 
+        // Funzione per pulire il titolo
+        function cleanTitle(title) {
+            if (!title) return '';
+            
+            let cleaned = title.trim();
+            
+            // Rimuovi spazi multipli e newlines
+            cleaned = cleaned.replace(/\s+/g, ' ');
+            
+            // Rimuovi eventuali prefissi/suffissi comuni
+            cleaned = cleaned.replace(/^Titolo\s*:\s*/i, '')
+                            .replace(/^Gara\s*:\s*/i, '')
+                            .replace(/^Nome\s*:\s*/i, '')
+                            .replace(/\s*-+\s*(Dashboard|Gestione|Admin|Sistema).*$/i, '')
+                            .replace(/\s*\|.*$/i, '')
+                            .trim();
+            
+            return cleaned;
+        }
+
+        // Funzione per verificare se il testo sembra un titolo di gara
+        function isLikelyRaceTitle(text) {
+            const lowerText = text.toLowerCase();
+            
+            // Parole chiave che indicano un titolo di gara
+            const raceKeywords = [
+                'gara', 'competizione', 'torneo', 'campionato',
+                'coppa', 'trofeo', 'evento', 'manifestazione',
+                'regionale', 'nazionale', 'internazionale',
+                'strada', 'pista', 'cross', 'mtb', 'ciclocross'
+            ];
+            
+            return raceKeywords.some(keyword => lowerText.includes(keyword));
+        }
+
         // Funzione per creare una card gara
-        function createRaceCard(gara, title) {
+        function createRaceCard(gara, title, status = 'active') {
             const container = document.createElement('div');
             container.className = 'race-card-container';
             
-            // Usa il titolo ottenuto o il default
             const displayTitle = title || gara.defaultTitle;
             const filePath = gara.file;
             
             container.innerHTML = `
-                <a href="${filePath}" class="race-card" data-link="${filePath}" data-title="${displayTitle}" style="border-left-color: ${gara.color}">
+                <a href="${filePath}" class="race-card" data-link="${filePath}" data-title="${displayTitle}" data-id="${gara.id}" style="border-left-color: ${gara.color}">
                     <div class="race-info">
                         <h2>${displayTitle}</h2>
-                        <p>Gestione iscrizioni e presenze per ${displayTitle}</p>
+                        <p>Gestione iscrizioni e presenze</p>
+                        ${title ? `<small style="color: ${gara.color}; font-weight: 500;">Titolo da #mainTitle</small>` : 
+                                  `<small style="color: var(--warning-color);">Usando titolo predefinito</small>`}
                     </div>
                     <div class="arrow">→</div>
+                    <div class="status-indicator status-${status}"></div>
                 </a>
-                <button class="copy-link-btn" onclick="copyFullLink(this, '${filePath}')" title="Copia link completo">
+                <button class="copy-link-btn" onclick="copyFullLink(event, this, '${filePath}')" title="Copia link completo">
                     📋 Copia Link
                 </button>
             `;
@@ -367,48 +681,151 @@
             return container;
         }
 
-        // Funzione principale per caricare tutte le gare
-        async function loadGareTitles() {
+        // Funzione per filtrare le gare
+        function filterGare() {
             const grid = document.getElementById('gare-grid');
-            const loadingElement = document.getElementById('loading');
+            const filteredGare = currentGare.filter(gara => {
+                const title = (gara.title || gara.defaultTitle).toLowerCase();
+                return title.includes(searchTerm.toLowerCase());
+            });
+
+            // Mostra messaggio se nessun risultato
+            const noResults = grid.querySelector('.no-results');
+            if (noResults) noResults.remove();
+
+            if (filteredGare.length === 0 && searchTerm) {
+                const noResultsMsg = document.createElement('div');
+                noResultsMsg.className = 'no-results';
+                noResultsMsg.innerHTML = `
+                    <h3>Nessuna gara trovata</h3>
+                    <p>Prova con un termine di ricerca diverso</p>
+                `;
+                grid.appendChild(noResultsMsg);
+            }
+
+            // Aggiorna contatori
+            document.getElementById('total-gare').textContent = filteredGare.length;
+            document.getElementById('active-gare').textContent = filteredGare.filter(g => g.title).length;
             
-            // Array di promesse per ottenere tutti i titoli
-            const titlePromises = gare.map(async (gara) => {
-                const title = await getPageTitle(gara.file);
-                return { ...gara, title };
+            return filteredGare;
+        }
+
+        // Funzione per renderizzare le gare
+        function renderGare(gareArray) {
+            const grid = document.getElementById('gare-grid');
+            grid.innerHTML = '';
+            
+            const filteredGare = searchTerm ? filterGare() : gareArray;
+            
+            filteredGare.forEach(gara => {
+                const status = gara.title ? 'active' : 'warning';
+                const card = createRaceCard(gara, gara.title, status);
+                grid.appendChild(card);
             });
             
-            // Attendi che tutti i titoli siano stati recuperati
-            const gareConTitoli = await Promise.allSettled(titlePromises);
-            
-            // Nascondi lo spinner di caricamento
-            loadingElement.style.display = 'none';
-            
-            // Crea le card per ogni gara
-            gareConTitoli.forEach((result, index) => {
-                if (result.status === 'fulfilled') {
-                    const gara = result.value;
-                    const card = createRaceCard(gara, gara.title);
-                    grid.appendChild(card);
-                } else {
-                    // Se c'è un errore, usa il titolo di default
-                    const gara = gare[index];
-                    const card = createRaceCard(gara, null);
-                    grid.appendChild(card);
-                }
-            });
-            
-            // Mostra la griglia con animazione
-            grid.classList.add('loaded');
-            
-            // Aggiungi gli event listener alle nuove card
             setupCardEventListeners();
         }
 
+        // Funzione principale per caricare tutte le gare
+        async function loadGareTitles(forceRefresh = false) {
+            const grid = document.getElementById('gare-grid');
+            const loadingElement = document.getElementById('loading');
+            const refreshBtn = document.getElementById('refresh-btn');
+            
+            grid.classList.remove('loaded');
+            loadingElement.style.display = 'flex';
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = '🔄 Caricamento...';
+            
+            const cache = getCachedTitles();
+            const now = Date.now();
+            
+            const titlePromises = gare.map(async (gara) => {
+                const cached = cache[gara.file];
+                
+                // Usa la cache se valida e non forzato refresh
+                if (!forceRefresh && cached && (now - cached.timestamp) < CACHE_DURATION) {
+                    console.log(`Usando cache per ${gara.file}: "${cached.title}"`);
+                    return { ...gara, title: cached.title };
+                }
+                
+                console.log(`Fetching titolo per ${gara.file}...`);
+                // Altrimenti fetch nuovo titolo
+                const title = await getMainTitle(gara.file);
+                if (title) {
+                    setCachedTitle(gara.file, title);
+                    console.log(`Titolo salvato in cache per ${gara.file}: "${title}"`);
+                } else {
+                    console.log(`Nessun titolo trovato per ${gara.file}`);
+                }
+                return { ...gara, title };
+            });
+            
+            try {
+                const results = await Promise.allSettled(titlePromises);
+                
+                currentGare = results.map((result, index) => {
+                    if (result.status === 'fulfilled') {
+                        return result.value;
+                    } else {
+                        const gara = gare[index];
+                        console.error(`Errore per ${gara.file}:`, result.reason);
+                        return { ...gara, title: null };
+                    }
+                });
+                
+                // Nascondi lo spinner
+                loadingElement.style.display = 'none';
+                
+                // Ordina alfabeticamente
+                currentGare.sort((a, b) => {
+                    const titleA = (a.title || a.defaultTitle).toLowerCase();
+                    const titleB = (b.title || b.defaultTitle).toLowerCase();
+                    return titleA.localeCompare(titleB);
+                });
+                
+                // Renderizza
+                renderGare(currentGare);
+                
+                // Mostra la griglia con animazione
+                setTimeout(() => {
+                    grid.classList.add('loaded');
+                }, 100);
+                
+                // Aggiorna statistiche
+                updateStats();
+                updateCacheStatus();
+                
+                // Mostra riepilogo
+                const foundTitles = currentGare.filter(g => g.title).length;
+                if (foundTitles > 0) {
+                    showToast(`Recuperati ${foundTitles} titoli su ${gare.length} gare`);
+                } else {
+                    showToast('Nessun titolo trovato. Controlla che le pagine abbiano #mainTitle', true);
+                }
+                
+            } catch (error) {
+                console.error('Errore nel caricamento delle gare:', error);
+                loadingElement.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="color: var(--danger-color); font-size: 3rem;">⚠️</div>
+                        <h3>Errore nel caricamento</h3>
+                        <p>${error.message}</p>
+                        <button class="btn btn-primary" onclick="loadGareTitles()">Riprova</button>
+                    </div>
+                `;
+                showToast('Errore nel caricamento dei titoli', true);
+            } finally {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = '🔄 Aggiorna Titoli';
+            }
+        }
+
         // Funzione per mostrare il toast
-        function showToast(message) {
+        function showToast(message, isError = false) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
+            toast.style.background = isError ? 'var(--danger-color)' : 'var(--primary-color)';
             toast.classList.add('show');
             
             setTimeout(() => {
@@ -417,8 +834,9 @@
         }
 
         // Funzione per copiare il link completo
-        function copyFullLink(button, filePath) {
-            event.stopPropagation(); // Previene il click sulla card
+        function copyFullLink(event, button, filePath) {
+            event.preventDefault();
+            event.stopPropagation();
             
             // Ottieni l'URL completo
             const baseUrl = window.location.origin;
@@ -433,26 +851,17 @@
             // Crea il testo da copiare (URL e titolo)
             const textToCopy = `${title}\n${fullUrl}`;
             
-            // Usa la Clipboard API moderna
             navigator.clipboard.writeText(textToCopy).then(() => {
-                // Feedback visivo sul pulsante
                 button.innerHTML = '✓ Copiato!';
                 button.classList.add('copied');
-                
-                // Mostra toast notification
                 showToast(`Link di "${title}" copiato negli appunti!`);
                 
-                // Ripristina il pulsante dopo 2 secondi
                 setTimeout(() => {
                     button.innerHTML = '📋 Copia Link';
                     button.classList.remove('copied');
                 }, 2000);
-                
             }).catch(err => {
-                // Fallback per browser più vecchi
                 console.error('Errore Clipboard API:', err);
-                
-                // Metodo fallback
                 const textArea = document.createElement('textarea');
                 textArea.value = textToCopy;
                 document.body.appendChild(textArea);
@@ -460,10 +869,9 @@
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
                 
-                // Feedback anche per il fallback
                 button.innerHTML = '✓ Copiato!';
                 button.classList.add('copied');
-                showToast(`Link di "${title}" copiato (metodo fallback)`);
+                showToast(`Link copiato (metodo compatibilità)`);
                 
                 setTimeout(() => {
                     button.innerHTML = '📋 Copia Link';
@@ -474,7 +882,6 @@
 
         // Funzione per impostare gli event listener sulle card
         function setupCardEventListeners() {
-            // Copia link con tasto destro sulla card
             document.querySelectorAll('.race-card').forEach(card => {
                 card.addEventListener('contextmenu', function(e) {
                     e.preventDefault();
@@ -483,73 +890,101 @@
                     
                     if (confirm(`Vuoi copiare il link per "${title}"?`)) {
                         const button = this.parentElement.querySelector('.copy-link-btn');
-                        copyFullLink(button, filePath);
+                        copyFullLink(e, button, filePath);
                     }
                 });
                 
-                // Aggiungi anche la possibilità di copiare con Ctrl+C quando la card è in focus
                 card.addEventListener('keydown', function(e) {
                     if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
                         e.preventDefault();
                         const filePath = this.getAttribute('data-link');
                         const button = this.parentElement.querySelector('.copy-link-btn');
-                        copyFullLink(button, filePath);
+                        copyFullLink(e, button, filePath);
                     }
                 });
                 
-                // Aggiungi tabindex per accessibilità
                 card.setAttribute('tabindex', '0');
             });
         }
 
-        // Pulsante per aggiornare manualmente i titoli
-        function addRefreshButton() {
-            const header = document.querySelector('header');
-            const refreshBtn = document.createElement('button');
-            refreshBtn.innerHTML = '🔄 Aggiorna Titoli';
-            refreshBtn.style.cssText = `
-                margin-top: 15px;
-                padding: 8px 16px;
-                background: var(--secondary-color);
-                color: white;
-                border: none;
-                border-radius: 6px;
-                cursor: pointer;
-                font-size: 0.9rem;
-                transition: background 0.3s ease;
-            `;
-            refreshBtn.onmouseover = () => refreshBtn.style.background = '#2980b9';
-            refreshBtn.onmouseout = () => refreshBtn.style.background = 'var(--secondary-color)';
-            refreshBtn.onclick = () => {
-                refreshBtn.disabled = true;
-                refreshBtn.innerHTML = '🔄 Aggiornamento...';
-                
-                // Svuota la griglia
-                const grid = document.getElementById('gare-grid');
-                grid.innerHTML = '';
-                grid.classList.remove('loaded');
-                
-                // Mostra di nuovo lo spinner
-                const loadingElement = document.getElementById('loading');
-                loadingElement.style.display = 'flex';
-                
-                // Ricarica i titoli
-                setTimeout(() => {
-                    loadGareTitles();
-                    refreshBtn.disabled = false;
-                    refreshBtn.innerHTML = '🔄 Aggiorna Titoli';
-                    showToast('Titoli delle gare aggiornati!');
-                }, 500);
-            };
+        // Aggiorna statistiche
+        function updateStats() {
+            const total = currentGare.length;
+            const active = currentGare.filter(g => g.title).length;
             
-            header.appendChild(refreshBtn);
+            document.getElementById('total-gare').textContent = total;
+            document.getElementById('active-gare').textContent = active;
         }
 
-        // Inizializza la dashboard quando la pagina è caricata
+        // Inizializza la dashboard
         document.addEventListener('DOMContentLoaded', () => {
+            // Carica le gare
             loadGareTitles();
-            addRefreshButton();
+            
+            // Configura pulsante refresh
+            document.getElementById('refresh-btn').addEventListener('click', () => {
+                loadGareTitles(true);
+            });
+            
+            // Configura ricerca
+            document.getElementById('search-gare').addEventListener('input', (e) => {
+                searchTerm = e.target.value.trim();
+                renderGare(currentGare);
+            });
+            
+            // Configura pulsante pulizia cache
+            document.getElementById('clear-cache-btn').addEventListener('click', () => {
+                if (confirm('Vuoi pulire la cache dei titoli? I titoli verranno ricaricati dalle pagine.')) {
+                    if (clearCache()) {
+                        setTimeout(() => loadGareTitles(true), 500);
+                    }
+                }
+            });
+            
+            // Aggiorna cache status
+            updateCacheStatus();
         });
+
+        // Tasti rapidi
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+F per focus sulla ricerca
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('search-gare').focus();
+            }
+            
+            // F5 per refresh
+            if (e.key === 'F5') {
+                e.preventDefault();
+                document.getElementById('refresh-btn').click();
+            }
+            
+            // Escape per cancellare ricerca
+            if (e.key === 'Escape') {
+                document.getElementById('search-gare').value = '';
+                searchTerm = '';
+                renderGare(currentGare);
+            }
+            
+            // Ctrl+R per refresh
+            if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                e.preventDefault();
+                document.getElementById('refresh-btn').click();
+            }
+        });
+        
+        // DEBUG: Mostra informazioni sulle pagine
+        function debugPages() {
+            console.log('=== DEBUG PAGINE GARE ===');
+            console.log(`Numero gare configurate: ${gare.length}`);
+            gare.forEach(gara => {
+                console.log(`- ${gara.file}: ID ${gara.id}, Colore ${gara.color}`);
+            });
+            console.log('=== FINE DEBUG ===');
+        }
+        
+        // Esegui debug all'avvio
+        setTimeout(debugPages, 1000);
     </script>
 </body>
 </html>
