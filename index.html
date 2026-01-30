@@ -32,7 +32,7 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -43,24 +43,30 @@
         .container {
             width: 100%;
             max-width: 1200px;
+            padding: 20px;
         }
 
-        header {
-            text-align: center;
+        /* HEADER MODIFICATO PER LOGO A LARGHEZZA PAGINA */
+        .header-container {
+            width: 100%;
             margin-bottom: 50px;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(26, 35, 126, 0.2);
-            color: white;
             position: relative;
             overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(26, 35, 126, 0.2);
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
 
-        header::before {
+        .header-top {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            padding: 40px;
+            color: white;
+            position: relative;
+            text-align: center;
+        }
+
+        .header-top::before {
             content: '';
             position: absolute;
             top: 0;
@@ -70,41 +76,45 @@
             background: linear-gradient(90deg, #ff9800, #ffeb3b, #4caf50);
         }
 
-        .logo-container {
+        .header-logo-section {
+            width: 100%;
+            background: white;
+            padding: 40px 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 25px;
-            width: 100%;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.05);
         }
 
-        .logo {
-            max-width: 120px;
+        .logo-full-width {
+            max-width: 100%;
             height: auto;
-            margin-bottom: 15px;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+            max-height: 180px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
             transition: transform 0.3s ease;
         }
 
-        .logo:hover {
-            transform: scale(1.05);
+        .logo-full-width:hover {
+            transform: scale(1.02);
         }
 
         h1 {
             color: white;
-            font-size: 2.5rem;
-            margin: 0 0 10px;
+            font-size: 2.8rem;
+            margin: 0 0 15px;
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            font-weight: 700;
+            font-weight: 800;
         }
 
         .subtitle {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.3rem;
             margin: 0;
-            max-width: 700px;
+            max-width: 800px;
             line-height: 1.6;
             font-weight: 300;
+            margin: 0 auto;
         }
 
         .controls {
@@ -485,8 +495,8 @@
                 font-size: 1.1rem;
             }
             
-            .logo {
-                max-width: 100px;
+            .logo-full-width {
+                max-height: 140px;
             }
             
             .card-actions {
@@ -507,20 +517,19 @@
             .modal-content {
                 padding: 25px;
             }
+            
+            .header-top {
+                padding: 30px 20px;
+            }
+            
+            .header-logo-section {
+                padding: 30px 15px;
+            }
         }
 
         @media (max-width: 480px) {
-            body {
+            .container {
                 padding: 15px;
-            }
-            
-            header {
-                padding: 25px 20px;
-                margin-bottom: 30px;
-            }
-            
-            .logo {
-                max-width: 90px;
             }
             
             h1 {
@@ -534,19 +543,26 @@
             .race-info h2 {
                 font-size: 1.4rem;
             }
+            
+            .logo-full-width {
+                max-height: 120px;
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <header>
-            <div class="logo-container">
-                <img src="logo.png" alt="Logo" class="logo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1995/1995515.png'">
+        <!-- HEADER MODIFICATO CON LOGO A LARGHEZZA PAGINA -->
+        <div class="header-container">
+            <div class="header-top">
+                <h1>Pannello Gestione Gare</h1>
+                <p class="subtitle">Gestisci tutte le gare dalla stessa dashboard</p>
             </div>
-            <h1>Pannello Gestione Gare</h1>
-            <p class="subtitle">Gestisci tutte le gare dalla stessa dashboard</p>
-        </header>
+            <div class="header-logo-section">
+                <img src="logo.png" alt="Logo" class="logo-full-width" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1995/1995515.png'">
+            </div>
+        </div>
 
         <div class="controls">
             <button class="btn btn-edit" id="edit-titles-btn">
