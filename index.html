@@ -11,6 +11,7 @@
             --secondary-color: #3498db;
             --success-color: #27ae60;
             --warning-color: #f39c12;
+            --error-color: #e74c3c;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-color: #2d3748;
@@ -76,9 +77,11 @@
 
         .loading-container {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             padding: 40px;
+            text-align: center;
         }
 
         .loading-spinner {
@@ -88,11 +91,47 @@
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
+            margin-bottom: 15px;
         }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        .error-container {
+            background: #fee;
+            border: 1px solid var(--error-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .error-container button {
+            background: var(--error-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .github-info {
+            background: #f0f8ff;
+            border: 1px solid var(--secondary-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 0.9rem;
+        }
+
+        .github-info code {
+            background: #e3f2fd;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
         }
 
         .grid {
@@ -166,7 +205,6 @@
             transform: translateX(5px);
         }
 
-        /* Pulsante Copia Link migliorato */
         .copy-link-btn {
             position: absolute;
             top: 10px;
@@ -180,7 +218,7 @@
             cursor: pointer;
             z-index: 10;
             opacity: 0;
-            transition: opacity 0.3s ease, background-color 0.3s ease;
+            transition: opacity 0.3s ease;
             font-weight: 500;
         }
 
@@ -199,7 +237,6 @@
             border-color: var(--success-color);
         }
 
-        /* Toast notification */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -231,6 +268,20 @@
             border-top: 1px solid #e2e8f0;
         }
 
+        .refresh-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -245,7 +296,7 @@
             }
             
             .copy-link-btn {
-                opacity: 1; /* Sempre visibile su mobile */
+                opacity: 1;
             }
         }
 
@@ -280,31 +331,59 @@
                 <div class="logo-placeholder">GG</div>
                 <div>
                     <h1>Dashboard Gestione Gare</h1>
-                    <p class="subtitle">Titoli aggiornati automaticamente dalle pagine</p>
+                    <p class="subtitle">Titoli aggiornati automaticamente dai file GitHub</p>
                 </div>
+            </div>
+            
+            <div class="github-info">
+                <strong>🔧 Come funziona:</strong> Questa dashboard legge automaticamente i titoli dai file 
+                <code>gara1.html</code>, <code>gara2.html</code>, ecc. presenti nello stesso repository GitHub.
+                Assicurati che ogni file abbia un tag <code>&lt;title&gt;Titolo della Gara&lt;/title&gt;</code>.
             </div>
         </header>
 
         <div id="loading" class="loading-container">
             <div class="loading-spinner"></div>
-            <span style="margin-left: 15px;">Caricamento titoli delle gare...</span>
+            <div>Recupero titoli dal repository GitHub...</div>
+            <div style="font-size: 0.8rem; color: var(--light-text); margin-top: 10px;">
+                Controllo i file: gara1.html, gara2.html, gara3.html, gara4.html, gara5.html
+            </div>
+        </div>
+
+        <div id="error" class="error-container" style="display: none;">
+            <h3 style="color: var(--error-color); margin-top: 0;">⚠️ Errore nel caricamento</h3>
+            <p id="error-message"></p>
+            <p style="font-size: 0.9rem; margin-top: 15px;">
+                Possibili soluzioni:
+                <br>1. Controlla che i file garaX.html esistano nel repository
+                <br>2. Assicurati che ogni file abbia un tag &lt;title&gt;
+                <br>3. Se sei in locale, usa il pulsante "Usa Titoli Locali"
+            </p>
+            <button onclick="retryLoading()">🔄 Riprova</button>
+            <button onclick="useLocalTitles()" style="background: var(--warning-color); margin-left: 10px;">
+                📁 Usa Titoli Locali
+            </button>
         </div>
 
         <main class="grid" id="gare-grid">
-            <!-- Le card verranno generate dinamicamente da JavaScript -->
+            <!-- Le card verranno generate dinamicamente -->
         </main>
 
         <footer>
-            &copy; 2026 Sistema Gestione Gare | Dashboard v2.1 (Titoli automatici)
+            &copy; 2026 Sistema Gestione Gare 
+            <div style="margin-top: 10px;">
+                <button class="refresh-btn" onclick="loadGareTitles()">
+                    🔄 Aggiorna Titoli da GitHub
+                </button>
+            </div>
         </footer>
     </div>
 
-    <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
     <script>
-        // Configurazione delle gare - qui puoi aggiungere/rimuovere gare
-        const gare = [
+        // Configurazione delle gare
+        const GARE_CONFIG = [
             { id: 1, file: 'gara1.html', color: '#3498db', defaultTitle: 'Gara 1' },
             { id: 2, file: 'gara2.html', color: '#27ae60', defaultTitle: 'Gara 2' },
             { id: 3, file: 'gara3.html', color: '#e74c3c', defaultTitle: 'Gara 3' },
@@ -312,34 +391,102 @@
             { id: 5, file: 'gara5.html', color: '#9b59b6', defaultTitle: 'Gara 5' }
         ];
 
-        // Funzione per ottenere il titolo da una pagina HTML
-        async function getPageTitle(url) {
+        // Funzione per ottenere il percorso base del repository
+        function getBasePath() {
+            // Se siamo su GitHub Pages, usa il percorso del repository
+            if (window.location.hostname.includes('github.io')) {
+                const path = window.location.pathname;
+                // Rimuove il nome file dalla path per ottenere la directory base
+                const basePath = path.substring(0, path.lastIndexOf('/'));
+                return basePath || '';
+            }
+            // Se siamo in locale, usa il percorso corrente
+            return '';
+        }
+
+        // Funzione per ottenere il titolo da un file HTML su GitHub
+        async function getGitHubPageTitle(filename) {
             try {
-                // Usiamo fetch per ottenere il contenuto della pagina
-                const response = await fetch(url, { 
+                const basePath = getBasePath();
+                const fileUrl = basePath ? `${basePath}/${filename}` : filename;
+                
+                console.log(`Tentativo di recuperare: ${fileUrl}`);
+                
+                // Prova prima con una normale richiesta fetch
+                const response = await fetch(fileUrl, {
                     method: 'GET',
-                    headers: { 'Content-Type': 'text/html' }
+                    headers: {
+                        'Accept': 'text/html',
+                        'Cache-Control': 'no-cache'
+                    }
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`Errore ${response.status}: ${response.statusText}`);
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
                 const html = await response.text();
                 
-                // Estraiamo il titolo dal tag <title>
+                // Estrae il titolo dal tag <title>
                 const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
                 
                 if (titleMatch && titleMatch[1]) {
-                    // Puliamo il titolo rimuovendo spazi extra
-                    return titleMatch[1].trim();
+                    const title = titleMatch[1].trim();
+                    console.log(`Titolo trovato per ${filename}: ${title}`);
+                    return title;
+                } else {
+                    // Cerca anche nel body come fallback
+                    const bodyMatch = html.match(/<h1[^>]*>([^<]+)<\/h1>/i) || 
+                                     html.match(/<h2[^>]*>([^<]+)<\/h2>/i);
+                    if (bodyMatch && bodyMatch[1]) {
+                        return bodyMatch[1].trim();
+                    }
+                    throw new Error('Nessun titolo trovato nel file');
+                }
+                
+            } catch (error) {
+                console.warn(`Errore nel recupero di ${filename}:`, error.message);
+                
+                // Tentativo alternativo: usa l'API di GitHub RAW
+                if (window.location.hostname.includes('github.io')) {
+                    try {
+                        const repoMatch = window.location.pathname.match(/\/([^\/]+)\/([^\/]+)/);
+                        if (repoMatch) {
+                            const username = repoMatch[1];
+                            const repo = repoMatch[2].split('/')[0];
+                            const rawUrl = `https://raw.githubusercontent.com/${username}/${repo}/main/${filename}`;
+                            
+                            const rawResponse = await fetch(rawUrl);
+                            if (rawResponse.ok) {
+                                const html = await rawResponse.text();
+                                const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+                                if (titleMatch && titleMatch[1]) {
+                                    return titleMatch[1].trim();
+                                }
+                            }
+                        }
+                    } catch (rawError) {
+                        console.warn('Fallito anche il tentativo con GitHub RAW:', rawError.message);
+                    }
                 }
                 
                 return null;
-            } catch (error) {
-                console.warn(`Impossibile recuperare il titolo da ${url}:`, error.message);
-                return null;
             }
+        }
+
+        // Funzione per mostrare/nascondere il loading
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+        }
+
+        // Funzione per mostrare/nascondere l'errore
+        function showError(message) {
+            document.getElementById('error-message').textContent = message;
+            document.getElementById('error').style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error').style.display = 'none';
         }
 
         // Funzione per creare una card gara
@@ -347,19 +494,17 @@
             const container = document.createElement('div');
             container.className = 'race-card-container';
             
-            // Usa il titolo ottenuto o il default
             const displayTitle = title || gara.defaultTitle;
-            const filePath = gara.file;
             
             container.innerHTML = `
-                <a href="${filePath}" class="race-card" data-link="${filePath}" data-title="${displayTitle}" style="border-left-color: ${gara.color}">
+                <a href="${gara.file}" class="race-card" data-link="${gara.file}" data-title="${displayTitle}" style="border-left-color: ${gara.color}">
                     <div class="race-info">
                         <h2>${displayTitle}</h2>
                         <p>Gestione iscrizioni e presenze per ${displayTitle}</p>
                     </div>
                     <div class="arrow">→</div>
                 </a>
-                <button class="copy-link-btn" onclick="copyFullLink(this, '${filePath}')" title="Copia link completo">
+                <button class="copy-link-btn" onclick="copyFullLink(this, '${gara.file}')" title="Copia link completo">
                     📋 Copia Link
                 </button>
             `;
@@ -367,42 +512,87 @@
             return container;
         }
 
-        // Funzione principale per caricare tutte le gare
+        // Funzione principale per caricare i titoli
         async function loadGareTitles() {
             const grid = document.getElementById('gare-grid');
-            const loadingElement = document.getElementById('loading');
             
-            // Array di promesse per ottenere tutti i titoli
-            const titlePromises = gare.map(async (gara) => {
-                const title = await getPageTitle(gara.file);
-                return { ...gara, title };
-            });
+            // Reset
+            grid.innerHTML = '';
+            grid.classList.remove('loaded');
+            hideError();
+            showLoading(true);
             
-            // Attendi che tutti i titoli siano stati recuperati
-            const gareConTitoli = await Promise.allSettled(titlePromises);
-            
-            // Nascondi lo spinner di caricamento
-            loadingElement.style.display = 'none';
-            
-            // Crea le card per ogni gara
-            gareConTitoli.forEach((result, index) => {
-                if (result.status === 'fulfilled') {
-                    const gara = result.value;
-                    const card = createRaceCard(gara, gara.title);
-                    grid.appendChild(card);
+            try {
+                // Array di promesse per ottenere tutti i titoli
+                const promises = GARE_CONFIG.map(async (gara) => {
+                    const title = await getGitHubPageTitle(gara.file);
+                    return { ...gara, title };
+                });
+                
+                // Attendi che tutti i titoli siano recuperati
+                const results = await Promise.allSettled(promises);
+                
+                showLoading(false);
+                
+                // Conta quanti titoli sono stati recuperati con successo
+                const successful = results.filter(r => r.status === 'fulfilled' && r.value.title).length;
+                
+                // Crea le card per ogni gara
+                results.forEach((result, index) => {
+                    const gara = GARE_CONFIG[index];
+                    
+                    if (result.status === 'fulfilled' && result.value.title) {
+                        const card = createRaceCard(gara, result.value.title);
+                        grid.appendChild(card);
+                    } else {
+                        // Usa il titolo di default
+                        const card = createRaceCard(gara, null);
+                        grid.appendChild(card);
+                    }
+                });
+                
+                // Mostra la griglia
+                grid.classList.add('loaded');
+                
+                // Mostra un messaggio di riepilogo
+                if (successful === GARE_CONFIG.length) {
+                    showToast(`✅ Tutti i ${GARE_CONFIG.length} titoli sono stati caricati da GitHub!`);
+                } else if (successful > 0) {
+                    showToast(`⚠️ ${successful} su ${GARE_CONFIG.length} titoli caricati. Alcuni usano titoli predefiniti.`);
                 } else {
-                    // Se c'è un errore, usa il titolo di default
-                    const gara = gare[index];
-                    const card = createRaceCard(gara, null);
-                    grid.appendChild(card);
+                    showError('Impossibile caricare i titoli da GitHub. Usa "Titoli Locali" o controlla la connessione.');
+                    showToast('❌ Impossibile recuperare i titoli da GitHub');
                 }
+                
+                setupCardEventListeners();
+                
+            } catch (error) {
+                showLoading(false);
+                showError(`Errore durante il caricamento: ${error.message}`);
+            }
+        }
+
+        // Funzione per usare titoli locali (fallback)
+        function useLocalTitles() {
+            const grid = document.getElementById('gare-grid');
+            grid.innerHTML = '';
+            grid.classList.remove('loaded');
+            hideError();
+            showLoading(false);
+            
+            GARE_CONFIG.forEach(gara => {
+                const card = createRaceCard(gara, null);
+                grid.appendChild(card);
             });
             
-            // Mostra la griglia con animazione
             grid.classList.add('loaded');
-            
-            // Aggiungi gli event listener alle nuove card
             setupCardEventListeners();
+            showToast('Usando titoli predefiniti locali.');
+        }
+
+        // Funzione per riprovare il caricamento
+        function retryLoading() {
+            loadGareTitles();
         }
 
         // Funzione per mostrare il toast
@@ -416,43 +606,30 @@
             }, 3000);
         }
 
-        // Funzione per copiare il link completo
+        // Funzione per copiare il link
         function copyFullLink(button, filePath) {
-            event.stopPropagation(); // Previene il click sulla card
+            event.stopPropagation();
             
-            // Ottieni l'URL completo
             const baseUrl = window.location.origin;
             const currentPath = window.location.pathname;
             const directory = currentPath.substring(0, currentPath.lastIndexOf('/')) || '';
             const fullUrl = baseUrl + directory + '/' + filePath;
             
-            // Ottieni il titolo dalla card
             const card = button.parentElement.querySelector('.race-card');
             const title = card.getAttribute('data-title') || 'Gara';
-            
-            // Crea il testo da copiare (URL e titolo)
             const textToCopy = `${title}\n${fullUrl}`;
             
-            // Usa la Clipboard API moderna
             navigator.clipboard.writeText(textToCopy).then(() => {
-                // Feedback visivo sul pulsante
                 button.innerHTML = '✓ Copiato!';
                 button.classList.add('copied');
+                showToast(`Link di "${title}" copiato!`);
                 
-                // Mostra toast notification
-                showToast(`Link di "${title}" copiato negli appunti!`);
-                
-                // Ripristina il pulsante dopo 2 secondi
                 setTimeout(() => {
                     button.innerHTML = '📋 Copia Link';
                     button.classList.remove('copied');
                 }, 2000);
-                
             }).catch(err => {
-                // Fallback per browser più vecchi
-                console.error('Errore Clipboard API:', err);
-                
-                // Metodo fallback
+                // Fallback
                 const textArea = document.createElement('textarea');
                 textArea.value = textToCopy;
                 document.body.appendChild(textArea);
@@ -460,10 +637,9 @@
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
                 
-                // Feedback anche per il fallback
                 button.innerHTML = '✓ Copiato!';
                 button.classList.add('copied');
-                showToast(`Link di "${title}" copiato (metodo fallback)`);
+                showToast(`Link di "${title}" copiato!`);
                 
                 setTimeout(() => {
                     button.innerHTML = '📋 Copia Link';
@@ -472,9 +648,8 @@
             });
         }
 
-        // Funzione per impostare gli event listener sulle card
+        // Setup event listeners
         function setupCardEventListeners() {
-            // Copia link con tasto destro sulla card
             document.querySelectorAll('.race-card').forEach(card => {
                 card.addEventListener('contextmenu', function(e) {
                     e.preventDefault();
@@ -487,7 +662,6 @@
                     }
                 });
                 
-                // Aggiungi anche la possibilità di copiare con Ctrl+C quando la card è in focus
                 card.addEventListener('keydown', function(e) {
                     if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
                         e.preventDefault();
@@ -497,58 +671,20 @@
                     }
                 });
                 
-                // Aggiungi tabindex per accessibilità
                 card.setAttribute('tabindex', '0');
             });
         }
 
-        // Pulsante per aggiornare manualmente i titoli
-        function addRefreshButton() {
-            const header = document.querySelector('header');
-            const refreshBtn = document.createElement('button');
-            refreshBtn.innerHTML = '🔄 Aggiorna Titoli';
-            refreshBtn.style.cssText = `
-                margin-top: 15px;
-                padding: 8px 16px;
-                background: var(--secondary-color);
-                color: white;
-                border: none;
-                border-radius: 6px;
-                cursor: pointer;
-                font-size: 0.9rem;
-                transition: background 0.3s ease;
-            `;
-            refreshBtn.onmouseover = () => refreshBtn.style.background = '#2980b9';
-            refreshBtn.onmouseout = () => refreshBtn.style.background = 'var(--secondary-color)';
-            refreshBtn.onclick = () => {
-                refreshBtn.disabled = true;
-                refreshBtn.innerHTML = '🔄 Aggiornamento...';
-                
-                // Svuota la griglia
-                const grid = document.getElementById('gare-grid');
-                grid.innerHTML = '';
-                grid.classList.remove('loaded');
-                
-                // Mostra di nuovo lo spinner
-                const loadingElement = document.getElementById('loading');
-                loadingElement.style.display = 'flex';
-                
-                // Ricarica i titoli
-                setTimeout(() => {
-                    loadGareTitles();
-                    refreshBtn.disabled = false;
-                    refreshBtn.innerHTML = '🔄 Aggiorna Titoli';
-                    showToast('Titoli delle gare aggiornati!');
-                }, 500);
-            };
-            
-            header.appendChild(refreshBtn);
-        }
-
-        // Inizializza la dashboard quando la pagina è caricata
+        // Inizializza quando la pagina è caricata
         document.addEventListener('DOMContentLoaded', () => {
             loadGareTitles();
-            addRefreshButton();
+            
+            // Aggiungi informazioni di debug in console
+            console.log('Informazioni di configurazione:');
+            console.log('- Hostname:', window.location.hostname);
+            console.log('- Path:', window.location.pathname);
+            console.log('- Base Path:', getBasePath());
+            console.log('- Numero gare:', GARE_CONFIG.length);
         });
     </script>
 </body>
