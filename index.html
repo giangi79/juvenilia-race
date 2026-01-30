@@ -10,8 +10,6 @@
             --primary-color: #2c3e50;
             --secondary-color: #3498db;
             --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --error-color: #e74c3c;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-color: #2d3748;
@@ -32,7 +30,7 @@
 
         .container {
             width: 100%;
-            max-width: 1000px;
+            max-width: 900px;
         }
 
         header {
@@ -75,86 +73,6 @@
             margin-top: 8px;
         }
 
-        .instructions {
-            background: #e8f4fc;
-            border: 2px solid var(--secondary-color);
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-            max-width: 800px;
-        }
-
-        .instructions h3 {
-            color: var(--primary-color);
-            margin-top: 0;
-            margin-bottom: 15px;
-        }
-
-        .instructions code {
-            background: #e3f2fd;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.9rem;
-        }
-
-        .instructions pre {
-            background: #f1f8ff;
-            padding: 15px;
-            border-radius: 6px;
-            overflow-x: auto;
-            font-size: 0.85rem;
-            border-left: 4px solid var(--secondary-color);
-            margin: 15px 0;
-        }
-
-        .status-bar {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 12px 15px;
-            margin: 20px 0;
-            font-size: 0.9rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .status-bar.success {
-            background: #d4edda;
-            border-color: #c3e6cb;
-            color: #155724;
-        }
-
-        .status-bar.error {
-            background: #f8d7da;
-            border-color: #f5c6cb;
-            color: #721c24;
-        }
-
-        .status-bar.warning {
-            background: #fff3cd;
-            border-color: #ffeaa7;
-            color: #856404;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--secondary-color);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         .grid {
             display: grid;
             gap: 20px;
@@ -178,7 +96,6 @@
             transition: all 0.3s ease;
             border-left: 4px solid var(--secondary-color);
             position: relative;
-            min-height: 90px;
         }
 
         .race-card:hover {
@@ -199,7 +116,6 @@
             font-size: 1.2rem;
             color: var(--primary-color);
             font-weight: 600;
-            line-height: 1.4;
         }
 
         .race-info p {
@@ -220,6 +136,7 @@
             transform: translateX(5px);
         }
 
+        /* Pulsante Copia Link migliorato */
         .copy-link-btn {
             position: absolute;
             top: 10px;
@@ -233,7 +150,7 @@
             cursor: pointer;
             z-index: 10;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease, background-color 0.3s ease;
             font-weight: 500;
         }
 
@@ -252,6 +169,7 @@
             border-color: var(--success-color);
         }
 
+        /* Toast notification */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -283,20 +201,6 @@
             border-top: 1px solid #e2e8f0;
         }
 
-        .refresh-btn {
-            background: var(--secondary-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -311,7 +215,7 @@
             }
             
             .copy-link-btn {
-                opacity: 1;
+                opacity: 1; /* Sempre visibile su mobile */
             }
         }
 
@@ -346,373 +250,93 @@
                 <div class="logo-placeholder">GG</div>
                 <div>
                     <h1>Dashboard Gestione Gare</h1>
-                    <p class="subtitle">Titoli letti da meta tag - Soluzione garantita</p>
+                    <p class="subtitle">Accedi alle singole pagine di gestione delle competizioni</p>
                 </div>
-            </div>
-            
-            <div class="instructions">
-                <h3>📋 ISTRUZIONI PER FAR FUNZIONARE LA DASHBOARD:</h3>
-                
-                <p><strong>1. Aggiungi questo meta tag in OGNI file garaX.html:</strong></p>
-                <pre>&lt;!-- METTI QUESTO DOPO &lt;title&gt; E PRIMA DI &lt;/head&gt; --&gt;
-&lt;meta name="gara-title" content="Titolo della tua gara"&gt;</pre>
-                
-                <p><strong>2. Esempio per gara1.html:</strong></p>
-                <pre>&lt;!DOCTYPE html&gt;
-&lt;html lang="it"&gt;
-&lt;head&gt;
-    &lt;meta charset="UTF-8"&gt;
-    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
-    &lt;title&gt;Gran Premio Nazionale&lt;/title&gt;
-    &lt;!-- ⬇️ AGGIUNGI QUESTO META TAG ⬇️ --&gt;
-    &lt;meta name="gara-title" content="Gran Premio Nazionale"&gt;
-    &lt;!-- ⬆️ IMPORTANTE: Stesso contenuto del title ⬆️ --&gt;
-&lt;/head&gt;</pre>
-                
-                <p><strong>3. Fai lo stesso per gara2.html, gara3.html, ecc.</strong></p>
-                
-                <p><strong>4. Una volta aggiunti i meta tag, clicca "Aggiorna Tutti i Titoli"</strong></p>
-            </div>
-            
-            <div class="status-bar" id="statusBar">
-                <span id="statusText">
-                    Aggiungi i meta tag alle tue pagine gara come indicato sopra
-                </span>
-                <button class="refresh-btn" onclick="loadAllTitles()" style="padding: 4px 8px; font-size: 0.8rem;">
-                    🔄 Prova
-                </button>
             </div>
         </header>
 
-        <main class="grid" id="gare-grid">
-            <!-- Le card verranno generate dinamicamente -->
-        </main>
-
-        <footer>
-            &copy; 2026 Sistema Gestione Gare 
-            <div style="margin-top: 10px;">
-                <button class="refresh-btn" onclick="loadAllTitles()">
-                    🔄 Aggiorna Tutti i Titoli
-                </button>
-                <div style="font-size: 0.75rem; margin-top: 5px; color: #999;">
-                    Soluzione meta tag - Funziona senza problemi CORS
-                </div>
-            </div>
-        </footer>
-    </div>
-
-    <div class="toast" id="toast"></div>
-
-    <script>
-        // Lista delle gare da recuperare
-        const GARE_FILES = [
-            'gara1.html',
-            'gara2.html', 
-            'gara3.html',
-            'gara4.html',
-            'gara5.html'
-        ];
-
-        // Colori per le card
-        const COLORS = ['#3498db', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'];
-
-        // Cache dei titoli
-        let currentTitles = {};
-
-        // Funzione per aggiornare la status bar
-        function updateStatus(message, type = 'info') {
-            const statusBar = document.getElementById('statusBar');
-            const statusText = document.getElementById('statusText');
-            
-            statusBar.className = 'status-bar ' + type;
-            statusText.innerHTML = message;
-        }
-
-        // SOLUZIONE PRINCIPALE: Legge dai meta tag
-        async function getTitleFromMetaTag(filename) {
-            updateStatus(`<span class="spinner"></span> Lettura meta tag da: ${filename}...`, 'info');
-            
-            try {
-                // Prova a fare fetch del file
-                const response = await fetch(filename);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const html = await response.text();
-                
-                // Usa DOMParser per analizzare l'HTML
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                
-                // 1. PRIMA Cerca il meta tag personalizzato "gara-title"
-                const metaTag = doc.querySelector('meta[name="gara-title"]');
-                if (metaTag && metaTag.content && metaTag.content.trim() !== '') {
-                    const title = metaTag.content.trim();
-                    console.log(`✅ Meta tag trovato per ${filename}: "${title}"`);
-                    return title;
-                }
-                
-                // 2. POI Cerca altri meta tag possibili
-                const ogTitle = doc.querySelector('meta[property="og:title"]');
-                if (ogTitle && ogTitle.content) {
-                    const title = ogTitle.content.trim();
-                    console.log(`✅ Open Graph title per ${filename}: "${title}"`);
-                    return title;
-                }
-                
-                // 3. INFINE Cerca il tag <title> normale
-                if (doc.title && doc.title.trim() !== '') {
-                    const title = doc.title.trim();
-                    console.log(`✅ Title tag per ${filename}: "${title}"`);
-                    return title;
-                }
-                
-                // 4. ULTIMO tentativo: cerca h1
-                const h1 = doc.querySelector('h1');
-                if (h1 && h1.textContent.trim() !== '') {
-                    const title = h1.textContent.trim();
-                    console.log(`✅ H1 trovato per ${filename}: "${title}"`);
-                    return title;
-                }
-                
-                throw new Error('Nessun titolo trovato nei meta tag');
-                
-            } catch (error) {
-                console.error(`❌ Errore lettura ${filename}:`, error.message);
-                
-                // SOLUZIONE DI FALLBACK: Usa regex se DOMParser fallisce
-                try {
-                    const response = await fetch(filename);
-                    const html = await response.text();
-                    
-                    // Cerca meta tag con regex
-                    const metaMatch = html.match(/<meta\s+name=["']gara-title["']\s+content=["']([^"']+)["']/i);
-                    if (metaMatch && metaMatch[1]) {
-                        const title = metaMatch[1].trim();
-                        console.log(`✅ Regex meta tag per ${filename}: "${title}"`);
-                        return title;
-                    }
-                    
-                    // Cerca title tag con regex
-                    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-                    if (titleMatch && titleMatch[1]) {
-                        const title = titleMatch[1].trim();
-                        console.log(`✅ Regex title per ${filename}: "${title}"`);
-                        return title;
-                    }
-                    
-                } catch (regexError) {
-                    console.log(`Regex fallita per ${filename}:`, regexError.message);
-                }
-                
-                throw error;
-            }
-        }
-
-        // SOLUZIONE ALTERNATIVA: Usa iframe (funziona anche con CORS)
-        function getTitleWithIframe(filename) {
-            return new Promise((resolve, reject) => {
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = filename;
-                
-                iframe.onload = function() {
-                    setTimeout(() => {
-                        try {
-                            // Prova a leggere il meta tag dall'iframe
-                            const meta = iframe.contentDocument.querySelector('meta[name="gara-title"]');
-                            if (meta && meta.content) {
-                                resolve(meta.content.trim());
-                                return;
-                            }
-                            
-                            // Fallback al title normale
-                            const title = iframe.contentDocument.title;
-                            if (title && title.trim() !== '') {
-                                resolve(title.trim());
-                                return;
-                            }
-                            
-                            reject(new Error('Nessun titolo nell iframe'));
-                        } catch (error) {
-                            reject(new Error('Impossibile leggere iframe'));
-                        } finally {
-                            document.body.removeChild(iframe);
-                        }
-                    }, 1000); // Da tempo per caricare
-                };
-                
-                iframe.onerror = function() {
-                    document.body.removeChild(iframe);
-                    reject(new Error('Errore caricamento iframe'));
-                };
-                
-                document.body.appendChild(iframe);
-            });
-        }
-
-        // Funzione che prova tutti i metodi
-        async function getTitleWithAllMethods(filename) {
-            const methods = [
-                { name: 'Meta tag', func: () => getTitleFromMetaTag(filename) },
-                { name: 'Iframe', func: () => getTitleWithIframe(filename) }
-            ];
-            
-            for (const method of methods) {
-                try {
-                    console.log(`Tentativo ${method.name} per ${filename}`);
-                    const title = await method.func();
-                    if (title) {
-                        console.log(`✅ Successo con ${method.name}: "${title}"`);
-                        return title;
-                    }
-                } catch (error) {
-                    console.log(`❌ Fallito ${method.name}:`, error.message);
-                }
-            }
-            
-            throw new Error('Tutti i metodi falliti');
-        }
-
-        // Funzione per caricare tutti i titoli
-        async function loadAllTitles() {
-            updateStatus('<span class="spinner"></span> Avvio lettura meta tag...', 'info');
-            
-            const grid = document.getElementById('gare-grid');
-            grid.innerHTML = '';
-            
-            let successCount = 0;
-            let errorCount = 0;
-            
-            // Crea cards di placeholder
-            GARE_FILES.forEach((filename, index) => {
-                const defaultTitle = `Gara ${index + 1} (controllo meta tag...)`;
-                const card = createRaceCard(filename, defaultTitle, COLORS[index]);
-                grid.appendChild(card);
-            });
-            
-            setupCardEventListeners();
-            
-            // Prova a recuperare ogni titolo
-            for (let i = 0; i < GARE_FILES.length; i++) {
-                const filename = GARE_FILES[i];
-                
-                try {
-                    const title = await getTitleWithAllMethods(filename);
-                    
-                    if (title) {
-                        currentTitles[filename] = title;
-                        successCount++;
-                        updateCardTitle(filename, title);
-                    }
-                    
-                } catch (error) {
-                    errorCount++;
-                    const fallbackTitle = `Gara ${i + 1}`;
-                    currentTitles[filename] = fallbackTitle;
-                    updateCardTitle(filename, fallbackTitle);
-                    
-                    // Mostra errore specifico per questa gara
-                    console.log(`⚠️ ${filename}: ${error.message}`);
-                }
-            }
-            
-            // Aggiorna status finale
-            if (successCount === GARE_FILES.length) {
-                updateStatus(`✅ Tutti i ${successCount} titoli letti dai meta tag!`, 'success');
-                showToast('Titoli aggiornati dai meta tag!');
-            } else if (successCount > 0) {
-                updateStatus(`⚠️ ${successCount} successi, ${errorCount} errori. Alcuni file non hanno meta tag.`, 'warning');
-                showToast(`Letti ${successCount} su ${GARE_FILES.length} titoli`);
-                
-                // Mostra messaggio per i file mancanti
-                if (errorCount > 0) {
-                    const missingFiles = GARE_FILES.filter(f => !currentTitles[f] || currentTitles[f].includes('Gara'));
-                    if (missingFiles.length > 0) {
-                        setTimeout(() => {
-                            alert(`ATTENZIONE: I seguenti file non hanno meta tag "gara-title":\n${missingFiles.join('\n')}\n\nAggiungi il meta tag per visualizzare i titoli corretti.`);
-                        }, 1000);
-                    }
-                }
-            } else {
-                updateStatus('❌ Nessun meta tag trovato. Aggiungi i meta tag come indicato sopra.', 'error');
-                showToast('Aggiungi meta tag alle tue pagine gara');
-            }
-            
-            // Salva in cache
-            localStorage.setItem('cachedGareTitles', JSON.stringify(currentTitles));
-            localStorage.setItem('cachedTimestamp', Date.now());
-        }
-
-        // Aggiorna il titolo di una card
-        function updateCardTitle(filename, newTitle) {
-            const cards = document.querySelectorAll('.race-card');
-            cards.forEach(card => {
-                if (card.getAttribute('data-link') === filename) {
-                    const titleElement = card.querySelector('h2');
-                    if (titleElement) titleElement.textContent = newTitle;
-                    
-                    const descElement = card.querySelector('p');
-                    if (descElement) descElement.textContent = `Gestione iscrizioni e presenze per ${newTitle}`;
-                    
-                    card.setAttribute('data-title', newTitle);
-                }
-            });
-        }
-
-        // Carica dalla cache
-        function loadFromCache() {
-            const cached = localStorage.getItem('cachedGareTitles');
-            const timestamp = localStorage.getItem('cachedTimestamp');
-            
-            if (cached && timestamp) {
-                const age = Date.now() - parseInt(timestamp);
-                if (age < 30 * 60 * 1000) { // 30 minuti
-                    currentTitles = JSON.parse(cached);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        // Mostra titoli dalla cache
-        function showCachedTitles() {
-            const grid = document.getElementById('gare-grid');
-            grid.innerHTML = '';
-            
-            GARE_FILES.forEach((filename, index) => {
-                const title = currentTitles[filename] || `Gara ${index + 1}`;
-                const card = createRaceCard(filename, title, COLORS[index]);
-                grid.appendChild(card);
-            });
-            
-            setupCardEventListeners();
-        }
-
-        // Crea una card gara
-        function createRaceCard(filename, title, color) {
-            const container = document.createElement('div');
-            container.className = 'race-card-container';
-            
-            container.innerHTML = `
-                <a href="${filename}" class="race-card" data-link="${filename}" data-title="${title}" style="border-left-color: ${color}">
+        <main class="grid">
+            <!-- Gara 1 -->
+            <div class="race-card-container">
+                <a href="gara1.html" class="race-card" data-link="gara1.html" data-title="Gestione Gara 1">
                     <div class="race-info">
-                        <h2>${title}</h2>
-                        <p>Gestione iscrizioni e presenze per ${title}</p>
+                        <h2>Gestione Gara 1</h2>
+                        <p>Accesso alla pagina di gestione iscrizioni e presenze per Gara 1</p>
                     </div>
                     <div class="arrow">→</div>
                 </a>
-                <button class="copy-link-btn" onclick="copyFullLink(this, '${filename}')" title="Copia link completo">
+                <button class="copy-link-btn" onclick="copyFullLink(this, 'gara1.html')" title="Copia link completo">
                     📋 Copia Link
                 </button>
-            `;
-            
-            return container;
-        }
+            </div>
 
-        // Mostra toast
+            <!-- Gara 2 -->
+            <div class="race-card-container">
+                <a href="gara2.html" class="race-card" data-link="gara2.html" data-title="Gestione Gara 2">
+                    <div class="race-info">
+                        <h2>Gestione Gara 2</h2>
+                        <p>Accesso alla pagina di gestione iscrizioni e presenze per Gara 2</p>
+                    </div>
+                    <div class="arrow">→</div>
+                </a>
+                <button class="copy-link-btn" onclick="copyFullLink(this, 'gara2.html')" title="Copia link completo">
+                    📋 Copia Link
+                </button>
+            </div>
+
+            <!-- Gara 3 -->
+            <div class="race-card-container">
+                <a href="gara3.html" class="race-card" data-link="gara3.html" data-title="Gestione Gara 3">
+                    <div class="race-info">
+                        <h2>Gestione Gara 3</h2>
+                        <p>Accesso alla pagina di gestione iscrizioni e presenze per Gara 3</p>
+                    </div>
+                    <div class="arrow">→</div>
+                </a>
+                <button class="copy-link-btn" onclick="copyFullLink(this, 'gara3.html')" title="Copia link completo">
+                    📋 Copia Link
+                </button>
+            </div>
+
+            <!-- Gara 4 -->
+            <div class="race-card-container">
+                <a href="gara4.html" class="race-card" data-link="gara4.html" data-title="Gestione Gara 4">
+                    <div class="race-info">
+                        <h2>Gestione Gara 4</h2>
+                        <p>Accesso alla pagina di gestione iscrizioni e presenze per Gara 4</p>
+                    </div>
+                    <div class="arrow">→</div>
+                </a>
+                <button class="copy-link-btn" onclick="copyFullLink(this, 'gara4.html')" title="Copia link completo">
+                    📋 Copia Link
+                </button>
+            </div>
+
+            <!-- Gara 5 -->
+            <div class="race-card-container">
+                <a href="gara5.html" class="race-card" data-link="gara5.html" data-title="Gestione Gara 5">
+                    <div class="race-info">
+                        <h2>Gestione Gara 5</h2>
+                        <p>Accesso alla pagina di gestione iscrizioni e presenze per Gara 5</p>
+                    </div>
+                    <div class="arrow">→</div>
+                </a>
+                <button class="copy-link-btn" onclick="copyFullLink(this, 'gara5.html')" title="Copia link completo">
+                    📋 Copia Link
+                </button>
+            </div>
+        </main>
+
+        <footer>
+            &copy; 2026 Sistema Gestione Gare | Dashboard v2.0
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Funzione per mostrare il toast
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -723,29 +347,47 @@
             }, 3000);
         }
 
-        // Copia link
+        // Funzione per copiare il link completo
         function copyFullLink(button, filePath) {
-            event.stopPropagation();
+            event.stopPropagation(); // Previene il click sulla card
             
-            const currentUrl = window.location.href;
-            const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
-            const fullUrl = baseUrl + filePath;
+            // Ottieni l'URL completo
+            const baseUrl = window.location.origin;
+            const currentPath = window.location.pathname;
+            const directory = currentPath.substring(0, currentPath.lastIndexOf('/')) || '';
+            const fullUrl = baseUrl + directory + '/' + filePath;
             
+            // Ottieni il titolo dalla card
             const card = button.parentElement.querySelector('.race-card');
             const title = card.getAttribute('data-title') || 'Gara';
+            
+            // Crea il testo da copiare (URL e titolo)
             const textToCopy = `${title}\n${fullUrl}`;
             
+            // Usa la Clipboard API moderna
             navigator.clipboard.writeText(textToCopy).then(() => {
+                // Feedback visivo sul pulsante
                 button.innerHTML = '✓ Copiato!';
                 button.classList.add('copied');
-                showToast(`Link di "${title}" copiato!`);
                 
+                // Mostra toast notification
+                showToast(`Link di "${title}" copiato negli appunti!`);
+                
+                // Ripristina il pulsante dopo 2 secondi
                 setTimeout(() => {
                     button.innerHTML = '📋 Copia Link';
                     button.classList.remove('copied');
                 }, 2000);
+                
+                // Log in console per debug
+                console.log('Link copiato:', fullUrl);
+                console.log('Titolo:', title);
+                
             }).catch(err => {
-                // Fallback
+                // Fallback per browser più vecchi
+                console.error('Errore Clipboard API:', err);
+                
+                // Metodo fallback
                 const textArea = document.createElement('textarea');
                 textArea.value = textToCopy;
                 document.body.appendChild(textArea);
@@ -753,9 +395,10 @@
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
                 
+                // Feedback anche per il fallback
                 button.innerHTML = '✓ Copiato!';
                 button.classList.add('copied');
-                showToast(`Link di "${title}" copiato!`);
+                showToast(`Link di "${title}" copiato (metodo fallback)`);
                 
                 setTimeout(() => {
                     button.innerHTML = '📋 Copia Link';
@@ -764,87 +407,33 @@
             });
         }
 
-        // Setup event listeners
-        function setupCardEventListeners() {
-            document.querySelectorAll('.race-card').forEach(card => {
-                card.addEventListener('contextmenu', function(e) {
+        // Copia link con tasto destro sulla card
+        document.querySelectorAll('.race-card').forEach(card => {
+            card.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                const filePath = this.getAttribute('data-link');
+                const title = this.getAttribute('data-title');
+                
+                if (confirm(`Vuoi copiare il link per "${title}"?`)) {
+                    const button = this.parentElement.querySelector('.copy-link-btn');
+                    copyFullLink(button, filePath);
+                }
+            });
+        });
+
+        // Aggiungi anche la possibilità di copiare con Ctrl+C quando la card è in focus
+        document.querySelectorAll('.race-card').forEach(card => {
+            card.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
                     e.preventDefault();
                     const filePath = this.getAttribute('data-link');
-                    const title = this.getAttribute('data-title');
-                    
-                    if (confirm(`Vuoi copiare il link per "${title}"?`)) {
-                        const button = this.parentElement.querySelector('.copy-link-btn');
-                        copyFullLink(button, filePath);
-                    }
-                });
-                
-                card.addEventListener('keydown', function(e) {
-                    if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-                        e.preventDefault();
-                        const filePath = this.getAttribute('data-link');
-                        const button = this.parentElement.querySelector('.copy-link-btn');
-                        copyFullLink(button, filePath);
-                    }
-                });
-                
-                card.setAttribute('tabindex', '0');
-            });
-        }
-
-        // Genera codice meta tag per aiutare l'utente
-        function generateMetaTagCode() {
-            let code = '';
-            GARE_FILES.forEach(filename => {
-                const garaNum = filename.match(/\d+/)[0];
-                code += `\n<!-- Per ${filename} -->\n`;
-                code += `<meta name="gara-title" content="Titolo Gara ${garaNum}">\n`;
+                    const button = this.parentElement.querySelector('.copy-link-btn');
+                    copyFullLink(button, filePath);
+                }
             });
             
-            // Mostra il codice
-            alert('Copia questo codice e incollalo nei tuoi file HTML:\n\n' + code);
-            
-            // Copia automaticamente negli appunti
-            navigator.clipboard.writeText(code).then(() => {
-                showToast('Codice meta tag copiato negli appunti!');
-            });
-        }
-
-        // Aggiungi pulsante per generare codice
-        function addGenerateCodeButton() {
-            const instructions = document.querySelector('.instructions');
-            const button = document.createElement('button');
-            button.innerHTML = '📋 Genera Codice Meta Tag';
-            button.style.cssText = `
-                background: var(--secondary-color);
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 6px;
-                cursor: pointer;
-                font-size: 0.9rem;
-                margin-top: 10px;
-                display: block;
-            `;
-            button.onclick = generateMetaTagCode;
-            instructions.appendChild(button);
-        }
-
-        // Inizializza
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Aggiungi pulsante per generare codice
-            addGenerateCodeButton();
-            
-            // Prima carica dalla cache
-            if (loadFromCache()) {
-                showCachedTitles();
-                updateStatus('📁 Titoli dalla cache. Aggiorna per leggere meta tag.', 'warning');
-            } else {
-                // Mostra cards vuote
-                showCachedTitles();
-            }
-            
-            // Non caricare automaticamente - aspetta che l'utente clicchi
-            updateStatus('Clicca "Aggiorna Tutti i Titoli" dopo aver aggiunto i meta tag', 'info');
+            // Aggiungi tabindex per accessibilità
+            card.setAttribute('tabindex', '0');
         });
     </script>
 </body>
