@@ -1899,6 +1899,36 @@
                 font-size: 0.8rem;
             }
         }
+    
+    /* Stile Pulsante Torna in Cima */
+    #backToTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        z-index: 999;
+        border: none;
+        outline: none;
+        background: var(--gradient-danger);
+        color: white;
+        cursor: pointer;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        box-shadow: var(--shadow-heavy);
+        transition: all 0.3s ease;
+        align-items: center;
+        justify-content: center;
+    }
+    #backToTopBtn:hover {
+        transform: translateY(-5px) scale(1.1);
+        background: var(--gradient-primary);
+    }
+    @media (max-width: 768px) {
+        #backToTopBtn { bottom: 85px; right: 15px; width: 45px; height: 45px; }
+    }
+
     </style>
 </head>
 <body>
@@ -3752,6 +3782,25 @@
     }
 
     init();
+</script>
+
+    <button onclick="scrollToTop()" id="backToTopBtn" title="Torna in cima">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script>
+    // Logica Torna in Cima
+    window.onscroll = function() {
+        const btn = document.getElementById("backToTopBtn");
+        if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+            btn.style.display = "flex";
+        } else {
+            btn.style.display = "none";
+        }
+    };
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 </script>
 </body>
 </html>
