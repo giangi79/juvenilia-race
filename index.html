@@ -75,6 +75,58 @@
             margin-top: 8px;
         }
 
+        .config-panel {
+            background: #e8f4fc;
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .config-panel h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .config-input {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .config-input label {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .config-input input {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        .config-input button {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .config-input button:hover {
+            background: #2980b9;
+        }
+
         .status-bar {
             background: #f8f9fa;
             border: 1px solid #dee2e6;
@@ -313,13 +365,35 @@
                 <div class="logo-placeholder">GG</div>
                 <div>
                     <h1>Dashboard Gestione Gare</h1>
-                    <p class="subtitle">Titoli aggiornati automaticamente via GitHub API</p>
+                    <p class="subtitle">Titoli aggiornati automaticamente da GitHub</p>
+                </div>
+            </div>
+            
+            <div class="config-panel">
+                <h3>⚙️ Configurazione GitHub</h3>
+                <div class="config-input">
+                    <label for="githubUser">Username GitHub:</label>
+                    <input type="text" id="githubUser" placeholder="es: mariorossi">
+                    
+                    <label for="githubRepo">Nome Repository:</label>
+                    <input type="text" id="githubRepo" placeholder="es: gestione-gare">
+                    
+                    <label for="githubBranch">Branch:</label>
+                    <input type="text" id="githubBranch" value="main" placeholder="main o master">
+                    
+                    <button onclick="saveConfig()">✅ Salva Configurazione</button>
+                </div>
+                <div style="font-size: 0.8rem; color: #666;">
+                    <strong>Come trovare questi dati:</strong><br>
+                    1. Vai su https://github.com/<br>
+                    2. Trova il tuo repository<br>
+                    3. L'URL sarà: https://github.com/<strong>TUO-USER</strong>/<strong>NOME-REPO</strong>
                 </div>
             </div>
             
             <div class="status-bar" id="statusBar">
                 <span id="statusText">
-                    <span class="spinner"></span> Connessione a GitHub API...
+                    Configura il tuo repository GitHub per iniziare
                 </span>
                 <button class="refresh-btn" onclick="loadAllTitles()" style="padding: 4px 8px; font-size: 0.8rem;">
                     🔄
@@ -338,7 +412,7 @@
                     🔄 Aggiorna Tutti i Titoli
                 </button>
                 <div style="font-size: 0.75rem; margin-top: 5px; color: #999;">
-                    I titoli vengono letti direttamente dai file HTML nel repository GitHub
+                    I titoli vengono letti in tempo reale dai file HTML su GitHub
                 </div>
             </div>
         </footer>
@@ -347,15 +421,10 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // CONFIGURAZIONE - MODIFICA QUESTI VALORI!
-        // ===========================================
-        // 1. Vai sul tuo repository GitHub
-        // 2. Copia il nome utente e repository dall'URL
-        //    Esempio: https://github.com/TUO-UTENTE/NOME-REPOSITORY
-        const GITHUB_USER = 'giangi79';      // Sostituisci con il tuo username GitHub
-        const GITHUB_REPO = 'juvenilia-race';       // Sostituisci con il nome del repository
-        const GITHUB_BRANCH = 'main';                // Di solito 'main' o 'master'
-        // ===========================================
+        // VARIABILI DI CONFIGURAZIONE (salvate in localStorage)
+        let GITHUB_USER = localStorage.getItem('githubUser') || '';
+        let GITHUB_REPO = localStorage.getItem('githubRepo') || '';
+        let GITHUB_BRANCH = localStorage.getItem('githubBranch') || 'main';
 
         // Lista delle gare da recuperare
         const GARE_FILES = [
@@ -372,6 +441,43 @@
         // Stato dell'applicazione
         let currentTitles = {};
 
+        // Inizializza i campi di configurazione
+        function initConfigFields() {
+            document.getElementById('githubUser').value = GITHUB_USER;
+            document.getElementById('githubRepo').value = GITHUB_REPO;
+            document.getElementById('githubBranch').value = GITHUB_BRANCH;
+        }
+
+        // Salva la configurazione
+        function saveConfig() {
+            const user = document.getElementById('githubUser').value.trim();
+            const repo = document.getElementById('githubRepo').value.trim();
+            const branch = document.getElementById('githubBranch').value.trim() || 'main';
+            
+            if (!user || !repo) {
+                showToast('❌ Inserisci username e repository!');
+                return;
+            }
+            
+            GITHUB_USER = user;
+            GITHUB_REPO = repo;
+            GITHUB_BRANCH = branch;
+            
+            // Salva in localStorage
+            localStorage.setItem('githubUser', user);
+            localStorage.setItem('githubRepo', repo);
+            localStorage.setItem('githubBranch', branch);
+            
+            showToast('✅ Configurazione salvata!');
+            updateStatus('Configurazione salvata. Clicca "Aggiorna Tutti i Titoli"', 'success');
+            
+            // Nascondi il pannello di configurazione se tutto è configurato
+            document.querySelector('.config-panel').style.display = 'none';
+            
+            // Prova a caricare i titoli
+            setTimeout(() => loadAllTitles(), 1000);
+        }
+
         // Funzione per aggiornare la status bar
         function updateStatus(message, type = 'info') {
             const statusBar = document.getElementById('statusBar');
@@ -381,91 +487,68 @@
             statusText.innerHTML = message;
         }
 
-        // Funzione per ottenere il contenuto di un file da GitHub
-        async function getFileFromGitHubSimple(filename) {
-    const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${filename}`;
-    
-    const response = await fetch(url);
-    const html = await response.text();
-    const match = html.match(/<title>([^<]+)<\/title>/i);
-    return match ? match[1].trim() : null;
-}
-                });
-                
-                if (!response.ok) {
-                    if (response.status === 403) {
-                        throw new Error('Rate limit di GitHub raggiunto. Riprova tra un minuto.');
-                    }
-                    throw new Error(`File non trovato: ${filename}`);
-                }
-                
-                const data = await response.json();
-                
-                // Decodifica il contenuto base64
-                const content = atob(data.content);
-                
-                // Estrae il titolo dal file HTML
-                const titleMatch = content.match(/<title[^>]*>([^<]+)<\/title>/i);
-                if (titleMatch && titleMatch[1]) {
-                    return titleMatch[1].trim();
-                }
-                
-                // Fallback: cerca h1
-                const h1Match = content.match(/<h1[^>]*>([^<]+)<\/h1>/i);
-                if (h1Match && h1Match[1]) {
-                    return h1Match[1].trim();
-                }
-                
-                return null;
-                
-            } catch (error) {
-                console.error(`Errore recupero ${filename}:`, error);
-                throw error;
+        // SOLUZIONE ULTRA-SEMPLICE: Usa solo GitHub RAW URL
+        async function getTitleFromGitHubRaw(filename) {
+            if (!GITHUB_USER || !GITHUB_REPO) {
+                throw new Error('Configurazione GitHub mancante');
             }
-        }
-
-        // Metodo ALTERNATIVO: Usa GitHub RAW URL (più semplice)
-        async function getFileFromGitHubRaw(filename) {
+            
             const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${filename}`;
             
+            updateStatus(`<span class="spinner"></span> Lettura: ${filename}...`, 'info');
+            
             try {
-                updateStatus(`<span class="spinner"></span> Lettura: ${filename}...`, 'info');
-                
                 const response = await fetch(url, {
+                    // Aggiungi timestamp per evitare cache
                     headers: {
-                        'Cache-Control': 'no-cache'
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
                     }
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    if (response.status === 404) {
+                        throw new Error(`File ${filename} non trovato nel repository`);
+                    }
+                    throw new Error(`Errore ${response.status}: ${response.statusText}`);
                 }
                 
-                const content = await response.text();
+                const html = await response.text();
                 
-                // Estrae il titolo
-                const titleMatch = content.match(/<title[^>]*>([^<]+)<\/title>/i);
+                // Estrae il titolo con regex robusta
+                const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
                 if (titleMatch && titleMatch[1]) {
-                    return titleMatch[1].trim();
+                    const title = titleMatch[1].trim();
+                    console.log(`✅ Titolo trovato per ${filename}: "${title}"`);
+                    return title;
                 }
                 
-                // Fallback
-                const h1Match = content.match(/<h1[^>]*>([^<]+)<\/h1>/i);
+                // Cerca anche h1 come fallback
+                const h1Match = html.match(/<h1[^>]*>([^<]+)<\/h1>/i);
                 if (h1Match && h1Match[1]) {
-                    return h1Match[1].trim();
+                    const title = h1Match[1].trim();
+                    console.log(`⚠️ Usando H1 per ${filename}: "${title}"`);
+                    return title;
                 }
                 
-                return null;
+                throw new Error('Nessun titolo trovato nel file');
                 
             } catch (error) {
-                console.error(`Errore RAW ${filename}:`, error);
+                console.error(`❌ Errore ${filename}:`, error.message);
                 throw error;
             }
         }
 
         // Funzione per caricare tutti i titoli
         async function loadAllTitles() {
-            updateStatus('<span class="spinner"></span> Avvio recupero titoli...', 'info');
+            if (!GITHUB_USER || !GITHUB_REPO) {
+                updateStatus('❌ Configura prima il tuo repository GitHub!', 'error');
+                document.querySelector('.config-panel').style.display = 'block';
+                showToast('Configura il repository GitHub');
+                return;
+            }
+            
+            updateStatus('<span class="spinner"></span> Avvio recupero titoli da GitHub...', 'info');
             
             const grid = document.getElementById('gare-grid');
             grid.innerHTML = '';
@@ -473,36 +556,40 @@
             let successCount = 0;
             let errorCount = 0;
             
-            // Prova entrambi i metodi per ogni file
+            // Mostra subito le card con titoli di default
+            GARE_FILES.forEach((filename, index) => {
+                const defaultTitle = `Gara ${index + 1} (caricamento...)`;
+                const card = createRaceCard(filename, defaultTitle, COLORS[index]);
+                grid.appendChild(card);
+            });
+            
+            setupCardEventListeners();
+            
+            // Prova a recuperare ogni titolo
             for (let i = 0; i < GARE_FILES.length; i++) {
                 const filename = GARE_FILES[i];
-                let title = null;
                 
                 try {
-                    // Prima prova con GitHub API
-                    title = await getFileFromGitHub(filename);
-                    
-                    // Se fallisce, prova con RAW
-                    if (!title) {
-                        title = await getFileFromGitHubRaw(filename);
-                    }
+                    const title = await getTitleFromGitHubRaw(filename);
                     
                     if (title) {
                         currentTitles[filename] = title;
                         successCount++;
+                        
+                        // Aggiorna la card con il titolo vero
+                        updateCardTitle(filename, title);
                     } else {
-                        throw new Error('Nessun titolo trovato nel file');
+                        throw new Error('Titolo vuoto');
                     }
                     
                 } catch (error) {
                     errorCount++;
-                    // Usa titolo di fallback
-                    currentTitles[filename] = `Gara ${i + 1} (${error.message})`;
+                    const fallbackTitle = `Gara ${i + 1} (errore: ${error.message.substring(0, 30)}...)`;
+                    currentTitles[filename] = fallbackTitle;
+                    
+                    // Aggiorna la card con il titolo di fallback
+                    updateCardTitle(filename, fallbackTitle);
                 }
-                
-                // Crea la card immediatamente
-                const card = createRaceCard(filename, currentTitles[filename], COLORS[i]);
-                grid.appendChild(card);
             }
             
             // Aggiorna status finale
@@ -517,11 +604,32 @@
                 showToast('Errore nel caricamento dei titoli');
             }
             
-            setupCardEventListeners();
-            
             // Salva in localStorage per cache
             localStorage.setItem('cachedGareTitles', JSON.stringify(currentTitles));
             localStorage.setItem('cachedTimestamp', Date.now());
+        }
+
+        // Aggiorna il titolo di una card specifica
+        function updateCardTitle(filename, newTitle) {
+            const cards = document.querySelectorAll('.race-card');
+            cards.forEach(card => {
+                if (card.getAttribute('data-link') === filename) {
+                    // Aggiorna titolo
+                    const titleElement = card.querySelector('h2');
+                    if (titleElement) {
+                        titleElement.textContent = newTitle;
+                    }
+                    
+                    // Aggiorna descrizione
+                    const descElement = card.querySelector('p');
+                    if (descElement) {
+                        descElement.textContent = `Gestione iscrizioni e presenze per ${newTitle}`;
+                    }
+                    
+                    // Aggiorna attributo data
+                    card.setAttribute('data-title', newTitle);
+                }
+            });
         }
 
         // Carica titoli dalla cache
@@ -531,8 +639,8 @@
             
             if (cached && timestamp) {
                 const age = Date.now() - parseInt(timestamp);
-                // Usa cache solo se ha meno di 1 ora
-                if (age < 60 * 60 * 1000) {
+                // Usa cache solo se ha meno di 10 minuti
+                if (age < 10 * 60 * 1000) {
                     currentTitles = JSON.parse(cached);
                     return true;
                 }
@@ -640,52 +748,55 @@
             });
         }
 
-        // Inizializza
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Mostra avviso se la configurazione non è stata modificata
-            if (GITHUB_USER === 'TUO-UTENTE-GITHUB' || GITHUB_REPO === 'NOME-REPOSITORY') {
-                updateStatus('❌ CONFIGURAZIONE NECESSARIA: Modifica GITHUB_USER e GITHUB_REPO nel codice!', 'error');
-                showToast('Modifica la configurazione GitHub per far funzionare la dashboard');
-                return;
-            }
-            
-            // Prima prova a caricare dalla cache
-            if (loadFromCache()) {
-                const grid = document.getElementById('gare-grid');
-                grid.innerHTML = '';
-                
-                GARE_FILES.forEach((filename, index) => {
-                    const title = currentTitles[filename] || `Gara ${index + 1}`;
-                    const card = createRaceCard(filename, title, COLORS[index]);
-                    grid.appendChild(card);
-                });
-                
-                setupCardEventListeners();
-                updateStatus('📁 Titoli caricati dalla cache. Aggiorna per controllare novità.', 'warning');
-            }
-            
-            // Poi carica i dati aggiornati da GitHub
-            await loadAllTitles();
-        });
-
-        // Helper: funzione per testare la connessione GitHub
+        // Testa la connessione GitHub
         async function testGitHubConnection() {
+            if (!GITHUB_USER || !GITHUB_REPO) return false;
+            
             try {
-                const testUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}`;
-                const response = await fetch(testUrl);
-                
-                if (response.ok) {
-                    return true;
-                } else {
-                    console.error('Test fallito:', response.status, response.statusText);
-                    return false;
-                }
+                const testUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/README.md`;
+                const response = await fetch(testUrl, { method: 'HEAD' });
+                return response.ok;
             } catch (error) {
-                console.error('Errore connessione:', error);
                 return false;
             }
         }
+
+        // Inizializza l'applicazione
+        async function initApp() {
+            // Inizializza i campi di configurazione
+            initConfigFields();
+            
+            // Se la configurazione esiste, nascondi il pannello
+            if (GITHUB_USER && GITHUB_REPO) {
+                document.querySelector('.config-panel').style.display = 'none';
+                updateStatus('Configurazione trovata. Caricamento...', 'success');
+                
+                // Prima prova a caricare dalla cache
+                if (loadFromCache()) {
+                    const grid = document.getElementById('gare-grid');
+                    grid.innerHTML = '';
+                    
+                    GARE_FILES.forEach((filename, index) => {
+                        const title = currentTitles[filename] || `Gara ${index + 1}`;
+                        const card = createRaceCard(filename, title, COLORS[index]);
+                        grid.appendChild(card);
+                    });
+                    
+                    setupCardEventListeners();
+                    updateStatus('📁 Titoli caricati dalla cache. Aggiorna per novità.', 'warning');
+                }
+                
+                // Poi carica i dati aggiornati
+                await loadAllTitles();
+                
+            } else {
+                updateStatus('Configura il tuo repository GitHub per iniziare', 'info');
+                document.querySelector('.config-panel').style.display = 'block';
+            }
+        }
+
+        // Avvia l'applicazione
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
-
