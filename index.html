@@ -382,18 +382,14 @@
         }
 
         // Funzione per ottenere il contenuto di un file da GitHub
-        async function getFileFromGitHub(filename) {
-            const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${filename}?ref=${GITHUB_BRANCH}`;
-            
-            try {
-                updateStatus(`<span class="spinner"></span> Recupero: ${filename}...`, 'info');
-                
-                const response = await fetch(url, {
-                    headers: {
-                        'Accept': 'application/vnd.github.v3+json',
-                        // Aggiungi un token GitHub per aumentare il rate limit (opzionale)
-                        // 'Authorization': 'token TUO_TOKEN_GITHUB'
-                    }
+        async function getFileFromGitHubSimple(filename) {
+    const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${filename}`;
+    
+    const response = await fetch(url);
+    const html = await response.text();
+    const match = html.match(/<title>([^<]+)<\/title>/i);
+    return match ? match[1].trim() : null;
+}
                 });
                 
                 if (!response.ok) {
@@ -692,3 +688,4 @@
     </script>
 </body>
 </html>
+
