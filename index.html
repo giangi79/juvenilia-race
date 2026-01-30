@@ -6,7 +6,6 @@
     <title>Dashboard - Gestione Gare</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
-        /* Stili identici alla versione precedente */
         :root {
             --primary-color: #2c3e50;
             --secondary-color: #3498db;
@@ -76,20 +75,51 @@
             margin-top: 8px;
         }
 
-        .simple-instruction {
-            background: #e8f4fc;
-            border-left: 4px solid var(--secondary-color);
-            padding: 15px;
-            border-radius: 6px;
+        .status-bar {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px 15px;
             margin: 15px 0;
             font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .simple-instruction code {
-            background: #e3f2fd;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
+        .status-bar.success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .status-bar.error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .status-bar.warning {
+            background: #fff3cd;
+            border-color: #ffeaa7;
+            color: #856404;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .grid {
@@ -220,6 +250,20 @@
             border-top: 1px solid #e2e8f0;
         }
 
+        .refresh-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -269,81 +313,256 @@
                 <div class="logo-placeholder">GG</div>
                 <div>
                     <h1>Dashboard Gestione Gare</h1>
-                    <p class="subtitle">Versione semplificata con titoli manuali</p>
+                    <p class="subtitle">Titoli aggiornati automaticamente via GitHub API</p>
                 </div>
             </div>
             
-            <div class="simple-instruction">
-                <strong>⚠️ Istruzione IMPORTANTE:</strong><br>
-                Modifica i titoli direttamente nel codice qui sotto (righe 240-244).<br>
-                Cerca: <code>const MANUAL_TITLES = { ... }</code> e cambia i titoli a tuo piacimento.
+            <div class="status-bar" id="statusBar">
+                <span id="statusText">
+                    <span class="spinner"></span> Connessione a GitHub API...
+                </span>
+                <button class="refresh-btn" onclick="loadAllTitles()" style="padding: 4px 8px; font-size: 0.8rem;">
+                    🔄
+                </button>
             </div>
         </header>
 
         <main class="grid" id="gare-grid">
-            <!-- Le card verranno generate qui -->
+            <!-- Le card verranno generate dinamicamente -->
         </main>
 
         <footer>
-            &copy; 2026 Sistema Gestione Gare<br>
-            <small>Per aggiornare i titoli, modifica il codice JavaScript di questa pagina</small>
+            &copy; 2026 Sistema Gestione Gare 
+            <div style="margin-top: 10px;">
+                <button class="refresh-btn" onclick="loadAllTitles()">
+                    🔄 Aggiorna Tutti i Titoli
+                </button>
+                <div style="font-size: 0.75rem; margin-top: 5px; color: #999;">
+                    I titoli vengono letti direttamente dai file HTML nel repository GitHub
+                </div>
+            </div>
         </footer>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
-        // ⚠️ MODIFICA QUI I TITOLI MANUALMENTE ⚠️
-        // Cambia questi titoli con quelli reali delle tue pagine
-        const MANUAL_TITLES = {
-            'gara1.html': 'Gran Premio Nazionale',
-            'gara2.html': 'Campionati Italiani Indoor',
-            'gara3.html': 'Maratona Cittadina',
-            'gara4.html': 'Coppa Regionale Under 23',
-            'gara5.html': 'Torneo Giovanile Estivo'
-        };
+        // CONFIGURAZIONE - MODIFICA QUESTI VALORI!
+        // ===========================================
+        // 1. Vai sul tuo repository GitHub
+        // 2. Copia il nome utente e repository dall'URL
+        //    Esempio: https://github.com/TUO-UTENTE/NOME-REPOSITORY
+        const GITHUB_USER = 'giangi79';      // Sostituisci con il tuo username GitHub
+        const GITHUB_REPO = 'juvenilia-race';       // Sostituisci con il nome del repository
+        const GITHUB_BRANCH = 'main';                // Di solito 'main' o 'master'
+        // ===========================================
 
-        // Configurazione colori
-        const GARE_CONFIG = [
-            { id: 1, file: 'gara1.html', color: '#3498db' },
-            { id: 2, file: 'gara2.html', color: '#27ae60' },
-            { id: 3, file: 'gara3.html', color: '#e74c3c' },
-            { id: 4, file: 'gara4.html', color: '#f39c12' },
-            { id: 5, file: 'gara5.html', color: '#9b59b6' }
+        // Lista delle gare da recuperare
+        const GARE_FILES = [
+            'gara1.html',
+            'gara2.html', 
+            'gara3.html',
+            'gara4.html',
+            'gara5.html'
         ];
 
-        // Funzione per ottenere il titolo (usa manuale come fallback)
-        function getTitleForFile(file) {
-            return MANUAL_TITLES[file] || 'Gara ' + file.charAt(4); // "gara1.html" -> "Gara 1"
+        // Colori per le card
+        const COLORS = ['#3498db', '#27ae60', '#e74c3c', '#f39c12', '#9b59b6'];
+
+        // Stato dell'applicazione
+        let currentTitles = {};
+
+        // Funzione per aggiornare la status bar
+        function updateStatus(message, type = 'info') {
+            const statusBar = document.getElementById('statusBar');
+            const statusText = document.getElementById('statusText');
+            
+            statusBar.className = 'status-bar ' + type;
+            statusText.innerHTML = message;
         }
 
-        // Crea tutte le card
-        function createAllCards() {
+        // Funzione per ottenere il contenuto di un file da GitHub
+        async function getFileFromGitHub(filename) {
+            const url = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${filename}?ref=${GITHUB_BRANCH}`;
+            
+            try {
+                updateStatus(`<span class="spinner"></span> Recupero: ${filename}...`, 'info');
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Accept': 'application/vnd.github.v3+json',
+                        // Aggiungi un token GitHub per aumentare il rate limit (opzionale)
+                        // 'Authorization': 'token TUO_TOKEN_GITHUB'
+                    }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 403) {
+                        throw new Error('Rate limit di GitHub raggiunto. Riprova tra un minuto.');
+                    }
+                    throw new Error(`File non trovato: ${filename}`);
+                }
+                
+                const data = await response.json();
+                
+                // Decodifica il contenuto base64
+                const content = atob(data.content);
+                
+                // Estrae il titolo dal file HTML
+                const titleMatch = content.match(/<title[^>]*>([^<]+)<\/title>/i);
+                if (titleMatch && titleMatch[1]) {
+                    return titleMatch[1].trim();
+                }
+                
+                // Fallback: cerca h1
+                const h1Match = content.match(/<h1[^>]*>([^<]+)<\/h1>/i);
+                if (h1Match && h1Match[1]) {
+                    return h1Match[1].trim();
+                }
+                
+                return null;
+                
+            } catch (error) {
+                console.error(`Errore recupero ${filename}:`, error);
+                throw error;
+            }
+        }
+
+        // Metodo ALTERNATIVO: Usa GitHub RAW URL (più semplice)
+        async function getFileFromGitHubRaw(filename) {
+            const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}/${filename}`;
+            
+            try {
+                updateStatus(`<span class="spinner"></span> Lettura: ${filename}...`, 'info');
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const content = await response.text();
+                
+                // Estrae il titolo
+                const titleMatch = content.match(/<title[^>]*>([^<]+)<\/title>/i);
+                if (titleMatch && titleMatch[1]) {
+                    return titleMatch[1].trim();
+                }
+                
+                // Fallback
+                const h1Match = content.match(/<h1[^>]*>([^<]+)<\/h1>/i);
+                if (h1Match && h1Match[1]) {
+                    return h1Match[1].trim();
+                }
+                
+                return null;
+                
+            } catch (error) {
+                console.error(`Errore RAW ${filename}:`, error);
+                throw error;
+            }
+        }
+
+        // Funzione per caricare tutti i titoli
+        async function loadAllTitles() {
+            updateStatus('<span class="spinner"></span> Avvio recupero titoli...', 'info');
+            
             const grid = document.getElementById('gare-grid');
             grid.innerHTML = '';
             
-            GARE_CONFIG.forEach(gara => {
-                const title = getTitleForFile(gara.file);
-                const container = document.createElement('div');
-                container.className = 'race-card-container';
+            let successCount = 0;
+            let errorCount = 0;
+            
+            // Prova entrambi i metodi per ogni file
+            for (let i = 0; i < GARE_FILES.length; i++) {
+                const filename = GARE_FILES[i];
+                let title = null;
                 
-                container.innerHTML = `
-                    <a href="${gara.file}" class="race-card" data-link="${gara.file}" data-title="${title}" style="border-left-color: ${gara.color}">
-                        <div class="race-info">
-                            <h2>${title}</h2>
-                            <p>Gestione iscrizioni e presenze per ${title}</p>
-                        </div>
-                        <div class="arrow">→</div>
-                    </a>
-                    <button class="copy-link-btn" onclick="copyFullLink(this, '${gara.file}')" title="Copia link completo">
-                        📋 Copia Link
-                    </button>
-                `;
+                try {
+                    // Prima prova con GitHub API
+                    title = await getFileFromGitHub(filename);
+                    
+                    // Se fallisce, prova con RAW
+                    if (!title) {
+                        title = await getFileFromGitHubRaw(filename);
+                    }
+                    
+                    if (title) {
+                        currentTitles[filename] = title;
+                        successCount++;
+                    } else {
+                        throw new Error('Nessun titolo trovato nel file');
+                    }
+                    
+                } catch (error) {
+                    errorCount++;
+                    // Usa titolo di fallback
+                    currentTitles[filename] = `Gara ${i + 1} (${error.message})`;
+                }
                 
-                grid.appendChild(container);
-            });
+                // Crea la card immediatamente
+                const card = createRaceCard(filename, currentTitles[filename], COLORS[i]);
+                grid.appendChild(card);
+            }
+            
+            // Aggiorna status finale
+            if (successCount === GARE_FILES.length) {
+                updateStatus(`✅ Tutti i ${successCount} titoli caricati con successo!`, 'success');
+                showToast('Titoli aggiornati automaticamente da GitHub!');
+            } else if (successCount > 0) {
+                updateStatus(`⚠️ ${successCount} successi, ${errorCount} errori. Alcuni titoli potrebbero essere predefiniti.`, 'warning');
+                showToast(`Caricati ${successCount} su ${GARE_FILES.length} titoli`);
+            } else {
+                updateStatus('❌ Impossibile caricare i titoli. Controlla la configurazione.', 'error');
+                showToast('Errore nel caricamento dei titoli');
+            }
             
             setupCardEventListeners();
+            
+            // Salva in localStorage per cache
+            localStorage.setItem('cachedGareTitles', JSON.stringify(currentTitles));
+            localStorage.setItem('cachedTimestamp', Date.now());
+        }
+
+        // Carica titoli dalla cache
+        function loadFromCache() {
+            const cached = localStorage.getItem('cachedGareTitles');
+            const timestamp = localStorage.getItem('cachedTimestamp');
+            
+            if (cached && timestamp) {
+                const age = Date.now() - parseInt(timestamp);
+                // Usa cache solo se ha meno di 1 ora
+                if (age < 60 * 60 * 1000) {
+                    currentTitles = JSON.parse(cached);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Crea una card gara
+        function createRaceCard(filename, title, color) {
+            const container = document.createElement('div');
+            container.className = 'race-card-container';
+            
+            container.innerHTML = `
+                <a href="${filename}" class="race-card" data-link="${filename}" data-title="${title}" style="border-left-color: ${color}">
+                    <div class="race-info">
+                        <h2>${title}</h2>
+                        <p>Gestione iscrizioni e presenze per ${title}</p>
+                    </div>
+                    <div class="arrow">→</div>
+                </a>
+                <button class="copy-link-btn" onclick="copyFullLink(this, '${filename}')" title="Copia link completo">
+                    📋 Copia Link
+                </button>
+            `;
+            
+            return container;
         }
 
         // Mostra toast
@@ -426,10 +645,50 @@
         }
 
         // Inizializza
-        document.addEventListener('DOMContentLoaded', () => {
-            createAllCards();
-            showToast('Dashboard caricata! Modifica i titli nel codice se necessario.');
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Mostra avviso se la configurazione non è stata modificata
+            if (GITHUB_USER === 'TUO-UTENTE-GITHUB' || GITHUB_REPO === 'NOME-REPOSITORY') {
+                updateStatus('❌ CONFIGURAZIONE NECESSARIA: Modifica GITHUB_USER e GITHUB_REPO nel codice!', 'error');
+                showToast('Modifica la configurazione GitHub per far funzionare la dashboard');
+                return;
+            }
+            
+            // Prima prova a caricare dalla cache
+            if (loadFromCache()) {
+                const grid = document.getElementById('gare-grid');
+                grid.innerHTML = '';
+                
+                GARE_FILES.forEach((filename, index) => {
+                    const title = currentTitles[filename] || `Gara ${index + 1}`;
+                    const card = createRaceCard(filename, title, COLORS[index]);
+                    grid.appendChild(card);
+                });
+                
+                setupCardEventListeners();
+                updateStatus('📁 Titoli caricati dalla cache. Aggiorna per controllare novità.', 'warning');
+            }
+            
+            // Poi carica i dati aggiornati da GitHub
+            await loadAllTitles();
         });
+
+        // Helper: funzione per testare la connessione GitHub
+        async function testGitHubConnection() {
+            try {
+                const testUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}`;
+                const response = await fetch(testUrl);
+                
+                if (response.ok) {
+                    return true;
+                } else {
+                    console.error('Test fallito:', response.status, response.statusText);
+                    return false;
+                }
+            } catch (error) {
+                console.error('Errore connessione:', error);
+                return false;
+            }
+        }
     </script>
 </body>
 </html>
