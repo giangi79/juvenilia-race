@@ -2,272 +2,218 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Gestione Gare - Dashboard</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap">
     <style>
+        /* RESET E VARIABILI */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         :root {
             --primary-color: #1a237e;
             --secondary-color: #283593;
             --accent-color: #3949ab;
             --highlight-color: #5c6bc0;
-            --bg-color: #f5f5f5;
-            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --text-color: #2c3e50;
             --card-bg: #ffffff;
-            --success-color: #4caf50;
-            --warning-color: #ff9800;
-            --info-color: #2196f3;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+            --danger-color: #e74c3c;
             --gradient-start: #1a237e;
             --gradient-end: #3949ab;
-            --card-gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --card-gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --card-gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --card-gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            --card-gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --border-radius-sm: 8px;
+            --border-radius-md: 12px;
+            --border-radius-lg: 16px;
+            --border-radius-xl: 20px;
+            --safe-area-top: env(safe-area-inset-top, 0px);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
         }
 
+        /* STILI BASE - MOBILE FIRST */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Segoe UI Emoji", Helvetica, Arial, sans-serif;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-image: radial-gradient(circle at 50% 50%, rgba(120, 119, 198, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+            line-height: 1.5;
+            font-size: 14px;
+            padding-top: var(--safe-area-top);
+            padding-bottom: var(--safe-area-bottom);
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
+        /* CONTAINER FLESSIBILE */
         .container {
             width: 100%;
-            max-width: 1200px;
-            padding: 20px;
-        }
-
-        /* HEADER MODIFICATO PER LOGO A LARGHEZZA PAGINA */
-        .header-container {
-            width: 100%;
-            margin-bottom: 50px;
-            position: relative;
-            overflow: hidden;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(26, 35, 126, 0.2);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header-top {
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            padding: 40px;
-            color: white;
-            position: relative;
-            text-align: center;
-        }
-
-        .header-top::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(90deg, #ff9800, #ffeb3b, #4caf50);
-        }
-
-        .header-logo-section {
-            width: 100%;
-            background: white;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: inset 0 5px 15px rgba(0,0,0,0.05);
-        }
-
-        .logo-full-width {
-            max-width: 100%;
-            height: auto;
-            max-height: 180px;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
-            transition: transform 0.3s ease;
-        }
-
-        .logo-full-width:hover {
-            transform: scale(1.02);
-        }
-
-        h1 {
-            color: white;
-            font-size: 2.8rem;
-            margin: 0 0 15px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            font-weight: 800;
-        }
-
-        .subtitle {
-            color: rgba(255, 255, 255, 0.95);
-            font-size: 1.3rem;
-            margin: 0;
-            max-width: 800px;
-            line-height: 1.6;
-            font-weight: 300;
+            padding: 0 15px;
             margin: 0 auto;
         }
 
-        .controls {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 40px;
-            background: white;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        /* HEADER COMPATTO PER MOBILE */
+        .app-header {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            margin-bottom: 20px;
+            overflow: hidden;
         }
 
-        .btn {
-            padding: 14px 30px;
-            border: none;
-            border-radius: 12px;
-            background-color: var(--accent-color);
+        .header-top-bar {
+            height: 5px;
+            background: linear-gradient(90deg, #ff9800, #ffeb3b, #4caf50);
+        }
+
+        .header-content {
+            padding: 20px 15px;
+            text-align: center;
             color: white;
-            font-weight: 700;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.3s ease;
-            font-size: 1.05rem;
         }
 
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-            background-color: var(--secondary-color);
+        .logo-container {
+            margin-bottom: 15px;
+            padding: 10px;
+        }
+
+        .logo-full-width {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            max-height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.2));
+        }
+
+        .app-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .app-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.95;
+            font-weight: 400;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* CONTROLLI ADATTIVI */
+        .controls-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius-lg);
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        /* BOTTONI TOUCH-FRIENDLY */
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: var(--border-radius-md);
+            background: var(--accent-color);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            min-height: 48px;
+            min-width: 48px;
+            touch-action: manipulation;
+            flex: 1;
+            max-width: 100%;
         }
 
         .btn:active {
-            transform: translateY(-1px);
+            transform: translateY(2px);
+            box-shadow: var(--shadow-sm);
         }
 
         .btn-edit {
-            background: linear-gradient(135deg, var(--warning-color), #ffb74d);
+            background: linear-gradient(135deg, var(--warning-color), #f1c40f);
         }
 
-        .btn-copy-race {
-            background-color: rgba(255, 255, 255, 0.95);
-            color: var(--primary-color);
-            padding: 12px 22px;
-            border-radius: 12px;
-            font-size: 1rem;
-            box-shadow: 0 5px 12px rgba(0,0,0,0.1);
-            border: 1px solid rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 700;
-        }
-
-        .btn-copy-race:hover {
-            background-color: white;
-            color: var(--accent-color);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 18px rgba(0,0,0,0.15);
-        }
-
-        .btn-copy-race.copied {
-            background-color: var(--success-color);
-            color: white;
-        }
-
-        .grid {
+        /* GRID RESPONSIVO */
+        .races-grid {
             display: grid;
-            gap: 30px;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            margin-bottom: 50px;
+            gap: 15px;
+            grid-template-columns: 1fr;
+            margin-bottom: 30px;
         }
 
+        /* CARD OTTIMIZZATE PER MOBILE */
         .race-card {
             background: var(--card-bg);
-            border-radius: 20px;
+            border-radius: var(--border-radius-lg);
             overflow: hidden;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.12);
-            transition: all 0.4s ease;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
             position: relative;
             display: flex;
             flex-direction: column;
-            height: 100%;
+            min-height: 180px;
         }
 
-        .race-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.18);
-        }
-
-        .race-card:nth-child(1) .card-header {
-            background: var(--card-gradient-1);
-        }
-        
-        .race-card:nth-child(2) .card-header {
-            background: var(--card-gradient-2);
-        }
-        
-        .race-card:nth-child(3) .card-header {
-            background: var(--card-gradient-3);
-        }
-        
-        .race-card:nth-child(4) .card-header {
-            background: var(--card-gradient-4);
-        }
-        
-        .race-card:nth-child(5) .card-header {
-            background: var(--card-gradient-5);
+        .race-card:active {
+            transform: translateY(2px);
+            box-shadow: var(--shadow-sm);
         }
 
         .card-header {
-            padding: 35px;
+            padding: 20px 15px;
             color: white;
             position: relative;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
-        .card-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.2));
-        }
-
-        .race-info {
-            position: relative;
-            z-index: 1;
-        }
+        .card-header.gradient-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-header.gradient-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .card-header.gradient-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .card-header.gradient-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .card-header.gradient-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
 
         .race-info h2 {
-            margin: 0;
-            font-size: 1.9rem;
-            color: white;
-            font-weight: 800;
-            margin-bottom: 10px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 5px;
             line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .race-info p {
-            margin: 0;
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.95);
+            font-size: 0.9rem;
+            opacity: 0.95;
             font-weight: 400;
         }
 
         .card-content {
-            padding: 35px;
+            padding: 20px 15px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -276,37 +222,68 @@
 
         .card-actions {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-copy-race {
+            background: rgba(57, 73, 171, 0.08);
+            color: var(--accent-color);
+            padding: 12px 16px;
+            border-radius: var(--border-radius-md);
+            font-size: 0.95rem;
+            border: 1px solid rgba(57, 73, 171, 0.15);
+            display: flex;
             align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 44px;
+            font-weight: 600;
+        }
+
+        .btn-copy-race:active {
+            background: rgba(57, 73, 171, 0.15);
+        }
+
+        .btn-copy-race.copied {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
         }
 
         .race-link {
             text-decoration: none;
             color: var(--accent-color);
-            font-weight: 800;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 12px;
-            transition: all 0.3s;
-            padding: 12px 0;
-            font-size: 1.2rem;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 16px;
+            border-radius: var(--border-radius-md);
+            background: rgba(57, 73, 171, 0.05);
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+            min-height: 44px;
         }
 
-        .race-link:hover {
-            color: var(--primary-color);
-            gap: 18px;
+        .race-link:active {
+            background: rgba(57, 73, 171, 0.1);
         }
 
         .arrow {
-            font-size: 1.5rem;
-            transition: transform 0.3s;
-            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.2s;
+            font-weight: 800;
         }
 
-        .race-link:hover .arrow {
-            transform: translateX(8px);
+        .race-link:active .arrow {
+            transform: translateX(3px);
         }
 
+        /* MODAL MOBILE-FRIENDLY */
         .edit-modal {
             display: none;
             position: fixed;
@@ -314,25 +291,30 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.85);
             z-index: 1000;
             justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
+            align-items: flex-start;
+            padding: 20px 15px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            backdrop-filter: blur(8px);
         }
 
         .modal-content {
-            background-color: white;
-            padding: 40px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 600px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-            animation: modalAppear 0.3s ease;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius-xl);
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            animation: modalSlideUp 0.3s ease-out;
+            margin: auto 0;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
-        @keyframes modalAppear {
-            from { opacity: 0; transform: translateY(-30px); }
+        @keyframes modalSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -340,239 +322,455 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            padding: 20px;
             border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            background: var(--card-bg);
+            border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
+            z-index: 1;
         }
 
         .modal-title {
             color: var(--primary-color);
-            font-size: 1.8rem;
-            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-weight: 800;
+            gap: 10px;
         }
 
         .close-modal {
             background: none;
             border: none;
-            font-size: 2rem;
-            color: #999;
+            font-size: 1.8rem;
+            color: #777;
             cursor: pointer;
-            transition: color 0.3s;
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
+            transition: background 0.2s;
         }
 
-        .close-modal:hover {
-            color: var(--primary-color);
-            background-color: #f5f5f5;
+        .close-modal:active {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .modal-body {
+            padding: 20px;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 700;
-            color: var(--primary-color);
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 1.1rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 0.95rem;
         }
 
         .form-group label i {
             color: var(--accent-color);
+            width: 20px;
         }
 
         .form-group input {
             width: 100%;
-            padding: 16px 20px;
+            padding: 14px 16px;
             border: 1px solid #ddd;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            box-sizing: border-box;
-            transition: all 0.3s;
+            border-radius: var(--border-radius-md);
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            transition: all 0.2s;
+            background: #f8f9fa;
         }
 
         .form-group input:focus {
             outline: none;
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 4px rgba(57, 73, 171, 0.15);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.15);
         }
 
         .modal-actions {
             display: flex;
-            justify-content: flex-end;
-            gap: 20px;
-            margin-top: 35px;
+            gap: 12px;
+            padding: 20px;
+            border-top: 1px solid #eee;
+            background: #f8f9fa;
+            border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
+        }
+
+        .modal-actions .btn {
+            flex: 1;
         }
 
         .btn-cancel {
-            background-color: #f1f1f1;
-            color: #333;
-            font-weight: 700;
+            background: #95a5a6;
         }
 
         .btn-save {
-            background: linear-gradient(135deg, var(--success-color), #66bb6a);
-            font-weight: 700;
+            background: linear-gradient(135deg, var(--success-color), #2ecc71);
         }
 
+        /* NOTIFICA MOBILE */
         .notification {
             position: fixed;
-            bottom: 40px;
-            right: 40px;
-            padding: 20px 30px;
-            background-color: var(--success-color);
+            bottom: 20px;
+            right: 15px;
+            left: 15px;
+            padding: 16px;
+            background: var(--success-color);
             color: white;
-            border-radius: 12px;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
             display: none;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             z-index: 1001;
-            animation: slideIn 0.4s ease;
-            max-width: 400px;
+            animation: slideInRight 0.3s ease;
+            max-width: 100%;
+            word-wrap: break-word;
         }
 
-        @keyframes slideIn {
+        @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
 
         .notification i {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
+            flex-shrink: 0;
         }
 
         .notification-text {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-
-        footer {
-            margin-top: 40px;
-            text-align: center;
-            font-size: 1rem;
-            color: #666;
-            padding: 25px;
-            width: 100%;
-        }
-
-        footer p {
-            margin: 0;
+            flex-grow: 1;
             font-weight: 500;
+            font-size: 0.95rem;
+            line-height: 1.4;
         }
 
-        @media (max-width: 768px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .controls {
-                justify-content: center;
-            }
-            
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            h1 {
-                font-size: 2.2rem;
-            }
-            
-            .subtitle {
-                font-size: 1.1rem;
-            }
-            
-            .logo-full-width {
-                max-height: 140px;
-            }
-            
-            .card-actions {
-                flex-direction: column;
-                gap: 20px;
-                align-items: stretch;
-            }
-            
-            .btn-copy-race, .race-link {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .race-info h2 {
-                font-size: 1.6rem;
-            }
-            
-            .modal-content {
-                padding: 25px;
-            }
-            
-            .header-top {
-                padding: 30px 20px;
-            }
-            
-            .header-logo-section {
-                padding: 30px 15px;
-            }
+        /* FOOTER ADATTIVO */
+        .app-footer {
+            text-align: center;
+            padding: 20px 15px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+            background: white;
+            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
         }
 
-        @media (max-width: 480px) {
-            .container {
+        /* ORIENTAMENTO ORIZZONTALE SU MOBILE */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .app-header {
+                margin-bottom: 10px;
+            }
+            
+            .header-content {
                 padding: 15px;
             }
             
-            h1 {
-                font-size: 1.8rem;
+            .logo-full-width {
+                max-height: 60px;
             }
             
-            .subtitle {
-                font-size: 1rem;
+            .app-title {
+                font-size: 1.5rem;
+                margin-bottom: 5px;
             }
             
-            .race-info h2 {
-                font-size: 1.4rem;
+            .app-subtitle {
+                font-size: 0.85rem;
+            }
+            
+            .controls-section {
+                padding: 12px;
+                margin-bottom: 15px;
+            }
+            
+            .races-grid {
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+            
+            .race-card {
+                min-height: 150px;
+            }
+        }
+
+        /* TABLET (768px+) */
+        @media (min-width: 768px) {
+            .container {
+                padding: 0 25px;
+                max-width: 1200px;
+            }
+            
+            body {
+                font-size: 15px;
+            }
+            
+            .app-header {
+                margin-bottom: 30px;
+                border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
+            }
+            
+            .header-content {
+                padding: 30px 25px;
+            }
+            
+            .logo-container {
+                margin-bottom: 20px;
             }
             
             .logo-full-width {
+                max-width: 350px;
+                max-height: 100px;
+            }
+            
+            .app-title {
+                font-size: 2.2rem;
+                margin-bottom: 10px;
+            }
+            
+            .app-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .controls-section {
+                padding: 20px;
+                margin-bottom: 30px;
+                justify-content: flex-end;
+            }
+            
+            .btn {
+                padding: 16px 25px;
+                font-size: 16px;
+                flex: none;
+            }
+            
+            .races-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+            
+            .race-card {
+                min-height: 200px;
+            }
+            
+            .card-header {
+                padding: 25px 20px;
+            }
+            
+            .race-info h2 {
+                font-size: 1.5rem;
+            }
+            
+            .card-content {
+                padding: 25px 20px;
+            }
+            
+            .card-actions {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+            
+            .btn-copy-race, .race-link {
+                flex: 1;
+                max-width: 48%;
+            }
+            
+            .edit-modal {
+                padding: 40px 20px;
+                align-items: center;
+            }
+            
+            .notification {
+                right: 25px;
+                left: auto;
+                max-width: 400px;
+            }
+        }
+
+        /* DESKTOP (1024px+) */
+        @media (min-width: 1024px) {
+            .races-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 25px;
+            }
+            
+            .app-title {
+                font-size: 2.5rem;
+            }
+            
+            .race-card:hover {
+                transform: translateY(-8px);
+                box-shadow: var(--shadow-lg);
+            }
+            
+            .race-card:hover .arrow {
+                transform: translateX(5px);
+            }
+            
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+            
+            .btn-copy-race:hover {
+                background: rgba(57, 73, 171, 0.1);
+            }
+            
+            .race-link:hover {
+                background: rgba(57, 73, 171, 0.08);
+            }
+            
+            .close-modal:hover {
+                background: rgba(0,0,0,0.05);
+            }
+            
+            .btn:active {
+                transform: translateY(1px);
+            }
+            
+            .race-card:active {
+                transform: translateY(2px);
+            }
+        }
+
+        /* GRANDI DESKTOP (1200px+) */
+        @media (min-width: 1200px) {
+            .container {
+                padding: 0 40px;
+            }
+            
+            .races-grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 30px;
+            }
+            
+            .app-header {
+                margin-bottom: 40px;
+            }
+            
+            .header-content {
+                padding: 40px;
+            }
+            
+            .logo-full-width {
+                max-width: 400px;
                 max-height: 120px;
             }
+        }
+
+        /* DARK MODE SUPPORT */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --text-color: #e0e0e0;
+                --card-bg: #1e1e1e;
+                --primary-color: #7986cb;
+                --secondary-color: #5c6bc0;
+                --accent-color: #3f51b5;
+            }
+            
+            body {
+                background-color: var(--bg-color);
+                color: var(--text-color);
+            }
+            
+            .controls-section,
+            .race-card,
+            .modal-content,
+            .app-footer {
+                background-color: var(--card-bg);
+            }
+            
+            .form-group input {
+                background: #2d2d2d;
+                border-color: #444;
+                color: var(--text-color);
+            }
+            
+            .form-group input:focus {
+                background: #333;
+            }
+            
+            .modal-actions {
+                background: #2d2d2d;
+            }
+            
+            .modal-header,
+            .modal-actions {
+                border-color: #444;
+            }
+        }
+
+        /* GESTIONE IPHONE NOTCH/SAFE AREA */
+        @supports(padding: max(0px)) {
+            .container {
+                padding-left: max(15px, env(safe-area-inset-left));
+                padding-right: max(15px, env(safe-area-inset-right));
+            }
+            
+            .app-header {
+                padding-top: env(safe-area-inset-top);
+            }
+        }
+
+        /* LOADING STATE */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        /* ANIMAZIONI PER PERFORMANCE */
+        .race-card,
+        .btn,
+        .modal-content {
+            will-change: transform;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- HEADER MODIFICATO CON LOGO A LARGHEZZA PAGINA -->
-        <div class="header-container">
-            <div class="header-top">
-                <h1>Pannello Gestione Gare</h1>
-                <p class="subtitle">Gestisci tutte le gare dalla stessa dashboard</p>
+    <!-- HEADER COMPATTO -->
+    <header class="app-header">
+        <div class="header-top-bar"></div>
+        <div class="header-content">
+            <div class="logo-container">
+                <img src="logo.png" alt="Logo" class="logo-full-width" 
+                     onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 30\"><rect width=\"100\" height=\"30\" rx=\"5\" fill=\"%231a237e\"/><text x=\"50\" y=\"18\" font-family=\"Arial\" font-size=\"12\" fill=\"white\" text-anchor=\"middle\">LOGO</text></svg>'">
             </div>
-            <div class="header-logo-section">
-                <img src="logo.png" alt="Logo" class="logo-full-width" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1995/1995515.png'">
-            </div>
+            <h1 class="app-title">Pannello Gestione Gare</h1>
+            <p class="app-subtitle">Gestisci tutte le gare dalla stessa dashboard</p>
         </div>
+    </header>
 
-        <div class="controls">
+    <!-- CONTENUTO PRINCIPALE -->
+    <main class="container">
+        <!-- CONTROLLI -->
+        <section class="controls-section">
             <button class="btn btn-edit" id="edit-titles-btn">
-                <i class="fas fa-edit"></i> Modifica Titoli Gare
+                <i class="fas fa-edit"></i> Modifica Titoli
             </button>
-        </div>
+        </section>
 
-        <main class="grid">
-            <div class="race-card">
-                <div class="card-header">
+        <!-- GRIGLIA GARE -->
+        <section class="races-grid">
+            <!-- GARA 1 -->
+            <article class="race-card">
+                <div class="card-header gradient-1">
                     <div class="race-info">
                         <h2 class="race-title">Gara 1: Circuito Cittadino</h2>
                         <p>Gestione iscrizioni e presenze</p>
@@ -585,14 +783,15 @@
                         </button>
                         <a href="gara1.html" class="race-link">
                             Vai alla Gestione
-                            <div class="arrow">→</div>
+                            <span class="arrow">→</span>
                         </a>
                     </div>
                 </div>
-            </div>
+            </article>
 
-            <div class="race-card">
-                <div class="card-header">
+            <!-- GARA 2 -->
+            <article class="race-card">
+                <div class="card-header gradient-2">
                     <div class="race-info">
                         <h2 class="race-title">Gara 2: Trail Montano</h2>
                         <p>Gestione iscrizioni e presenze</p>
@@ -605,14 +804,15 @@
                         </button>
                         <a href="gara2.html" class="race-link">
                             Vai alla Gestione
-                            <div class="arrow">→</div>
+                            <span class="arrow">→</span>
                         </a>
                     </div>
                 </div>
-            </div>
+            </article>
 
-            <div class="race-card">
-                <div class="card-header">
+            <!-- GARA 3 -->
+            <article class="race-card">
+                <div class="card-header gradient-3">
                     <div class="race-info">
                         <h2 class="race-title">Gara 3: Mezza Maratona</h2>
                         <p>Gestione iscrizioni e presenze</p>
@@ -625,14 +825,15 @@
                         </button>
                         <a href="gara3.html" class="race-link">
                             Vai alla Gestione
-                            <div class="arrow">→</div>
+                            <span class="arrow">→</span>
                         </a>
                     </div>
                 </div>
-            </div>
+            </article>
 
-            <div class="race-card">
-                <div class="card-header">
+            <!-- GARA 4 -->
+            <article class="race-card">
+                <div class="card-header gradient-4">
                     <div class="race-info">
                         <h2 class="race-title">Gara 4: Granfondo Ciclistica</h2>
                         <p>Gestione iscrizioni e presenze</p>
@@ -645,14 +846,15 @@
                         </button>
                         <a href="gara4.html" class="race-link">
                             Vai alla Gestione
-                            <div class="arrow">→</div>
+                            <span class="arrow">→</span>
                         </a>
                     </div>
                 </div>
-            </div>
+            </article>
 
-            <div class="race-card">
-                <div class="card-header">
+            <!-- GARA 5 -->
+            <article class="race-card">
+                <div class="card-header gradient-5">
                     <div class="race-info">
                         <h2 class="race-title">Gara 5: Duathlon Sprint</h2>
                         <p>Gestione iscrizioni e presenze</p>
@@ -665,84 +867,120 @@
                         </button>
                         <a href="gara5.html" class="race-link">
                             Vai alla Gestione
-                            <div class="arrow">→</div>
+                            <span class="arrow">→</span>
                         </a>
                     </div>
                 </div>
-            </div>
-        </main>
+            </article>
+        </section>
 
-        <footer>
-            <p>&copy; 2026 Sistema Gestione Gare | Versione 4.0</p>
+        <!-- FOOTER -->
+        <footer class="app-footer">
+            <p>&copy; 2026 Sistema Gestione Gare | Versione 4.0 Mobile</p>
         </footer>
-    </div>
+    </main>
 
-    <!-- Modal per la modifica dei titoli -->
+    <!-- MODAL MODIFICA TITOLI -->
     <div class="edit-modal" id="edit-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-edit"></i> Modifica Titoli Gare</h3>
                 <button class="close-modal" id="close-modal">&times;</button>
             </div>
-            <form id="edit-form">
-                <div class="form-group">
-                    <label for="title-1"><i class="fas fa-flag-checkered"></i> Titolo Gara 1:</label>
-                    <input type="text" id="title-1" class="title-input" data-index="1" value="Gara 1: Circuito Cittadino">
-                </div>
-                <div class="form-group">
-                    <label for="title-2"><i class="fas fa-mountain"></i> Titolo Gara 2:</label>
-                    <input type="text" id="title-2" class="title-input" data-index="2" value="Gara 2: Trail Montano">
-                </div>
-                <div class="form-group">
-                    <label for="title-3"><i class="fas fa-running"></i> Titolo Gara 3:</label>
-                    <input type="text" id="title-3" class="title-input" data-index="3" value="Gara 3: Mezza Maratona">
-                </div>
-                <div class="form-group">
-                    <label for="title-4"><i class="fas fa-bicycle"></i> Titolo Gara 4:</label>
-                    <input type="text" id="title-4" class="title-input" data-index="4" value="Gara 4: Granfondo Ciclistica">
-                </div>
-                <div class="form-group">
-                    <label for="title-5"><i class="fas fa-swimmer"></i> Titolo Gara 5:</label>
-                    <input type="text" id="title-5" class="title-input" data-index="5" value="Gara 5: Duathlon Sprint">
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-cancel" id="cancel-btn">Annulla</button>
-                    <button type="submit" class="btn btn-save">Salva Modifiche</button>
-                </div>
-            </form>
+            <div class="modal-body">
+                <form id="edit-form">
+                    <div class="form-group">
+                        <label for="title-1"><i class="fas fa-flag-checkered"></i> Titolo Gara 1:</label>
+                        <input type="text" id="title-1" class="title-input" data-index="1" value="Gara 1: Circuito Cittadino">
+                    </div>
+                    <div class="form-group">
+                        <label for="title-2"><i class="fas fa-mountain"></i> Titolo Gara 2:</label>
+                        <input type="text" id="title-2" class="title-input" data-index="2" value="Gara 2: Trail Montano">
+                    </div>
+                    <div class="form-group">
+                        <label for="title-3"><i class="fas fa-running"></i> Titolo Gara 3:</label>
+                        <input type="text" id="title-3" class="title-input" data-index="3" value="Gara 3: Mezza Maratona">
+                    </div>
+                    <div class="form-group">
+                        <label for="title-4"><i class="fas fa-bicycle"></i> Titolo Gara 4:</label>
+                        <input type="text" id="title-4" class="title-input" data-index="4" value="Gara 4: Granfondo Ciclistica">
+                    </div>
+                    <div class="form-group">
+                        <label for="title-5"><i class="fas fa-swimmer"></i> Titolo Gara 5:</label>
+                        <input type="text" id="title-5" class="title-input" data-index="5" value="Gara 5: Duathlon Sprint">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-cancel" id="cancel-btn">Annulla</button>
+                <button type="submit" class="btn btn-save" id="save-btn">Salva Modifiche</button>
+            </div>
         </div>
     </div>
 
-    <!-- Notifica -->
+    <!-- NOTIFICA -->
     <div class="notification" id="notification">
         <i class="fas fa-check-circle"></i>
         <span class="notification-text" id="notification-text">Operazione completata con successo!</span>
     </div>
 
     <script>
+        // RILEVA DISPOSITIVO MOBILE
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isAndroid = /Android/.test(navigator.userAgent);
+
+        // OTTIMIZZAZIONI PER DISPOSITIVI MOBILI
+        if (isMobile) {
+            // Aggiunge classe per gestione touch
+            document.body.classList.add('touch-device');
+            
+            // Previene lo zoom su doppio tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Copia link per ogni singola gara
+            // COPIA LINK CON FEEDBACK TATTILE
             const copyRaceButtons = document.querySelectorAll('.btn-copy-race');
             const notification = document.getElementById('notification');
             const notificationText = document.getElementById('notification-text');
             
             copyRaceButtons.forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', async function() {
                     const raceLink = this.getAttribute('data-link');
                     const baseUrl = window.location.origin + window.location.pathname;
                     const fullUrl = baseUrl.replace(/[^/]*$/, raceLink);
                     
-                    navigator.clipboard.writeText(fullUrl).then(() => {
-                        // Feedback visivo sul bottone cliccato
+                    try {
+                        await navigator.clipboard.writeText(fullUrl);
+                        
+                        // Feedback visivo immediato per mobile
                         const originalText = this.innerHTML;
-                        this.innerHTML = '<i class="fas fa-check"></i> Link Copiato!';
+                        this.innerHTML = '<i class="fas fa-check"></i> Copiato!';
                         this.classList.add('copied');
+                        
+                        // Vibrazione su dispositivi mobili (se supportata)
+                        if (navigator.vibrate) {
+                            navigator.vibrate(50);
+                        }
                         
                         // Notifica
                         const raceTitle = this.closest('.race-card').querySelector('.race-title').textContent;
-                        notificationText.textContent = `Link di "${raceTitle}" copiato!`;
-                        notification.style.backgroundColor = '#2196f3';
+                        notificationText.textContent = `Link di "${raceTitle}" copiato negli appunti!`;
+                        notification.style.backgroundColor = '#3498db';
                         notification.style.display = 'flex';
+                        
+                        // Scroll automatico per mostrare la notifica su mobile
+                        if (isMobile) {
+                            notification.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
                         
                         // Reset del bottone dopo 2 secondi
                         setTimeout(() => {
@@ -754,21 +992,32 @@
                         setTimeout(() => {
                             notification.style.display = 'none';
                         }, 3000);
-                    });
+                        
+                    } catch (err) {
+                        // Fallback per browser che non supportano clipboard API
+                        notificationText.textContent = 'Errore nella copia del link. Prova a selezionarlo manualmente.';
+                        notification.style.backgroundColor = '#e74c3c';
+                        notification.style.display = 'flex';
+                        
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                        }, 3000);
+                    }
                 });
             });
             
-            // Sistema per modificare i titoli
+            // SISTEMA PER MODIFICARE I TITOLI
             const editBtn = document.getElementById('edit-titles-btn');
             const editModal = document.getElementById('edit-modal');
             const closeModal = document.getElementById('close-modal');
             const cancelBtn = document.getElementById('cancel-btn');
+            const saveBtn = document.getElementById('save-btn');
             const editForm = document.getElementById('edit-form');
             
-            // Carica i titoli salvati se presenti
+            // Carica i titoli salvati
             loadSavedTitles();
             
-            // Apre il modal di modifica
+            // APRE IL MODAL DI MODIFICA
             editBtn.addEventListener('click', function() {
                 // Popola i campi con i valori correnti
                 const raceCards = document.querySelectorAll('.race-card');
@@ -779,45 +1028,68 @@
                 });
                 
                 editModal.style.display = 'flex';
-            });
-            
-            // Chiude il modal
-            closeModal.addEventListener('click', function() {
-                editModal.style.display = 'none';
-            });
-            
-            cancelBtn.addEventListener('click', function() {
-                editModal.style.display = 'none';
-            });
-            
-            // Chiude il modal cliccando fuori dal contenuto
-            editModal.addEventListener('click', function(e) {
-                if (e.target === editModal) {
-                    editModal.style.display = 'none';
+                
+                // Focus sul primo campo su mobile
+                if (isMobile) {
+                    setTimeout(() => {
+                        document.getElementById('title-1').focus();
+                    }, 300);
                 }
             });
             
-            // Salva le modifiche
-            editForm.addEventListener('submit', function(e) {
+            // CHIUSURA MODAL
+            function closeEditModal() {
+                editModal.style.display = 'none';
+                // Rimuove il focus per evitare problemi con la tastiera virtuale su mobile
+                if (document.activeElement && document.activeElement.blur) {
+                    document.activeElement.blur();
+                }
+            }
+            
+            closeModal.addEventListener('click', closeEditModal);
+            cancelBtn.addEventListener('click', closeEditModal);
+            
+            // CHIUSURA MODAL CLICCANDO FUORI O CON ESC
+            editModal.addEventListener('click', function(e) {
+                if (e.target === editModal) {
+                    closeEditModal();
+                }
+            });
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && editModal.style.display === 'flex') {
+                    closeEditModal();
+                }
+            });
+            
+            // SALVA LE MODIFICHE
+            saveBtn.addEventListener('click', function(e) {
                 e.preventDefault();
                 
                 // Aggiorna i titoli nelle card
                 const titleInputs = document.querySelectorAll('.title-input');
                 titleInputs.forEach(input => {
                     const index = input.getAttribute('data-index');
-                    const newTitle = input.value;
-                    const raceTitle = document.querySelector(`.race-card:nth-child(${index}) .race-title`);
+                    const newTitle = input.value.trim();
                     
-                    if (raceTitle) {
-                        raceTitle.textContent = newTitle;
-                        // Salva nel localStorage
-                        localStorage.setItem(`race-title-${index}`, newTitle);
+                    if (newTitle) {
+                        const raceCard = document.querySelector(`.race-card:nth-child(${index}) .race-title`);
+                        if (raceCard) {
+                            raceCard.textContent = newTitle;
+                            // Salva nel localStorage
+                            localStorage.setItem(`race-title-${index}`, newTitle);
+                        }
                     }
                 });
                 
-                // Mostra notifica di successo
-                notificationText.textContent = 'Titoli delle gare aggiornati con successo!';
-                notification.style.backgroundColor = '#4caf50';
+                // Feedback tattile
+                if (navigator.vibrate) {
+                    navigator.vibrate([50, 30, 50]);
+                }
+                
+                // Notifica di successo
+                notificationText.textContent = 'Titoli aggiornati con successo!';
+                notification.style.backgroundColor = '#27ae60';
                 notification.style.display = 'flex';
                 
                 setTimeout(() => {
@@ -825,10 +1097,16 @@
                 }, 3000);
                 
                 // Chiude il modal
-                editModal.style.display = 'none';
+                closeEditModal();
             });
             
-            // Funzione per caricare i titoli salvati
+            // FORM SUBMIT PER ENTER
+            editForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveBtn.click();
+            });
+            
+            // FUNZIONE PER CARICARE I TITOLI SALVATI
             function loadSavedTitles() {
                 for (let i = 1; i <= 5; i++) {
                     const savedTitle = localStorage.getItem(`race-title-${i}`);
@@ -841,32 +1119,41 @@
                 }
             }
             
-            // Aggiunge un effetto di hover più pronunciato per i dispositivi touch
-            if ('ontouchstart' in window) {
-                const raceCards = document.querySelectorAll('.race-card');
-                raceCards.forEach(card => {
-                    card.addEventListener('touchstart', function() {
-                        this.style.transform = 'translateY(-4px)';
-                    });
-                    
-                    card.addEventListener('touchend', function() {
-                        this.style.transform = '';
-                    });
-                });
+            // GESTIONE SCROLL SU IOS PER EVITARE BOUNCE
+            if (isIOS) {
+                document.body.style.webkitOverflowScrolling = 'touch';
+                document.body.style.height = '100%';
+                document.body.style.overflow = 'hidden';
+                
+                setTimeout(() => {
+                    document.body.style.overflow = 'auto';
+                }, 500);
             }
             
-            // Aggiunge un effetto di focus per i pulsanti
-            const allButtons = document.querySelectorAll('button, .race-link');
-            allButtons.forEach(button => {
-                button.addEventListener('focus', function() {
-                    this.style.outline = '2px solid var(--accent-color)';
-                    this.style.outlineOffset = '2px';
-                });
-                
-                button.addEventListener('blur', function() {
-                    this.style.outline = 'none';
-                });
+            // PREVENZIONE SCROLL SU MODAL APERTO SU IOS
+            editModal.addEventListener('touchmove', function(e) {
+                if (editModal.style.display === 'flex') {
+                    e.stopPropagation();
+                }
+            }, { passive: false });
+            
+            // MIGLIORAMENTO PERFORMANCE SU SCROLL
+            let ticking = false;
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    window.requestAnimationFrame(function() {
+                        // Eventuali ottimizzazioni durante lo scroll
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
             });
+            
+            // LAZY LOAD PER IMMAGINI FUTURE
+            const logoImg = document.querySelector('.logo-full-width');
+            if (logoImg) {
+                logoImg.loading = 'lazy';
+            }
         });
     </script>
 </body>
