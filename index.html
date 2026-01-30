@@ -6,6 +6,7 @@
     <title>Dashboard - Gestione Gare</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
+        /* Stili identici alla versione precedente */
         :root {
             --primary-color: #2c3e50;
             --secondary-color: #3498db;
@@ -75,15 +76,20 @@
             margin-top: 8px;
         }
 
-        .debug-info {
+        .simple-instruction {
             background: #e8f4fc;
             border-left: 4px solid var(--secondary-color);
-            padding: 12px 15px;
+            padding: 15px;
             border-radius: 6px;
             margin: 15px 0;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+        }
+
+        .simple-instruction code {
+            background: #e3f2fd;
+            padding: 2px 6px;
+            border-radius: 4px;
             font-family: monospace;
-            word-break: break-all;
         }
 
         .grid {
@@ -214,20 +220,6 @@
             border-top: 1px solid #e2e8f0;
         }
 
-        .refresh-btn {
-            background: var(--secondary-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin-top: 10px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -277,242 +269,81 @@
                 <div class="logo-placeholder">GG</div>
                 <div>
                     <h1>Dashboard Gestione Gare</h1>
-                    <p class="subtitle">Titoli letti direttamente dai file HTML</p>
+                    <p class="subtitle">Versione semplificata con titoli manuali</p>
                 </div>
             </div>
             
-            <div class="debug-info" id="debugInfo">
-                Caricamento in corso...
+            <div class="simple-instruction">
+                <strong>⚠️ Istruzione IMPORTANTE:</strong><br>
+                Modifica i titoli direttamente nel codice qui sotto (righe 240-244).<br>
+                Cerca: <code>const MANUAL_TITLES = { ... }</code> e cambia i titoli a tuo piacimento.
             </div>
         </header>
 
         <main class="grid" id="gare-grid">
-            <!-- Le card verranno generate dinamicamente -->
+            <!-- Le card verranno generate qui -->
         </main>
 
         <footer>
-            &copy; 2026 Sistema Gestione Gare 
-            <div style="margin-top: 10px;">
-                <button class="refresh-btn" onclick="loadAllGare()">
-                    🔄 Ricarica Tutto
-                </button>
-                <button class="refresh-btn" onclick="showManualEdit()" style="background: var(--warning-color); margin-left: 10px;">
-                    ✏️ Modifica Manuale
-                </button>
-            </div>
+            &copy; 2026 Sistema Gestione Gare<br>
+            <small>Per aggiornare i titoli, modifica il codice JavaScript di questa pagina</small>
         </footer>
-    </div>
-
-    <!-- Modal per modifica manuale -->
-    <div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
-        <div style="background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px;">
-            <h3 style="margin-top: 0;">✏️ Modifica Manuale Titoli</h3>
-            <div id="editForm"></div>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="saveManualEdits()" style="background: var(--success-color); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
-                    Salva
-                </button>
-                <button onclick="hideEditModal()" style="background: var(--error-color); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
-                    Annulla
-                </button>
-            </div>
-        </div>
     </div>
 
     <div class="toast" id="toast"></div>
 
     <script>
-        // Configurazione delle gare
+        // ⚠️ MODIFICA QUI I TITOLI MANUALMENTE ⚠️
+        // Cambia questi titoli con quelli reali delle tue pagine
+        const MANUAL_TITLES = {
+            'gara1.html': 'Gran Premio Nazionale',
+            'gara2.html': 'Campionati Italiani Indoor',
+            'gara3.html': 'Maratona Cittadina',
+            'gara4.html': 'Coppa Regionale Under 23',
+            'gara5.html': 'Torneo Giovanile Estivo'
+        };
+
+        // Configurazione colori
         const GARE_CONFIG = [
-            { id: 1, file: 'gara1.html', color: '#3498db', defaultTitle: 'Gara 1' },
-            { id: 2, file: 'gara2.html', color: '#27ae60', defaultTitle: 'Gara 2' },
-            { id: 3, file: 'gara3.html', color: '#e74c3c', defaultTitle: 'Gara 3' },
-            { id: 4, file: 'gara4.html', color: '#f39c12', defaultTitle: 'Gara 4' },
-            { id: 5, file: 'gara5.html', color: '#9b59b6', defaultTitle: 'Gara 5' }
+            { id: 1, file: 'gara1.html', color: '#3498db' },
+            { id: 2, file: 'gara2.html', color: '#27ae60' },
+            { id: 3, file: 'gara3.html', color: '#e74c3c' },
+            { id: 4, file: 'gara4.html', color: '#f39c12' },
+            { id: 5, file: 'gara5.html', color: '#9b59b6' }
         ];
 
-        // Stato delle gare
-        let currentGare = [...GARE_CONFIG];
-
-        // Aggiorna informazioni di debug
-        function updateDebugInfo(message) {
-            document.getElementById('debugInfo').textContent = message;
+        // Funzione per ottenere il titolo (usa manuale come fallback)
+        function getTitleForFile(file) {
+            return MANUAL_TITLES[file] || 'Gara ' + file.charAt(4); // "gara1.html" -> "Gara 1"
         }
 
-        // Versione SEMPLICE - Legge i titoli in modo diretto
-        async function tryLoadTitle(file) {
-            updateDebugInfo(`Provando a leggere: ${file}`);
-            
-            try {
-                // Prova a fare una semplice richiesta fetch al file
-                const response = await fetch(file, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'text/html',
-                        'Cache-Control': 'no-cache'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const html = await response.text();
-                
-                // Cerca il titolo con regex più flessibile
-                const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-                if (titleMatch && titleMatch[1]) {
-                    return titleMatch[1].trim();
-                }
-                
-                // Cerca anche h1 come fallback
-                const h1Match = html.match(/<h1[^>]*>([^<]+)<\/h1>/i);
-                if (h1Match && h1Match[1]) {
-                    return h1Match[1].trim();
-                }
-                
-                return null;
-            } catch (error) {
-                console.log(`Errore lettura ${file}:`, error.message);
-                return null;
-            }
-        }
-
-        // Carica tutte le gare
-        async function loadAllGare() {
-            updateDebugInfo('Inizio caricamento gare...');
+        // Crea tutte le card
+        function createAllCards() {
             const grid = document.getElementById('gare-grid');
             grid.innerHTML = '';
             
-            // Per ogni gara, prova a leggere il titolo
-            for (const gara of currentGare) {
-                updateDebugInfo(`Caricamento: ${gara.file}`);
+            GARE_CONFIG.forEach(gara => {
+                const title = getTitleForFile(gara.file);
+                const container = document.createElement('div');
+                container.className = 'race-card-container';
                 
-                // Crea card temporanea con titolo di default
-                let title = gara.defaultTitle;
-                
-                // Prova a leggere il titolo reale
-                const realTitle = await tryLoadTitle(gara.file);
-                if (realTitle) {
-                    title = realTitle;
-                    // Salva il titolo trovato
-                    gara.title = title;
-                }
-                
-                // Crea la card
-                const card = createRaceCard(gara, title);
-                grid.appendChild(card);
-            }
-            
-            updateDebugInfo('Caricamento completato!');
-            setupCardEventListeners();
-            showToast('Dashboard aggiornata!');
-        }
-
-        // Crea una card gara
-        function createRaceCard(gara, title) {
-            const container = document.createElement('div');
-            container.className = 'race-card-container';
-            
-            const displayTitle = title || gara.defaultTitle;
-            
-            container.innerHTML = `
-                <a href="${gara.file}" class="race-card" data-link="${gara.file}" data-title="${displayTitle}" style="border-left-color: ${gara.color}">
-                    <div class="race-info">
-                        <h2>${displayTitle}</h2>
-                        <p>Gestione iscrizioni e presenze per ${displayTitle}</p>
-                    </div>
-                    <div class="arrow">→</div>
-                </a>
-                <button class="copy-link-btn" onclick="copyFullLink(this, '${gara.file}')" title="Copia link completo">
-                    📋 Copia Link
-                </button>
-            `;
-            
-            return container;
-        }
-
-        // Mostra modal per modifica manuale
-        function showManualEdit() {
-            const modal = document.getElementById('editModal');
-            const form = document.getElementById('editForm');
-            
-            let formHTML = '<p style="margin-bottom: 15px;">Se i titoli non si caricano automaticamente, puoi modificarli manualmente:</p>';
-            
-            currentGare.forEach((gara, index) => {
-                const currentTitle = gara.title || gara.defaultTitle;
-                formHTML += `
-                    <div style="margin-bottom: 10px;">
-                        <label style="display: block; margin-bottom: 5px; font-weight: 600;">
-                            ${gara.file}:
-                        </label>
-                        <input type="text" 
-                               id="edit-${gara.id}" 
-                               value="${currentTitle}"
-                               style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
-                               placeholder="Inserisci il titolo per ${gara.file}">
-                    </div>
+                container.innerHTML = `
+                    <a href="${gara.file}" class="race-card" data-link="${gara.file}" data-title="${title}" style="border-left-color: ${gara.color}">
+                        <div class="race-info">
+                            <h2>${title}</h2>
+                            <p>Gestione iscrizioni e presenze per ${title}</p>
+                        </div>
+                        <div class="arrow">→</div>
+                    </a>
+                    <button class="copy-link-btn" onclick="copyFullLink(this, '${gara.file}')" title="Copia link completo">
+                        📋 Copia Link
+                    </button>
                 `;
-            });
-            
-            form.innerHTML = formHTML;
-            modal.style.display = 'flex';
-        }
-
-        // Nascondi modal
-        function hideEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-        }
-
-        // Salva modifiche manuali
-        function saveManualEdits() {
-            currentGare.forEach(gara => {
-                const input = document.getElementById(`edit-${gara.id}`);
-                if (input && input.value.trim()) {
-                    gara.title = input.value.trim();
-                }
-            });
-            
-            // Salva nel localStorage
-            localStorage.setItem('manualGareTitles', JSON.stringify(currentGare));
-            
-            // Ricarica la griglia
-            reloadGrid();
-            hideEditModal();
-            showToast('Titoli salvati manualmente!');
-        }
-
-        // Ricarica la griglia con i titoli correnti
-        function reloadGrid() {
-            const grid = document.getElementById('gare-grid');
-            grid.innerHTML = '';
-            
-            currentGare.forEach(gara => {
-                const title = gara.title || gara.defaultTitle;
-                const card = createRaceCard(gara, title);
-                grid.appendChild(card);
+                
+                grid.appendChild(container);
             });
             
             setupCardEventListeners();
-        }
-
-        // Carica titoli salvati manualmente
-        function loadManualTitles() {
-            const saved = localStorage.getItem('manualGareTitles');
-            if (saved) {
-                try {
-                    const savedGare = JSON.parse(saved);
-                    // Mantieni la struttura ma aggiorna i titoli
-                    savedGare.forEach(savedGara => {
-                        const existingGara = currentGare.find(g => g.id === savedGara.id);
-                        if (existingGara && savedGara.title) {
-                            existingGara.title = savedGara.title;
-                        }
-                    });
-                } catch (e) {
-                    console.log('Errore nel caricamento dei titoli salvati:', e);
-                }
-            }
         }
 
         // Mostra toast
@@ -530,7 +361,6 @@
         function copyFullLink(button, filePath) {
             event.stopPropagation();
             
-            // Ottieni URL completo
             const currentUrl = window.location.href;
             const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
             const fullUrl = baseUrl + filePath;
@@ -596,18 +426,9 @@
         }
 
         // Inizializza
-        document.addEventListener('DOMContentLoaded', async () => {
-            updateDebugInfo('Dashboard inizializzata...');
-            
-            // Carica titoli salvati manualmente
-            loadManualTitles();
-            
-            // Prova a caricare i titoli dai file
-            await loadAllGare();
-            
-            // Mostra informazioni utili in debug
-            const debugMsg = `URL corrente: ${window.location.href}\n`;
-            updateDebugInfo(debugMsg + 'Pronto! Usa "Modifica Manuale" se i titoli non si caricano.');
+        document.addEventListener('DOMContentLoaded', () => {
+            createAllCards();
+            showToast('Dashboard caricata! Modifica i titli nel codice se necessario.');
         });
     </script>
 </body>
