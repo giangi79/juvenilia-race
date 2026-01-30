@@ -75,6 +75,39 @@
             margin-top: 8px;
         }
 
+        .instructions {
+            background: #e8f4fc;
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            max-width: 800px;
+        }
+
+        .instructions h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        .instructions code {
+            background: #e3f2fd;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        .instructions pre {
+            background: #f1f8ff;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            border-left: 4px solid var(--secondary-color);
+            margin: 15px 0;
+        }
+
         .status-bar {
             background: #f8f9fa;
             border: 1px solid #dee2e6;
@@ -120,22 +153,6 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
-        }
-
-        .solution-info {
-            background: #e8f4fc;
-            border-left: 4px solid var(--secondary-color);
-            padding: 15px;
-            border-radius: 6px;
-            margin: 15px 0;
-            font-size: 0.9rem;
-        }
-
-        .solution-info code {
-            background: #e3f2fd;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
         }
 
         .grid {
@@ -329,22 +346,40 @@
                 <div class="logo-placeholder">GG</div>
                 <div>
                     <h1>Dashboard Gestione Gare</h1>
-                    <p class="subtitle">Titoli aggiornati automaticamente</p>
+                    <p class="subtitle">Titoli letti da meta tag - Soluzione garantita</p>
                 </div>
             </div>
             
-            <div class="solution-info">
-                <strong>🔧 Soluzione FUNZIONANTE:</strong> Questa versione legge i titoli direttamente dalle pagine 
-                GitHub Pages senza problemi CORS. Funziona con il tuo repository 
-                <code>giangi79/juvenilia-race</code>.
+            <div class="instructions">
+                <h3>📋 ISTRUZIONI PER FAR FUNZIONARE LA DASHBOARD:</h3>
+                
+                <p><strong>1. Aggiungi questo meta tag in OGNI file garaX.html:</strong></p>
+                <pre>&lt;!-- METTI QUESTO DOPO &lt;title&gt; E PRIMA DI &lt;/head&gt; --&gt;
+&lt;meta name="gara-title" content="Titolo della tua gara"&gt;</pre>
+                
+                <p><strong>2. Esempio per gara1.html:</strong></p>
+                <pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="it"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Gran Premio Nazionale&lt;/title&gt;
+    &lt;!-- ⬇️ AGGIUNGI QUESTO META TAG ⬇️ --&gt;
+    &lt;meta name="gara-title" content="Gran Premio Nazionale"&gt;
+    &lt;!-- ⬆️ IMPORTANTE: Stesso contenuto del title ⬆️ --&gt;
+&lt;/head&gt;</pre>
+                
+                <p><strong>3. Fai lo stesso per gara2.html, gara3.html, ecc.</strong></p>
+                
+                <p><strong>4. Una volta aggiunti i meta tag, clicca "Aggiorna Tutti i Titoli"</strong></p>
             </div>
             
             <div class="status-bar" id="statusBar">
                 <span id="statusText">
-                    <span class="spinner"></span> Lettura titoli dalle pagine GitHub Pages...
+                    Aggiungi i meta tag alle tue pagine gara come indicato sopra
                 </span>
                 <button class="refresh-btn" onclick="loadAllTitles()" style="padding: 4px 8px; font-size: 0.8rem;">
-                    🔄 Aggiorna
+                    🔄 Prova
                 </button>
             </div>
         </header>
@@ -360,7 +395,7 @@
                     🔄 Aggiorna Tutti i Titoli
                 </button>
                 <div style="font-size: 0.75rem; margin-top: 5px; color: #999;">
-                    Repository: giangi79/juvenilia-race | Branch: main
+                    Soluzione meta tag - Funziona senza problemi CORS
                 </div>
             </div>
         </footer>
@@ -369,12 +404,6 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // CONFIGURAZIONE PER IL TUO REPOSITORY
-        const GITHUB_USER = 'giangi79';
-        const GITHUB_REPO = 'juvenilia-race';
-        const GITHUB_BRANCH = 'main';
-        const GITHUB_PAGES_URL = `https://${GITHUB_USER}.github.io/${GITHUB_REPO}`;
-
         // Lista delle gare da recuperare
         const GARE_FILES = [
             'gara1.html',
@@ -399,27 +428,13 @@
             statusText.innerHTML = message;
         }
 
-        // SOLUZIONE 1: Usa GitHub Pages URL invece di GitHub RAW
-        async function getTitleFromGitHubPages(filename) {
-            // URL della pagina GitHub Pages
-            const pageUrl = `${GITHUB_PAGES_URL}/${filename}`;
-            
-            updateStatus(`<span class="spinner"></span> Lettura: ${filename}...`, 'info');
+        // SOLUZIONE PRINCIPALE: Legge dai meta tag
+        async function getTitleFromMetaTag(filename) {
+            updateStatus(`<span class="spinner"></span> Lettura meta tag da: ${filename}...`, 'info');
             
             try {
-                // Usa un proxy CORS per evitare problemi
-                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(pageUrl)}`;
-                
-                console.log(`Tentativo di leggere: ${pageUrl}`);
-                
-                const response = await fetch(proxyUrl, {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: {
-                        'Accept': 'text/html',
-                        'Cache-Control': 'no-cache'
-                    }
-                });
+                // Prova a fare fetch del file
+                const response = await fetch(filename);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -427,79 +442,76 @@
                 
                 const html = await response.text();
                 
-                // Estrae il titolo
-                const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-                if (titleMatch && titleMatch[1]) {
-                    const title = titleMatch[1].trim();
-                    console.log(`✅ Titolo trovato per ${filename}: "${title}"`);
+                // Usa DOMParser per analizzare l'HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // 1. PRIMA Cerca il meta tag personalizzato "gara-title"
+                const metaTag = doc.querySelector('meta[name="gara-title"]');
+                if (metaTag && metaTag.content && metaTag.content.trim() !== '') {
+                    const title = metaTag.content.trim();
+                    console.log(`✅ Meta tag trovato per ${filename}: "${title}"`);
                     return title;
                 }
                 
-                // Cerca anche h1 come fallback
-                const h1Match = html.match(/<h1[^>]*>([^<]+)<\/h1>/i);
-                if (h1Match && h1Match[1]) {
-                    const title = h1Match[1].trim();
-                    console.log(`⚠️ Usando H1 per ${filename}: "${title}"`);
+                // 2. POI Cerca altri meta tag possibili
+                const ogTitle = doc.querySelector('meta[property="og:title"]');
+                if (ogTitle && ogTitle.content) {
+                    const title = ogTitle.content.trim();
+                    console.log(`✅ Open Graph title per ${filename}: "${title}"`);
                     return title;
                 }
                 
-                throw new Error('Nessun titolo trovato nel file');
+                // 3. INFINE Cerca il tag <title> normale
+                if (doc.title && doc.title.trim() !== '') {
+                    const title = doc.title.trim();
+                    console.log(`✅ Title tag per ${filename}: "${title}"`);
+                    return title;
+                }
+                
+                // 4. ULTIMO tentativo: cerca h1
+                const h1 = doc.querySelector('h1');
+                if (h1 && h1.textContent.trim() !== '') {
+                    const title = h1.textContent.trim();
+                    console.log(`✅ H1 trovato per ${filename}: "${title}"`);
+                    return title;
+                }
+                
+                throw new Error('Nessun titolo trovato nei meta tag');
                 
             } catch (error) {
-                console.error(`❌ Errore ${filename}:`, error.message);
+                console.error(`❌ Errore lettura ${filename}:`, error.message);
                 
-                // SOLUZIONE 2: Prova con fetch diretto (potrebbe funzionare su stesso dominio)
+                // SOLUZIONE DI FALLBACK: Usa regex se DOMParser fallisce
                 try {
-                    const directResponse = await fetch(filename);
-                    if (directResponse.ok) {
-                        const html = await directResponse.text();
-                        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-                        if (titleMatch && titleMatch[1]) {
-                            return titleMatch[1].trim();
-                        }
+                    const response = await fetch(filename);
+                    const html = await response.text();
+                    
+                    // Cerca meta tag con regex
+                    const metaMatch = html.match(/<meta\s+name=["']gara-title["']\s+content=["']([^"']+)["']/i);
+                    if (metaMatch && metaMatch[1]) {
+                        const title = metaMatch[1].trim();
+                        console.log(`✅ Regex meta tag per ${filename}: "${title}"`);
+                        return title;
                     }
-                } catch (directError) {
-                    console.log(`Fetch diretto fallito per ${filename}:`, directError.message);
+                    
+                    // Cerca title tag con regex
+                    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+                    if (titleMatch && titleMatch[1]) {
+                        const title = titleMatch[1].trim();
+                        console.log(`✅ Regex title per ${filename}: "${title}"`);
+                        return title;
+                    }
+                    
+                } catch (regexError) {
+                    console.log(`Regex fallita per ${filename}:`, regexError.message);
                 }
                 
                 throw error;
             }
         }
 
-        // SOLUZIONE 3: Usa XMLHttpRequest (evita problemi CORS)
-        function getTitleWithXHR(filename) {
-            return new Promise((resolve, reject) => {
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', filename, true);
-                xhr.timeout = 5000;
-                
-                xhr.onload = function() {
-                    if (xhr.status === 200) {
-                        const html = xhr.responseText;
-                        const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-                        if (titleMatch && titleMatch[1]) {
-                            resolve(titleMatch[1].trim());
-                        } else {
-                            reject(new Error('Nessun titolo trovato'));
-                        }
-                    } else {
-                        reject(new Error(`HTTP ${xhr.status}`));
-                    }
-                };
-                
-                xhr.onerror = function() {
-                    reject(new Error('Errore di rete'));
-                };
-                
-                xhr.ontimeout = function() {
-                    reject(new Error('Timeout'));
-                };
-                
-                xhr.send();
-            });
-        }
-
-        // SOLUZIONE 4: Usa iframe per leggere il titolo
+        // SOLUZIONE ALTERNATIVA: Usa iframe (funziona anche con CORS)
         function getTitleWithIframe(filename) {
             return new Promise((resolve, reject) => {
                 const iframe = document.createElement('iframe');
@@ -507,18 +519,29 @@
                 iframe.src = filename;
                 
                 iframe.onload = function() {
-                    try {
-                        const title = iframe.contentDocument.title;
-                        if (title && title.trim() !== '') {
-                            resolve(title.trim());
-                        } else {
-                            reject(new Error('Titolo vuoto'));
+                    setTimeout(() => {
+                        try {
+                            // Prova a leggere il meta tag dall'iframe
+                            const meta = iframe.contentDocument.querySelector('meta[name="gara-title"]');
+                            if (meta && meta.content) {
+                                resolve(meta.content.trim());
+                                return;
+                            }
+                            
+                            // Fallback al title normale
+                            const title = iframe.contentDocument.title;
+                            if (title && title.trim() !== '') {
+                                resolve(title.trim());
+                                return;
+                            }
+                            
+                            reject(new Error('Nessun titolo nell iframe'));
+                        } catch (error) {
+                            reject(new Error('Impossibile leggere iframe'));
+                        } finally {
+                            document.body.removeChild(iframe);
                         }
-                    } catch (error) {
-                        reject(new Error('Impossibile leggere titolo iframe'));
-                    } finally {
-                        document.body.removeChild(iframe);
-                    }
+                    }, 1000); // Da tempo per caricare
                 };
                 
                 iframe.onerror = function() {
@@ -530,20 +553,19 @@
             });
         }
 
-        // Funzione principale che prova TUTTI i metodi
+        // Funzione che prova tutti i metodi
         async function getTitleWithAllMethods(filename) {
             const methods = [
-                { name: 'GitHub Pages + Proxy', func: () => getTitleFromGitHubPages(filename) },
-                { name: 'XHR diretto', func: () => getTitleWithXHR(filename) },
+                { name: 'Meta tag', func: () => getTitleFromMetaTag(filename) },
                 { name: 'Iframe', func: () => getTitleWithIframe(filename) }
             ];
             
             for (const method of methods) {
                 try {
-                    console.log(`Tentativo con metodo: ${method.name}`);
+                    console.log(`Tentativo ${method.name} per ${filename}`);
                     const title = await method.func();
                     if (title) {
-                        console.log(`✅ Successo con ${method.name}: ${title}`);
+                        console.log(`✅ Successo con ${method.name}: "${title}"`);
                         return title;
                     }
                 } catch (error) {
@@ -556,7 +578,7 @@
 
         // Funzione per caricare tutti i titoli
         async function loadAllTitles() {
-            updateStatus('<span class="spinner"></span> Avvio recupero titoli...', 'info');
+            updateStatus('<span class="spinner"></span> Avvio lettura meta tag...', 'info');
             
             const grid = document.getElementById('gare-grid');
             grid.innerHTML = '';
@@ -566,7 +588,7 @@
             
             // Crea cards di placeholder
             GARE_FILES.forEach((filename, index) => {
-                const defaultTitle = `Gara ${index + 1} (caricamento...)`;
+                const defaultTitle = `Gara ${index + 1} (controllo meta tag...)`;
                 const card = createRaceCard(filename, defaultTitle, COLORS[index]);
                 grid.appendChild(card);
             });
@@ -578,7 +600,6 @@
                 const filename = GARE_FILES[i];
                 
                 try {
-                    // Usa il metodo più affidabile
                     const title = await getTitleWithAllMethods(filename);
                     
                     if (title) {
@@ -592,20 +613,32 @@
                     const fallbackTitle = `Gara ${i + 1}`;
                     currentTitles[filename] = fallbackTitle;
                     updateCardTitle(filename, fallbackTitle);
+                    
+                    // Mostra errore specifico per questa gara
+                    console.log(`⚠️ ${filename}: ${error.message}`);
                 }
             }
             
             // Aggiorna status finale
             if (successCount === GARE_FILES.length) {
-                updateStatus(`✅ Tutti i ${successCount} titoli caricati!`, 'success');
-                showToast('Titoli aggiornati automaticamente!');
+                updateStatus(`✅ Tutti i ${successCount} titoli letti dai meta tag!`, 'success');
+                showToast('Titoli aggiornati dai meta tag!');
             } else if (successCount > 0) {
-                updateStatus(`⚠️ ${successCount} successi, ${errorCount} errori.`, 'warning');
-                showToast(`Caricati ${successCount} su ${GARE_FILES.length} titoli`);
+                updateStatus(`⚠️ ${successCount} successi, ${errorCount} errori. Alcuni file non hanno meta tag.`, 'warning');
+                showToast(`Letti ${successCount} su ${GARE_FILES.length} titoli`);
+                
+                // Mostra messaggio per i file mancanti
+                if (errorCount > 0) {
+                    const missingFiles = GARE_FILES.filter(f => !currentTitles[f] || currentTitles[f].includes('Gara'));
+                    if (missingFiles.length > 0) {
+                        setTimeout(() => {
+                            alert(`ATTENZIONE: I seguenti file non hanno meta tag "gara-title":\n${missingFiles.join('\n')}\n\nAggiungi il meta tag per visualizzare i titoli corretti.`);
+                        }, 1000);
+                    }
+                }
             } else {
-                // SOLUZIONE DI EMERGENZA: Leggi dai meta tag se presenti
-                updateStatus('📁 Usando titoli predefiniti', 'warning');
-                showToast('Usando titoli predefiniti - verifica connessione');
+                updateStatus('❌ Nessun meta tag trovato. Aggiungi i meta tag come indicato sopra.', 'error');
+                showToast('Aggiungi meta tag alle tue pagine gara');
             }
             
             // Salva in cache
@@ -636,12 +669,26 @@
             
             if (cached && timestamp) {
                 const age = Date.now() - parseInt(timestamp);
-                if (age < 10 * 60 * 1000) { // 10 minuti
+                if (age < 30 * 60 * 1000) { // 30 minuti
                     currentTitles = JSON.parse(cached);
                     return true;
                 }
             }
             return false;
+        }
+
+        // Mostra titoli dalla cache
+        function showCachedTitles() {
+            const grid = document.getElementById('gare-grid');
+            grid.innerHTML = '';
+            
+            GARE_FILES.forEach((filename, index) => {
+                const title = currentTitles[filename] || `Gara ${index + 1}`;
+                const card = createRaceCard(filename, title, COLORS[index]);
+                grid.appendChild(card);
+            });
+            
+            setupCardEventListeners();
         }
 
         // Crea una card gara
@@ -744,25 +791,60 @@
             });
         }
 
+        // Genera codice meta tag per aiutare l'utente
+        function generateMetaTagCode() {
+            let code = '';
+            GARE_FILES.forEach(filename => {
+                const garaNum = filename.match(/\d+/)[0];
+                code += `\n<!-- Per ${filename} -->\n`;
+                code += `<meta name="gara-title" content="Titolo Gara ${garaNum}">\n`;
+            });
+            
+            // Mostra il codice
+            alert('Copia questo codice e incollalo nei tuoi file HTML:\n\n' + code);
+            
+            // Copia automaticamente negli appunti
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('Codice meta tag copiato negli appunti!');
+            });
+        }
+
+        // Aggiungi pulsante per generare codice
+        function addGenerateCodeButton() {
+            const instructions = document.querySelector('.instructions');
+            const button = document.createElement('button');
+            button.innerHTML = '📋 Genera Codice Meta Tag';
+            button.style.cssText = `
+                background: var(--secondary-color);
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 0.9rem;
+                margin-top: 10px;
+                display: block;
+            `;
+            button.onclick = generateMetaTagCode;
+            instructions.appendChild(button);
+        }
+
         // Inizializza
         document.addEventListener('DOMContentLoaded', async () => {
+            // Aggiungi pulsante per generare codice
+            addGenerateCodeButton();
+            
             // Prima carica dalla cache
             if (loadFromCache()) {
-                const grid = document.getElementById('gare-grid');
-                grid.innerHTML = '';
-                
-                GARE_FILES.forEach((filename, index) => {
-                    const title = currentTitles[filename] || `Gara ${index + 1}`;
-                    const card = createRaceCard(filename, title, COLORS[index]);
-                    grid.appendChild(card);
-                });
-                
-                setupCardEventListeners();
-                updateStatus('📁 Titoli dalla cache. Aggiorna per novità.', 'warning');
+                showCachedTitles();
+                updateStatus('📁 Titoli dalla cache. Aggiorna per leggere meta tag.', 'warning');
+            } else {
+                // Mostra cards vuote
+                showCachedTitles();
             }
             
-            // Poi carica i dati aggiornati
-            await loadAllTitles();
+            // Non caricare automaticamente - aspetta che l'utente clicchi
+            updateStatus('Clicca "Aggiorna Tutti i Titoli" dopo aver aggiunto i meta tag', 'info');
         });
     </script>
 </body>
