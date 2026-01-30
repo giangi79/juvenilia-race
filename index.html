@@ -1,1 +1,333 @@
-gara5.html
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Gare - Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+            --light-text: #718096;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .logo-placeholder {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.8rem;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: var(--light-text);
+            font-size: 1rem;
+            margin-top: 8px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 15px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+
+        .race-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--secondary-color);
+            position: relative;
+        }
+
+        .race-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .race-card:active {
+            transform: translateY(-2px);
+        }
+
+        .race-info h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .race-info p {
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+            color: var(--light-text);
+        }
+
+        .arrow {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .race-card:hover .arrow {
+            transform: translateX(5px);
+        }
+
+        /* Stili per i link copiabili */
+        .link-copy {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--secondary-color);
+            border: 1px solid var(--secondary-color);
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .race-card:hover .link-copy {
+            display: block;
+        }
+
+        .link-copy:hover {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--light-text);
+            padding: 20px 0;
+            width: 100%;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .logo-container {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .logo-placeholder {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <div class="logo-placeholder">GG</div>
+                <div>
+                    <h1>Gestione Gare</h1>
+                    <p class="subtitle">Pannello di controllo per la gestione delle competizioni</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="grid">
+            <!-- Gara 1 -->
+            <div class="race-card-container">
+                <a href="gara1.html" class="race-card" id="gara1">
+                    <div class="race-info">
+                        <h2>Gestione Gara 1</h2>
+                        <p>Gestione iscrizioni e presenze</p>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="link-copy" onclick="copyLink('gara1')">Copia Link</div>
+                </a>
+                <div class="link-info" id="link-gara1" style="display: none;">gara1.html</div>
+            </div>
+
+            <!-- Gara 2 -->
+            <div class="race-card-container">
+                <a href="gara2.html" class="race-card" id="gara2">
+                    <div class="race-info">
+                        <h2>Gestione Gara 2</h2>
+                        <p>Gestione iscrizioni e presenze</p>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="link-copy" onclick="copyLink('gara2')">Copia Link</div>
+                </a>
+                <div class="link-info" id="link-gara2" style="display: none;">gara2.html</div>
+            </div>
+
+            <!-- Gara 3 -->
+            <div class="race-card-container">
+                <a href="gara3.html" class="race-card" id="gara3">
+                    <div class="race-info">
+                        <h2>Gestione Gara 3</h2>
+                        <p>Gestione iscrizioni e presenze</p>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="link-copy" onclick="copyLink('gara3')">Copia Link</div>
+                </a>
+                <div class="link-info" id="link-gara3" style="display: none;">gara3.html</div>
+            </div>
+
+            <!-- Gara 4 -->
+            <div class="race-card-container">
+                <a href="gara4.html" class="race-card" id="gara4">
+                    <div class="race-info">
+                        <h2>Gestione Gara 4</h2>
+                        <p>Gestione iscrizioni e presenze</p>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="link-copy" onclick="copyLink('gara4')">Copia Link</div>
+                </a>
+                <div class="link-info" id="link-gara4" style="display: none;">gara4.html</div>
+            </div>
+
+            <!-- Gara 5 -->
+            <div class="race-card-container">
+                <a href="gara5.html" class="race-card" id="gara5">
+                    <div class="race-info">
+                        <h2>Gestione Gara 5</h2>
+                        <p>Gestione iscrizioni e presenze</p>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="link-copy" onclick="copyLink('gara5')">Copia Link</div>
+                </a>
+                <div class="link-info" id="link-gara5" style="display: none;">gara5.html</div>
+            </div>
+        </main>
+
+        <footer>
+            &copy; 2026 Sistema Gestione Gare
+        </footer>
+    </div>
+
+    <script>
+        // Funzione per copiare il link
+        function copyLink(garaId) {
+            event.stopPropagation(); // Previene il click sulla card
+            
+            let linkText = garaId + '.html';
+            
+            // Crea un elemento temporaneo per copiare il testo
+            const tempInput = document.createElement('input');
+            tempInput.value = linkText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            
+            // Feedback visivo
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = 'Copiato!';
+            button.style.background = '#27ae60';
+            button.style.color = 'white';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = '';
+                button.style.color = '';
+            }, 1500);
+        }
+
+        // Per copiare anche gli URL completi (se necessario)
+        function copyFullUrl(garaId) {
+            const fullUrl = window.location.origin + '/' + garaId + '.html';
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                alert('URL completo copiato: ' + fullUrl);
+            });
+        }
+
+        // Mostra i link quando si clicca col tasto destro sulla card
+        document.querySelectorAll('.race-card').forEach(card => {
+            card.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                const garaId = this.id;
+                const link = garaId + '.html';
+                
+                if (confirm('Vuoi copiare il link "' + link + '"?')) {
+                    copyLink(garaId);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
