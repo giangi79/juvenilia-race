@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestione Gare - Dashboard</title>
+    <title>Dashboard - Gestione Gare</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <style>
         :root {
             --primary-color: #2c3e50;
             --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-color: #2d3748;
@@ -29,7 +31,7 @@
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 1000px;
         }
 
         header {
@@ -72,10 +74,41 @@
             margin-top: 8px;
         }
 
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .grid {
             display: grid;
-            gap: 15px;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .grid.loaded {
+            opacity: 1;
+        }
+
+        .race-card-container {
+            position: relative;
         }
 
         .race-card {
@@ -91,6 +124,7 @@
             transition: all 0.3s ease;
             border-left: 4px solid var(--secondary-color);
             position: relative;
+            min-height: 90px;
         }
 
         .race-card:hover {
@@ -102,11 +136,16 @@
             transform: translateY(-2px);
         }
 
+        .race-info {
+            flex: 1;
+        }
+
         .race-info h2 {
             margin: 0;
             font-size: 1.2rem;
             color: var(--primary-color);
             font-weight: 600;
+            line-height: 1.4;
         }
 
         .race-info p {
@@ -120,35 +159,66 @@
             color: var(--secondary-color);
             font-weight: bold;
             transition: transform 0.3s ease;
+            margin-left: 15px;
         }
 
         .race-card:hover .arrow {
             transform: translateX(5px);
         }
 
-        /* Stili per i link copiabili */
-        .link-copy {
-            display: none;
+        /* Pulsante Copia Link migliorato */
+        .copy-link-btn {
             position: absolute;
             top: 10px;
             right: 10px;
             background: rgba(255, 255, 255, 0.95);
-            padding: 5px 10px;
+            padding: 6px 12px;
             border-radius: 6px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--secondary-color);
             border: 1px solid var(--secondary-color);
             cursor: pointer;
             z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s ease, background-color 0.3s ease;
+            font-weight: 500;
         }
 
-        .race-card:hover .link-copy {
-            display: block;
+        .race-card-container:hover .copy-link-btn {
+            opacity: 1;
         }
 
-        .link-copy:hover {
+        .copy-link-btn:hover {
             background: var(--secondary-color);
             color: white;
+        }
+
+        .copy-link-btn.copied {
+            background: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 1000;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
 
         footer {
@@ -173,6 +243,10 @@
             h1 {
                 font-size: 1.5rem;
             }
+            
+            .copy-link-btn {
+                opacity: 1; /* Sempre visibile su mobile */
+            }
         }
 
         @media (max-width: 480px) {
@@ -191,6 +265,10 @@
                 height: 50px;
                 font-size: 20px;
             }
+            
+            .grid {
+                gap: 15px;
+            }
         }
     </style>
 </head>
@@ -201,132 +279,276 @@
             <div class="logo-container">
                 <div class="logo-placeholder">GG</div>
                 <div>
-                    <h1>Gestione Gare</h1>
-                    <p class="subtitle">Pannello di controllo per la gestione delle competizioni</p>
+                    <h1>Dashboard Gestione Gare</h1>
+                    <p class="subtitle">Titoli aggiornati automaticamente dalle pagine</p>
                 </div>
             </div>
         </header>
 
-        <main class="grid">
-            <!-- Gara 1 -->
-            <div class="race-card-container">
-                <a href="gara1.html" class="race-card" id="gara1">
-                    <div class="race-info">
-                        <h2>Gestione Gara 1</h2>
-                        <p>Gestione iscrizioni e presenze</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="link-copy" onclick="copyLink('gara1')">Copia Link</div>
-                </a>
-                <div class="link-info" id="link-gara1" style="display: none;">gara1.html</div>
-            </div>
+        <div id="loading" class="loading-container">
+            <div class="loading-spinner"></div>
+            <span style="margin-left: 15px;">Caricamento titoli delle gare...</span>
+        </div>
 
-            <!-- Gara 2 -->
-            <div class="race-card-container">
-                <a href="gara2.html" class="race-card" id="gara2">
-                    <div class="race-info">
-                        <h2>Gestione Gara 2</h2>
-                        <p>Gestione iscrizioni e presenze</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="link-copy" onclick="copyLink('gara2')">Copia Link</div>
-                </a>
-                <div class="link-info" id="link-gara2" style="display: none;">gara2.html</div>
-            </div>
-
-            <!-- Gara 3 -->
-            <div class="race-card-container">
-                <a href="gara3.html" class="race-card" id="gara3">
-                    <div class="race-info">
-                        <h2>Gestione Gara 3</h2>
-                        <p>Gestione iscrizioni e presenze</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="link-copy" onclick="copyLink('gara3')">Copia Link</div>
-                </a>
-                <div class="link-info" id="link-gara3" style="display: none;">gara3.html</div>
-            </div>
-
-            <!-- Gara 4 -->
-            <div class="race-card-container">
-                <a href="gara4.html" class="race-card" id="gara4">
-                    <div class="race-info">
-                        <h2>Gestione Gara 4</h2>
-                        <p>Gestione iscrizioni e presenze</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="link-copy" onclick="copyLink('gara4')">Copia Link</div>
-                </a>
-                <div class="link-info" id="link-gara4" style="display: none;">gara4.html</div>
-            </div>
-
-            <!-- Gara 5 -->
-            <div class="race-card-container">
-                <a href="gara5.html" class="race-card" id="gara5">
-                    <div class="race-info">
-                        <h2>Gestione Gara 5</h2>
-                        <p>Gestione iscrizioni e presenze</p>
-                    </div>
-                    <div class="arrow">→</div>
-                    <div class="link-copy" onclick="copyLink('gara5')">Copia Link</div>
-                </a>
-                <div class="link-info" id="link-gara5" style="display: none;">gara5.html</div>
-            </div>
+        <main class="grid" id="gare-grid">
+            <!-- Le card verranno generate dinamicamente da JavaScript -->
         </main>
 
         <footer>
-            &copy; 2026 Sistema Gestione Gare
+            &copy; 2026 Sistema Gestione Gare | Dashboard v2.1 (Titoli automatici)
         </footer>
     </div>
 
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
     <script>
-        // Funzione per copiare il link
-        function copyLink(garaId) {
-            event.stopPropagation(); // Previene il click sulla card
-            
-            let linkText = garaId + '.html';
-            
-            // Crea un elemento temporaneo per copiare il testo
-            const tempInput = document.createElement('input');
-            tempInput.value = linkText;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-            
-            // Feedback visivo
-            const button = event.target;
-            const originalText = button.textContent;
-            button.textContent = 'Copiato!';
-            button.style.background = '#27ae60';
-            button.style.color = 'white';
-            
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.background = '';
-                button.style.color = '';
-            }, 1500);
-        }
+        // Configurazione delle gare - qui puoi aggiungere/rimuovere gare
+        const gare = [
+            { id: 1, file: 'gara1.html', color: '#3498db', defaultTitle: 'Gara 1' },
+            { id: 2, file: 'gara2.html', color: '#27ae60', defaultTitle: 'Gara 2' },
+            { id: 3, file: 'gara3.html', color: '#e74c3c', defaultTitle: 'Gara 3' },
+            { id: 4, file: 'gara4.html', color: '#f39c12', defaultTitle: 'Gara 4' },
+            { id: 5, file: 'gara5.html', color: '#9b59b6', defaultTitle: 'Gara 5' }
+        ];
 
-        // Per copiare anche gli URL completi (se necessario)
-        function copyFullUrl(garaId) {
-            const fullUrl = window.location.origin + '/' + garaId + '.html';
-            navigator.clipboard.writeText(fullUrl).then(() => {
-                alert('URL completo copiato: ' + fullUrl);
-            });
-        }
-
-        // Mostra i link quando si clicca col tasto destro sulla card
-        document.querySelectorAll('.race-card').forEach(card => {
-            card.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                const garaId = this.id;
-                const link = garaId + '.html';
+        // Funzione per ottenere il titolo da una pagina HTML
+        async function getPageTitle(url) {
+            try {
+                // Usiamo fetch per ottenere il contenuto della pagina
+                const response = await fetch(url, { 
+                    method: 'GET',
+                    headers: { 'Content-Type': 'text/html' }
+                });
                 
-                if (confirm('Vuoi copiare il link "' + link + '"?')) {
-                    copyLink(garaId);
+                if (!response.ok) {
+                    throw new Error(`Errore ${response.status}: ${response.statusText}`);
+                }
+                
+                const html = await response.text();
+                
+                // Estraiamo il titolo dal tag <title>
+                const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+                
+                if (titleMatch && titleMatch[1]) {
+                    // Puliamo il titolo rimuovendo spazi extra
+                    return titleMatch[1].trim();
+                }
+                
+                return null;
+            } catch (error) {
+                console.warn(`Impossibile recuperare il titolo da ${url}:`, error.message);
+                return null;
+            }
+        }
+
+        // Funzione per creare una card gara
+        function createRaceCard(gara, title) {
+            const container = document.createElement('div');
+            container.className = 'race-card-container';
+            
+            // Usa il titolo ottenuto o il default
+            const displayTitle = title || gara.defaultTitle;
+            const filePath = gara.file;
+            
+            container.innerHTML = `
+                <a href="${filePath}" class="race-card" data-link="${filePath}" data-title="${displayTitle}" style="border-left-color: ${gara.color}">
+                    <div class="race-info">
+                        <h2>${displayTitle}</h2>
+                        <p>Gestione iscrizioni e presenze per ${displayTitle}</p>
+                    </div>
+                    <div class="arrow">→</div>
+                </a>
+                <button class="copy-link-btn" onclick="copyFullLink(this, '${filePath}')" title="Copia link completo">
+                    📋 Copia Link
+                </button>
+            `;
+            
+            return container;
+        }
+
+        // Funzione principale per caricare tutte le gare
+        async function loadGareTitles() {
+            const grid = document.getElementById('gare-grid');
+            const loadingElement = document.getElementById('loading');
+            
+            // Array di promesse per ottenere tutti i titoli
+            const titlePromises = gare.map(async (gara) => {
+                const title = await getPageTitle(gara.file);
+                return { ...gara, title };
+            });
+            
+            // Attendi che tutti i titoli siano stati recuperati
+            const gareConTitoli = await Promise.allSettled(titlePromises);
+            
+            // Nascondi lo spinner di caricamento
+            loadingElement.style.display = 'none';
+            
+            // Crea le card per ogni gara
+            gareConTitoli.forEach((result, index) => {
+                if (result.status === 'fulfilled') {
+                    const gara = result.value;
+                    const card = createRaceCard(gara, gara.title);
+                    grid.appendChild(card);
+                } else {
+                    // Se c'è un errore, usa il titolo di default
+                    const gara = gare[index];
+                    const card = createRaceCard(gara, null);
+                    grid.appendChild(card);
                 }
             });
+            
+            // Mostra la griglia con animazione
+            grid.classList.add('loaded');
+            
+            // Aggiungi gli event listener alle nuove card
+            setupCardEventListeners();
+        }
+
+        // Funzione per mostrare il toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Funzione per copiare il link completo
+        function copyFullLink(button, filePath) {
+            event.stopPropagation(); // Previene il click sulla card
+            
+            // Ottieni l'URL completo
+            const baseUrl = window.location.origin;
+            const currentPath = window.location.pathname;
+            const directory = currentPath.substring(0, currentPath.lastIndexOf('/')) || '';
+            const fullUrl = baseUrl + directory + '/' + filePath;
+            
+            // Ottieni il titolo dalla card
+            const card = button.parentElement.querySelector('.race-card');
+            const title = card.getAttribute('data-title') || 'Gara';
+            
+            // Crea il testo da copiare (URL e titolo)
+            const textToCopy = `${title}\n${fullUrl}`;
+            
+            // Usa la Clipboard API moderna
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                // Feedback visivo sul pulsante
+                button.innerHTML = '✓ Copiato!';
+                button.classList.add('copied');
+                
+                // Mostra toast notification
+                showToast(`Link di "${title}" copiato negli appunti!`);
+                
+                // Ripristina il pulsante dopo 2 secondi
+                setTimeout(() => {
+                    button.innerHTML = '📋 Copia Link';
+                    button.classList.remove('copied');
+                }, 2000);
+                
+            }).catch(err => {
+                // Fallback per browser più vecchi
+                console.error('Errore Clipboard API:', err);
+                
+                // Metodo fallback
+                const textArea = document.createElement('textarea');
+                textArea.value = textToCopy;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                // Feedback anche per il fallback
+                button.innerHTML = '✓ Copiato!';
+                button.classList.add('copied');
+                showToast(`Link di "${title}" copiato (metodo fallback)`);
+                
+                setTimeout(() => {
+                    button.innerHTML = '📋 Copia Link';
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Funzione per impostare gli event listener sulle card
+        function setupCardEventListeners() {
+            // Copia link con tasto destro sulla card
+            document.querySelectorAll('.race-card').forEach(card => {
+                card.addEventListener('contextmenu', function(e) {
+                    e.preventDefault();
+                    const filePath = this.getAttribute('data-link');
+                    const title = this.getAttribute('data-title');
+                    
+                    if (confirm(`Vuoi copiare il link per "${title}"?`)) {
+                        const button = this.parentElement.querySelector('.copy-link-btn');
+                        copyFullLink(button, filePath);
+                    }
+                });
+                
+                // Aggiungi anche la possibilità di copiare con Ctrl+C quando la card è in focus
+                card.addEventListener('keydown', function(e) {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+                        e.preventDefault();
+                        const filePath = this.getAttribute('data-link');
+                        const button = this.parentElement.querySelector('.copy-link-btn');
+                        copyFullLink(button, filePath);
+                    }
+                });
+                
+                // Aggiungi tabindex per accessibilità
+                card.setAttribute('tabindex', '0');
+            });
+        }
+
+        // Pulsante per aggiornare manualmente i titoli
+        function addRefreshButton() {
+            const header = document.querySelector('header');
+            const refreshBtn = document.createElement('button');
+            refreshBtn.innerHTML = '🔄 Aggiorna Titoli';
+            refreshBtn.style.cssText = `
+                margin-top: 15px;
+                padding: 8px 16px;
+                background: var(--secondary-color);
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 0.9rem;
+                transition: background 0.3s ease;
+            `;
+            refreshBtn.onmouseover = () => refreshBtn.style.background = '#2980b9';
+            refreshBtn.onmouseout = () => refreshBtn.style.background = 'var(--secondary-color)';
+            refreshBtn.onclick = () => {
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = '🔄 Aggiornamento...';
+                
+                // Svuota la griglia
+                const grid = document.getElementById('gare-grid');
+                grid.innerHTML = '';
+                grid.classList.remove('loaded');
+                
+                // Mostra di nuovo lo spinner
+                const loadingElement = document.getElementById('loading');
+                loadingElement.style.display = 'flex';
+                
+                // Ricarica i titoli
+                setTimeout(() => {
+                    loadGareTitles();
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = '🔄 Aggiorna Titoli';
+                    showToast('Titoli delle gare aggiornati!');
+                }, 500);
+            };
+            
+            header.appendChild(refreshBtn);
+        }
+
+        // Inizializza la dashboard quando la pagina è caricata
+        document.addEventListener('DOMContentLoaded', () => {
+            loadGareTitles();
+            addRefreshButton();
         });
     </script>
 </body>
