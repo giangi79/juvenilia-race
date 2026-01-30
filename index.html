@@ -10,6 +10,7 @@
             --primary-color: #2c3e50;
             --secondary-color: #3498db;
             --success-color: #27ae60;
+            --warning-color: #f39c12;
             --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-color: #2d3748;
@@ -30,7 +31,7 @@
 
         .container {
             width: 100%;
-            max-width: 900px;
+            max-width: 1000px;
         }
 
         header {
@@ -73,10 +74,37 @@
             margin-top: 8px;
         }
 
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .grid {
             display: grid;
             gap: 20px;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .grid.loaded {
+            opacity: 1;
         }
 
         .race-card-container {
@@ -96,6 +124,7 @@
             transition: all 0.3s ease;
             border-left: 4px solid var(--secondary-color);
             position: relative;
+            min-height: 90px;
         }
 
         .race-card:hover {
@@ -116,6 +145,7 @@
             font-size: 1.2rem;
             color: var(--primary-color);
             font-weight: 600;
+            line-height: 1.4;
         }
 
         .race-info p {
@@ -250,85 +280,22 @@
                 <div class="logo-placeholder">GG</div>
                 <div>
                     <h1>Dashboard Gestione Gare</h1>
-                    <p class="subtitle">Accedi alle singole pagine di gestione delle competizioni</p>
+                    <p class="subtitle">Titoli aggiornati automaticamente dalle pagine</p>
                 </div>
             </div>
         </header>
 
-        <main class="grid">
-            <!-- Gara 1 -->
-            <div class="race-card-container">
-                <a href="gara1.html" class="race-card" data-link="gara1.html" data-title="Gestione Gara 1">
-                    <div class="race-info">
-                        <h2>Gestione Gara 1</h2>
-                        <p>Accesso alla pagina di gestione iscrizioni e presenze per Gara 1</p>
-                    </div>
-                    <div class="arrow">→</div>
-                </a>
-                <button class="copy-link-btn" onclick="copyFullLink(this, 'gara1.html')" title="Copia link completo">
-                    📋 Copia Link
-                </button>
-            </div>
+        <div id="loading" class="loading-container">
+            <div class="loading-spinner"></div>
+            <span style="margin-left: 15px;">Caricamento titoli delle gare...</span>
+        </div>
 
-            <!-- Gara 2 -->
-            <div class="race-card-container">
-                <a href="gara2.html" class="race-card" data-link="gara2.html" data-title="Gestione Gara 2">
-                    <div class="race-info">
-                        <h2>Gestione Gara 2</h2>
-                        <p>Accesso alla pagina di gestione iscrizioni e presenze per Gara 2</p>
-                    </div>
-                    <div class="arrow">→</div>
-                </a>
-                <button class="copy-link-btn" onclick="copyFullLink(this, 'gara2.html')" title="Copia link completo">
-                    📋 Copia Link
-                </button>
-            </div>
-
-            <!-- Gara 3 -->
-            <div class="race-card-container">
-                <a href="gara3.html" class="race-card" data-link="gara3.html" data-title="Gestione Gara 3">
-                    <div class="race-info">
-                        <h2>Gestione Gara 3</h2>
-                        <p>Accesso alla pagina di gestione iscrizioni e presenze per Gara 3</p>
-                    </div>
-                    <div class="arrow">→</div>
-                </a>
-                <button class="copy-link-btn" onclick="copyFullLink(this, 'gara3.html')" title="Copia link completo">
-                    📋 Copia Link
-                </button>
-            </div>
-
-            <!-- Gara 4 -->
-            <div class="race-card-container">
-                <a href="gara4.html" class="race-card" data-link="gara4.html" data-title="Gestione Gara 4">
-                    <div class="race-info">
-                        <h2>Gestione Gara 4</h2>
-                        <p>Accesso alla pagina di gestione iscrizioni e presenze per Gara 4</p>
-                    </div>
-                    <div class="arrow">→</div>
-                </a>
-                <button class="copy-link-btn" onclick="copyFullLink(this, 'gara4.html')" title="Copia link completo">
-                    📋 Copia Link
-                </button>
-            </div>
-
-            <!-- Gara 5 -->
-            <div class="race-card-container">
-                <a href="gara5.html" class="race-card" data-link="gara5.html" data-title="Gestione Gara 5">
-                    <div class="race-info">
-                        <h2>Gestione Gara 5</h2>
-                        <p>Accesso alla pagina di gestione iscrizioni e presenze per Gara 5</p>
-                    </div>
-                    <div class="arrow">→</div>
-                </a>
-                <button class="copy-link-btn" onclick="copyFullLink(this, 'gara5.html')" title="Copia link completo">
-                    📋 Copia Link
-                </button>
-            </div>
+        <main class="grid" id="gare-grid">
+            <!-- Le card verranno generate dinamicamente da JavaScript -->
         </main>
 
         <footer>
-            &copy; 2026 Sistema Gestione Gare | Dashboard v2.0
+            &copy; 2026 Sistema Gestione Gare | Dashboard v2.1 (Titoli automatici)
         </footer>
     </div>
 
@@ -336,6 +303,108 @@
     <div class="toast" id="toast"></div>
 
     <script>
+        // Configurazione delle gare - qui puoi aggiungere/rimuovere gare
+        const gare = [
+            { id: 1, file: 'gara1.html', color: '#3498db', defaultTitle: 'Gara 1' },
+            { id: 2, file: 'gara2.html', color: '#27ae60', defaultTitle: 'Gara 2' },
+            { id: 3, file: 'gara3.html', color: '#e74c3c', defaultTitle: 'Gara 3' },
+            { id: 4, file: 'gara4.html', color: '#f39c12', defaultTitle: 'Gara 4' },
+            { id: 5, file: 'gara5.html', color: '#9b59b6', defaultTitle: 'Gara 5' }
+        ];
+
+        // Funzione per ottenere il titolo da una pagina HTML
+        async function getPageTitle(url) {
+            try {
+                // Usiamo fetch per ottenere il contenuto della pagina
+                const response = await fetch(url, { 
+                    method: 'GET',
+                    headers: { 'Content-Type': 'text/html' }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Errore ${response.status}: ${response.statusText}`);
+                }
+                
+                const html = await response.text();
+                
+                // Estraiamo il titolo dal tag <title>
+                const titleMatch = html.match(/<title>([^<]+)<\/title>/i);
+                
+                if (titleMatch && titleMatch[1]) {
+                    // Puliamo il titolo rimuovendo spazi extra
+                    return titleMatch[1].trim();
+                }
+                
+                return null;
+            } catch (error) {
+                console.warn(`Impossibile recuperare il titolo da ${url}:`, error.message);
+                return null;
+            }
+        }
+
+        // Funzione per creare una card gara
+        function createRaceCard(gara, title) {
+            const container = document.createElement('div');
+            container.className = 'race-card-container';
+            
+            // Usa il titolo ottenuto o il default
+            const displayTitle = title || gara.defaultTitle;
+            const filePath = gara.file;
+            
+            container.innerHTML = `
+                <a href="${filePath}" class="race-card" data-link="${filePath}" data-title="${displayTitle}" style="border-left-color: ${gara.color}">
+                    <div class="race-info">
+                        <h2>${displayTitle}</h2>
+                        <p>Gestione iscrizioni e presenze per ${displayTitle}</p>
+                    </div>
+                    <div class="arrow">→</div>
+                </a>
+                <button class="copy-link-btn" onclick="copyFullLink(this, '${filePath}')" title="Copia link completo">
+                    📋 Copia Link
+                </button>
+            `;
+            
+            return container;
+        }
+
+        // Funzione principale per caricare tutte le gare
+        async function loadGareTitles() {
+            const grid = document.getElementById('gare-grid');
+            const loadingElement = document.getElementById('loading');
+            
+            // Array di promesse per ottenere tutti i titoli
+            const titlePromises = gare.map(async (gara) => {
+                const title = await getPageTitle(gara.file);
+                return { ...gara, title };
+            });
+            
+            // Attendi che tutti i titoli siano stati recuperati
+            const gareConTitoli = await Promise.allSettled(titlePromises);
+            
+            // Nascondi lo spinner di caricamento
+            loadingElement.style.display = 'none';
+            
+            // Crea le card per ogni gara
+            gareConTitoli.forEach((result, index) => {
+                if (result.status === 'fulfilled') {
+                    const gara = result.value;
+                    const card = createRaceCard(gara, gara.title);
+                    grid.appendChild(card);
+                } else {
+                    // Se c'è un errore, usa il titolo di default
+                    const gara = gare[index];
+                    const card = createRaceCard(gara, null);
+                    grid.appendChild(card);
+                }
+            });
+            
+            // Mostra la griglia con animazione
+            grid.classList.add('loaded');
+            
+            // Aggiungi gli event listener alle nuove card
+            setupCardEventListeners();
+        }
+
         // Funzione per mostrare il toast
         function showToast(message) {
             const toast = document.getElementById('toast');
@@ -379,10 +448,6 @@
                     button.classList.remove('copied');
                 }, 2000);
                 
-                // Log in console per debug
-                console.log('Link copiato:', fullUrl);
-                console.log('Titolo:', title);
-                
             }).catch(err => {
                 // Fallback per browser più vecchi
                 console.error('Errore Clipboard API:', err);
@@ -407,33 +472,83 @@
             });
         }
 
-        // Copia link con tasto destro sulla card
-        document.querySelectorAll('.race-card').forEach(card => {
-            card.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                const filePath = this.getAttribute('data-link');
-                const title = this.getAttribute('data-title');
-                
-                if (confirm(`Vuoi copiare il link per "${title}"?`)) {
-                    const button = this.parentElement.querySelector('.copy-link-btn');
-                    copyFullLink(button, filePath);
-                }
-            });
-        });
-
-        // Aggiungi anche la possibilità di copiare con Ctrl+C quando la card è in focus
-        document.querySelectorAll('.race-card').forEach(card => {
-            card.addEventListener('keydown', function(e) {
-                if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+        // Funzione per impostare gli event listener sulle card
+        function setupCardEventListeners() {
+            // Copia link con tasto destro sulla card
+            document.querySelectorAll('.race-card').forEach(card => {
+                card.addEventListener('contextmenu', function(e) {
                     e.preventDefault();
                     const filePath = this.getAttribute('data-link');
-                    const button = this.parentElement.querySelector('.copy-link-btn');
-                    copyFullLink(button, filePath);
-                }
+                    const title = this.getAttribute('data-title');
+                    
+                    if (confirm(`Vuoi copiare il link per "${title}"?`)) {
+                        const button = this.parentElement.querySelector('.copy-link-btn');
+                        copyFullLink(button, filePath);
+                    }
+                });
+                
+                // Aggiungi anche la possibilità di copiare con Ctrl+C quando la card è in focus
+                card.addEventListener('keydown', function(e) {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+                        e.preventDefault();
+                        const filePath = this.getAttribute('data-link');
+                        const button = this.parentElement.querySelector('.copy-link-btn');
+                        copyFullLink(button, filePath);
+                    }
+                });
+                
+                // Aggiungi tabindex per accessibilità
+                card.setAttribute('tabindex', '0');
             });
+        }
+
+        // Pulsante per aggiornare manualmente i titoli
+        function addRefreshButton() {
+            const header = document.querySelector('header');
+            const refreshBtn = document.createElement('button');
+            refreshBtn.innerHTML = '🔄 Aggiorna Titoli';
+            refreshBtn.style.cssText = `
+                margin-top: 15px;
+                padding: 8px 16px;
+                background: var(--secondary-color);
+                color: white;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 0.9rem;
+                transition: background 0.3s ease;
+            `;
+            refreshBtn.onmouseover = () => refreshBtn.style.background = '#2980b9';
+            refreshBtn.onmouseout = () => refreshBtn.style.background = 'var(--secondary-color)';
+            refreshBtn.onclick = () => {
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = '🔄 Aggiornamento...';
+                
+                // Svuota la griglia
+                const grid = document.getElementById('gare-grid');
+                grid.innerHTML = '';
+                grid.classList.remove('loaded');
+                
+                // Mostra di nuovo lo spinner
+                const loadingElement = document.getElementById('loading');
+                loadingElement.style.display = 'flex';
+                
+                // Ricarica i titoli
+                setTimeout(() => {
+                    loadGareTitles();
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = '🔄 Aggiorna Titoli';
+                    showToast('Titoli delle gare aggiornati!');
+                }, 500);
+            };
             
-            // Aggiungi tabindex per accessibilità
-            card.setAttribute('tabindex', '0');
+            header.appendChild(refreshBtn);
+        }
+
+        // Inizializza la dashboard quando la pagina è caricata
+        document.addEventListener('DOMContentLoaded', () => {
+            loadGareTitles();
+            addRefreshButton();
         });
     </script>
 </body>
