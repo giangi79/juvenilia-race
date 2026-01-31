@@ -28,8 +28,6 @@
             --warning-color: #f39c12;
             --info-color: #3498db;
             --danger-color: #e74c3c;
-            --gradient-start: #1a237e;
-            --gradient-end: #3949ab;
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
             --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
@@ -82,7 +80,7 @@
             gap: 15px;
         }
 
-        /* LOGO CON SFONDO CHIARO PER MASSIMO CONTRASTO */
+        /* LOGO CON SFONDO CHIARO */
         .logo-container {
             background: white;
             padding: 20px;
@@ -95,6 +93,7 @@
             justify-content: center;
             align-items: center;
             margin: 0 auto;
+            min-height: 120px;
         }
 
         .logo-full-width {
@@ -500,6 +499,7 @@
             .logo-container {
                 padding: 25px;
                 max-width: 600px;
+                min-height: 140px;
             }
             
             .logo-full-width {
@@ -625,6 +625,7 @@
             .logo-container {
                 max-width: 700px;
                 padding: 30px;
+                min-height: 150px;
             }
             
             .logo-full-width {
@@ -706,7 +707,7 @@
             }
         }
 
-        /* LOGO FALLBACK SE L'IMMAGINE NON CARICA */
+        /* STILE PER LOGO ASSENTE */
         .logo-container::before {
             content: '';
             position: absolute;
@@ -716,6 +717,20 @@
             border-radius: var(--border-radius-lg);
             z-index: -1;
         }
+
+        /* Logo fallback visivo */
+        .logo-fallback {
+            display: none;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+            border-radius: 50%;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 <body>
@@ -724,8 +739,7 @@
     <header class="app-header">
         <div class="header-content">
             <div class="logo-container">
-                <img src="logo.png" alt="Logo" class="logo-full-width" 
-                     onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 30\"><rect width=\"100\" height=\"30\" rx=\"5\" fill=\"%231a237e\"/><text x=\"50\" y=\"18\" font-family=\"Arial\" font-size=\"12\" fill=\"white\" text-anchor=\"middle\">LOGO GARE</text></svg>'">
+                <img src="logo.png" alt="Logo Gestione Gare" class="logo-full-width">
             </div>
             <h1 class="app-title">Dashboard Gestione Gare</h1>
         </div>
@@ -900,6 +914,16 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // GESTIONE LOGO - Fallback semplificato
+            const logoImg = document.querySelector('.logo-full-width');
+            if (logoImg) {
+                logoImg.onerror = function() {
+                    // Se il logo non carica, nascondiamo semplicemente l'immagine
+                    // Il container bianco rimarrà visibile ma senza testo
+                    this.style.display = 'none';
+                };
+            }
+            
             // COPIA LINK
             const copyRaceButtons = document.querySelectorAll('.btn-copy-race');
             const notification = document.getElementById('notification');
@@ -1061,15 +1085,6 @@
                         }
                     }
                 }
-            }
-            
-            // Fallback per logo
-            const logoImg = document.querySelector('.logo-full-width');
-            if (logoImg) {
-                logoImg.onerror = function() {
-                    this.src = 'https://cdn-icons-png.flaticon.com/512/1995/1995515.png';
-                    this.style.maxWidth = '150px';
-                };
             }
         });
     </script>
