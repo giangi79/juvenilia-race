@@ -105,6 +105,33 @@
             filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
 
+        /* Fallback per logo mancante */
+        .logo-fallback {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .logo-fallback-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .logo-fallback-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
         /* TITOLO PRINCIPALE */
         .app-title {
             color: var(--primary-color);
@@ -706,31 +733,6 @@
                 padding-right: max(15px, env(safe-area-inset-right));
             }
         }
-
-        /* STILE PER LOGO ASSENTE */
-        .logo-container::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #f8f9fa, #ffffff);
-            border-radius: var(--border-radius-lg);
-            z-index: -1;
-        }
-
-        /* Logo fallback visivo */
-        .logo-fallback {
-            display: none;
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
-            border-radius: 50%;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
     </style>
 </head>
 <body>
@@ -740,6 +742,12 @@
         <div class="header-content">
             <div class="logo-container">
                 <img src="logo.png" alt="Logo Gestione Gare" class="logo-full-width">
+                <div class="logo-fallback">
+                    <div class="logo-fallback-icon">
+                        <i class="fas fa-flag-checkered"></i>
+                    </div>
+                    <div class="logo-fallback-text">Gestione Gare</div>
+                </div>
             </div>
             <h1 class="app-title">Dashboard Gestione Gare</h1>
         </div>
@@ -766,10 +774,10 @@
                 </div>
                 <div class="card-content">
                     <div class="card-actions">
-                        <button class="btn-copy-race" data-link="gara1.html">
+                        <button class="btn-copy-race" data-link="gara1.html" aria-label="Copia link Gara 1">
                             <i class="fas fa-link"></i> Copia Link
                         </button>
-                        <a href="gara1.html" class="race-link">
+                        <a href="gara1.html" class="race-link" aria-label="Vai alla gestione Gara 1">
                             Vai alla Gestione
                             <span class="arrow">→</span>
                         </a>
@@ -787,10 +795,10 @@
                 </div>
                 <div class="card-content">
                     <div class="card-actions">
-                        <button class="btn-copy-race" data-link="gara2.html">
+                        <button class="btn-copy-race" data-link="gara2.html" aria-label="Copia link Gara 2">
                             <i class="fas fa-link"></i> Copia Link
                         </button>
-                        <a href="gara2.html" class="race-link">
+                        <a href="gara2.html" class="race-link" aria-label="Vai alla gestione Gara 2">
                             Vai alla Gestione
                             <span class="arrow">→</span>
                         </a>
@@ -808,10 +816,10 @@
                 </div>
                 <div class="card-content">
                     <div class="card-actions">
-                        <button class="btn-copy-race" data-link="gara3.html">
+                        <button class="btn-copy-race" data-link="gara3.html" aria-label="Copia link Gara 3">
                             <i class="fas fa-link"></i> Copia Link
                         </button>
-                        <a href="gara3.html" class="race-link">
+                        <a href="gara3.html" class="race-link" aria-label="Vai alla gestione Gara 3">
                             Vai alla Gestione
                             <span class="arrow">→</span>
                         </a>
@@ -829,10 +837,10 @@
                 </div>
                 <div class="card-content">
                     <div class="card-actions">
-                        <button class="btn-copy-race" data-link="gara4.html">
+                        <button class="btn-copy-race" data-link="gara4.html" aria-label="Copia link Gara 4">
                             <i class="fas fa-link"></i> Copia Link
                         </button>
-                        <a href="gara4.html" class="race-link">
+                        <a href="gara4.html" class="race-link" aria-label="Vai alla gestione Gara 4">
                             Vai alla Gestione
                             <span class="arrow">→</span>
                         </a>
@@ -850,10 +858,10 @@
                 </div>
                 <div class="card-content">
                     <div class="card-actions">
-                        <button class="btn-copy-race" data-link="gara5.html">
+                        <button class="btn-copy-race" data-link="gara5.html" aria-label="Copia link Gara 5">
                             <i class="fas fa-link"></i> Copia Link
                         </button>
-                        <a href="gara5.html" class="race-link">
+                        <a href="gara5.html" class="race-link" aria-label="Vai alla gestione Gara 5">
                             Vai alla Gestione
                             <span class="arrow">→</span>
                         </a>
@@ -873,7 +881,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fas fa-edit"></i> Modifica Titoli Gare</h3>
-                <button class="close-modal" id="close-modal">&times;</button>
+                <button class="close-modal" id="close-modal" aria-label="Chiudi finestra di modifica">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="edit-form">
@@ -907,21 +915,32 @@
     </div>
 
     <!-- NOTIFICA -->
-    <div class="notification" id="notification">
+    <div class="notification" id="notification" role="alert" aria-live="polite">
         <i class="fas fa-check-circle"></i>
         <span class="notification-text" id="notification-text">Operazione completata con successo!</span>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // GESTIONE LOGO - Fallback semplificato
+            // GESTIONE LOGO - Fallback migliorato
             const logoImg = document.querySelector('.logo-full-width');
+            const logoFallback = document.querySelector('.logo-fallback');
+            
             if (logoImg) {
                 logoImg.onerror = function() {
-                    // Se il logo non carica, nascondiamo semplicemente l'immagine
-                    // Il container bianco rimarrà visibile ma senza testo
                     this.style.display = 'none';
+                    if (logoFallback) {
+                        logoFallback.style.display = 'flex';
+                    }
                 };
+                
+                // Controlla se l'immagine è già caricata
+                if (logoImg.complete && logoImg.naturalHeight === 0) {
+                    logoImg.style.display = 'none';
+                    if (logoFallback) {
+                        logoFallback.style.display = 'flex';
+                    }
+                }
             }
             
             // COPIA LINK
@@ -932,8 +951,10 @@
             copyRaceButtons.forEach(button => {
                 button.addEventListener('click', async function() {
                     const raceLink = this.getAttribute('data-link');
-                    const baseUrl = window.location.origin + window.location.pathname;
-                    const fullUrl = baseUrl.replace(/[^/]*$/, raceLink);
+                    const baseUrl = window.location.origin;
+                    const currentPath = window.location.pathname;
+                    const directory = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+                    const fullUrl = baseUrl + directory + raceLink;
                     
                     try {
                         await navigator.clipboard.writeText(fullUrl);
@@ -966,9 +987,27 @@
                         }, 3000);
                         
                     } catch (err) {
-                        // Fallback
-                        notificationText.textContent = 'Errore nella copia del link. Prova a selezionarlo manualmente.';
-                        notification.style.backgroundColor = '#e74c3c';
+                        // Fallback per browser meno recenti
+                        const textArea = document.createElement('textarea');
+                        textArea.value = fullUrl;
+                        textArea.style.position = 'fixed';
+                        textArea.style.opacity = '0';
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        
+                        try {
+                            document.execCommand('copy');
+                            // Notifica di successo
+                            const raceTitle = this.closest('.race-card').querySelector('.race-title').textContent;
+                            notificationText.textContent = `Link di "${raceTitle}" copiato negli appunti!`;
+                            notification.style.backgroundColor = '#3498db';
+                        } catch (err) {
+                            // Notifica di errore
+                            notificationText.textContent = 'Errore nella copia del link. Prova a selezionarlo manualmente.';
+                            notification.style.backgroundColor = '#e74c3c';
+                        }
+                        
+                        document.body.removeChild(textArea);
                         notification.style.display = 'flex';
                         
                         setTimeout(() => {
@@ -986,31 +1025,67 @@
             const saveBtn = document.getElementById('save-btn');
             const editForm = document.getElementById('edit-form');
             
+            // Salvataggio dei titoli in sessionStorage per maggiore affidabilità
+            function saveTitleToStorage(index, title) {
+                try {
+                    localStorage.setItem(`race-title-${index}`, title);
+                    sessionStorage.setItem(`race-title-${index}`, title);
+                } catch (e) {
+                    console.warn('Impossibile salvare nei localStorage/sessionStorage');
+                }
+            }
+            
             // Carica i titoli salvati
+            function loadSavedTitles() {
+                for (let i = 1; i <= 5; i++) {
+                    let savedTitle = localStorage.getItem(`race-title-${i}`);
+                    if (!savedTitle) {
+                        savedTitle = sessionStorage.getItem(`race-title-${i}`);
+                    }
+                    if (savedTitle) {
+                        const raceTitle = document.querySelector(`.race-card:nth-child(${i}) .race-title`);
+                        if (raceTitle) {
+                            raceTitle.textContent = savedTitle;
+                        }
+                    }
+                }
+            }
+            
+            // Carica i titoli all'avvio
             loadSavedTitles();
             
             // Apre il modal
             editBtn.addEventListener('click', function() {
                 const raceCards = document.querySelectorAll('.race-card');
                 raceCards.forEach(card => {
-                    const index = card.querySelector('.btn-copy-race').getAttribute('data-link').replace('gara', '').replace('.html', '');
-                    const title = card.querySelector('.race-title').textContent;
-                    document.getElementById(`title-${index}`).value = title;
+                    const copyBtn = card.querySelector('.btn-copy-race');
+                    if (copyBtn) {
+                        const link = copyBtn.getAttribute('data-link');
+                        const match = link.match(/gara(\d+)\.html/);
+                        if (match) {
+                            const index = match[1];
+                            const title = card.querySelector('.race-title').textContent;
+                            const input = document.getElementById(`title-${index}`);
+                            if (input) {
+                                input.value = title;
+                            }
+                        }
+                    }
                 });
                 
                 editModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
                 
-                // Focus sul primo campo su mobile
-                if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                    setTimeout(() => {
-                        document.getElementById('title-1').focus();
-                    }, 300);
-                }
+                // Focus sul primo campo
+                setTimeout(() => {
+                    document.getElementById('title-1').focus();
+                }, 300);
             });
             
             // Chiude il modal
             function closeEditModal() {
                 editModal.style.display = 'none';
+                document.body.style.overflow = '';
                 if (document.activeElement && document.activeElement.blur) {
                     document.activeElement.blur();
                 }
@@ -1030,6 +1105,11 @@
                 if (e.key === 'Escape' && editModal.style.display === 'flex') {
                     closeEditModal();
                 }
+                
+                // Salva con Ctrl+Enter o Cmd+Enter
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && editModal.style.display === 'flex') {
+                    saveBtn.click();
+                }
             });
             
             // Salva le modifiche
@@ -1037,18 +1117,35 @@
                 e.preventDefault();
                 
                 const titleInputs = document.querySelectorAll('.title-input');
+                let hasErrors = false;
+                
                 titleInputs.forEach(input => {
                     const index = input.getAttribute('data-index');
                     const newTitle = input.value.trim();
                     
-                    if (newTitle) {
+                    if (!newTitle) {
+                        input.style.borderColor = '#e74c3c';
+                        hasErrors = true;
+                    } else {
+                        input.style.borderColor = '';
                         const raceCard = document.querySelector(`.race-card:nth-child(${index}) .race-title`);
                         if (raceCard) {
                             raceCard.textContent = newTitle;
-                            localStorage.setItem(`race-title-${index}`, newTitle);
+                            saveTitleToStorage(index, newTitle);
                         }
                     }
                 });
+                
+                if (hasErrors) {
+                    notificationText.textContent = 'Per favore, compila tutti i campi!';
+                    notification.style.backgroundColor = '#e74c3c';
+                    notification.style.display = 'flex';
+                    
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                    }, 3000);
+                    return;
+                }
                 
                 // Feedback tattile
                 if (navigator.vibrate) {
@@ -1074,18 +1171,13 @@
                 saveBtn.click();
             });
             
-            // Carica i titoli salvati
-            function loadSavedTitles() {
-                for (let i = 1; i <= 5; i++) {
-                    const savedTitle = localStorage.getItem(`race-title-${i}`);
-                    if (savedTitle) {
-                        const raceTitle = document.querySelector(`.race-card:nth-child(${i}) .race-title`);
-                        if (raceTitle) {
-                            raceTitle.textContent = savedTitle;
-                        }
-                    }
-                }
-            }
+            // Pulizia dello stile degli input al focus
+            const titleInputs = document.querySelectorAll('.title-input');
+            titleInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.style.borderColor = '';
+                });
+            });
         });
     </script>
 </body>
