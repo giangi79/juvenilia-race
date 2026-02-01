@@ -913,6 +913,54 @@
         let copyButtonsState = {};
 
         /**
+         * FUNZIONE CORRETTA PER COPIARE IL LINK COMPLETO CON PERCORSO
+         */
+        function getFullRaceLink(fileName) {
+            // Ottieni l'URL base corrente
+            const currentUrl = window.location.href;
+            
+            // Estrai il percorso base fino alla directory corrente
+            const url = new URL(currentUrl);
+            const pathParts = url.pathname.split('/');
+            
+            // Costruisci il percorso base (rimuovi index.html se presente)
+            let basePath = '/';
+            if (pathParts.length > 1) {
+                // Trova se siamo nella directory juvenilia-race
+                const juveniliaIndex = pathParts.indexOf('juvenilia-race');
+                if (juveniliaIndex !== -1) {
+                    // Prendi tutto il percorso fino a juvenilia-race compreso
+                    basePath = pathParts.slice(0, juveniliaIndex + 1).join('/') + '/';
+                } else {
+                    // Altrimenti usa il percorso corrente senza il nome file
+                    basePath = pathParts.slice(0, -1).join('/') + '/';
+                }
+            }
+            
+            // Assicurati che basePath termini con /
+            if (!basePath.endsWith('/')) {
+                basePath += '/';
+            }
+            
+            // Se basePath è solo '/', aggiungi juvenilia-race/
+            if (basePath === '/') {
+                basePath = '/juvenilia-race/';
+            }
+            
+            // Costruisci l'URL completo
+            const fullUrl = `${url.origin}${basePath}${fileName}`;
+            
+            console.log('Link generato:', {
+                origin: url.origin,
+                basePath: basePath,
+                fileName: fileName,
+                fullUrl: fullUrl
+            });
+            
+            return fullUrl;
+        }
+
+        /**
          * Funzione principale: recupera le tabelle, i titoli e renderizza la pagina
          */
         async function initDashboard() {
@@ -1027,12 +1075,18 @@
 
         // Funzione per copiare il link della gara (ottimizzata per mobile)
         function copyRaceLink(fileName, raceNumber) {
-            const fullUrl = window.location.origin + '/' + fileName;
+            const fullUrl = getFullRaceLink(fileName);
+            
+            console.log('Copia link:', {
+                fileName: fileName,
+                raceNumber: raceNumber,
+                fullUrl: fullUrl
+            });
             
             // Usa Clipboard API con fallback
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(fullUrl).then(() => {
-                    showCopySuccess(raceNumber);
+                    showCopySuccess(raceNumber, fullUrl);
                 }).catch(err => {
                     fallbackCopy(fullUrl, raceNumber);
                 });
@@ -1041,19 +1095,20 @@
             }
         }
 
-        function showCopySuccess(raceNumber) {
+        function showCopySuccess(raceNumber, fullUrl) {
             // Mostra notifica
             const notif = document.getElementById('notif');
             notif.innerHTML = `
                 <i class="fas fa-check-circle" style="margin-right: 10px;"></i>
                 Link gara ${raceNumber} copiato!
+                <br><small style="opacity: 0.8; font-size: 0.8em; word-break: break-all;">${fullUrl}</small>
             `;
             notif.style.display = 'block';
             
-            // Reset notifica dopo 3 secondi
+            // Reset notifica dopo 4 secondi (più lungo per vedere l'URL)
             setTimeout(() => {
                 notif.style.display = 'none';
-            }, 3000);
+            }, 4000);
 
             // Animazione pulsante
             const btn = document.getElementById(`copy-btn-${raceNumber}`);
@@ -1088,7 +1143,7 @@
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
-                    showCopySuccess(raceNumber);
+                    showCopySuccess(raceNumber, text);
                 } else {
                     throw new Error('Fallback copy failed');
                 }
@@ -1200,7 +1255,9 @@
                     height: window.innerHeight,
                     pixelRatio: window.devicePixelRatio
                 },
-                touch: 'ontouchstart' in window
+                touch: 'ontouchstart' in window,
+                currentPath: window.location.pathname,
+                fullPath: window.location.href
             });
         };
 
