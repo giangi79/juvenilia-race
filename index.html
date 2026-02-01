@@ -3,1182 +3,776 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Gestione Gare - Dashboard</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <title>Dashboard Polisportiva Juvenilia</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
     <style>
-        /* RESET E VARIABILI */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Poppins', sans-serif; 
         }
-
+        
         :root {
-            --primary-color: #1a237e;
-            --secondary-color: #283593;
-            --accent-color: #3949ab;
-            --highlight-color: #5c6bc0;
-            --bg-color: #ffffff;
-            --text-color: #2c3e50;
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #5c6bc0;
+            --success: #43e97b;
+            --warning: #ffb74d;
+            --bg: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
             --card-bg: #ffffff;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --info-color: #3498db;
-            --danger-color: #e74c3c;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
-            --border-radius-sm: 8px;
-            --border-radius-md: 12px;
-            --border-radius-lg: 16px;
-            --border-radius-xl: 20px;
-            --safe-area-top: env(safe-area-inset-top, 0px);
-            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.18);
+            --radius: 20px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
-        /* STILI BASE */
-        body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.5;
-            font-size: 14px;
-            padding-top: var(--safe-area-top);
-            padding-bottom: var(--safe-area-bottom);
+        body { 
+            background: var(--bg); 
+            color: var(--text); 
             min-height: 100vh;
-            overflow-x: hidden;
+            padding-bottom: 40px;
         }
 
-        /* CONTAINER */
-        .container {
-            width: 100%;
-            padding: 0 15px;
-            margin: 0 auto;
-        }
-
-        /* HEADER SEMPLIFICATO */
-        .app-header {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
-            box-shadow: var(--shadow-md);
+        /* HEADER CON LOGO GRANDE */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; 
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom-left-radius: 40px; 
+            border-bottom-right-radius: 40px;
+            box-shadow: var(--shadow); 
+            margin-bottom: 40px;
             position: relative;
-            margin-bottom: 20px;
             overflow: hidden;
-            padding: 20px 0;
-            border-bottom: 3px solid var(--primary-color);
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M1200 120L0 16.48 0 0 1200 0 1200 120z" fill="%23ffffff" opacity="0.1"/></svg>');
+            background-size: 100% 100px;
+            background-repeat: no-repeat;
+            background-position: bottom;
+        }
+
+        .logo-header {
+            height: 120px;
+            width: auto;
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3));
+            margin-bottom: 20px;
+            border-radius: 15px;
+            background: white;
+            padding: 12px;
+            transition: var(--transition);
+        }
+
+        .logo-header:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
         }
 
         .header-content {
-            padding: 0 15px;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
+            z-index: 2;
+            position: relative;
         }
 
-        /* LOGO CON SFONDO CHIARO */
-        .logo-container {
-            background: white;
-            padding: 20px;
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-lg);
-            border: 2px solid #f0f0f0;
-            width: 100%;
-            max-width: 500px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0 auto;
-            min-height: 120px;
-        }
-
-        .logo-full-width {
-            width: 100%;
-            max-width: 300px;
-            height: auto;
-            max-height: 120px;
-            object-fit: contain;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-        }
-
-        /* Fallback per logo mancante */
-        .logo-fallback {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            text-align: center;
-        }
-
-        .logo-fallback-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 1.5rem;
-        }
-
-        .logo-fallback-text {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        /* TITOLO PRINCIPALE */
-        .app-title {
-            color: var(--primary-color);
-            font-size: 1.8rem;
+        .header-content h1 {
+            font-size: 2.2rem;
             font-weight: 800;
-            line-height: 1.2;
-            text-align: center;
-            padding: 0 10px;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
 
-        /* CONTROLLI */
-        .controls-section {
-            background: white;
-            border-radius: var(--border-radius-lg);
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow-md);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            border: 1px solid #f0f0f0;
+        .header-content p {
+            font-size: 1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+            font-weight: 300;
         }
 
-        /* BOTTONI */
-        .btn {
-            padding: 14px 20px;
-            border: none;
-            border-radius: var(--border-radius-md);
-            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.2s ease;
-            min-height: 48px;
-            min-width: 48px;
-            touch-action: manipulation;
-            flex: 1;
-            max-width: 100%;
-            box-shadow: 0 4px 6px rgba(57, 73, 171, 0.2);
-        }
-
-        .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 4px rgba(57, 73, 171, 0.2);
-        }
-
-        .btn-edit {
-            background: linear-gradient(135deg, var(--warning-color), #e67e22);
-        }
-
-        /* GRIGLIA GARE */
-        .races-grid {
+        /* CONTAINER PRINCIPALE */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 25px;
             display: grid;
-            gap: 15px;
-            grid-template-columns: 1fr;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
         }
 
-        /* CARD GARE */
+        /* CARD GARA */
         .race-card {
             background: var(--card-bg);
-            border-radius: var(--border-radius-lg);
+            border-radius: var(--radius);
             overflow: hidden;
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s ease;
-            position: relative;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
             display: flex;
             flex-direction: column;
-            min-height: 180px;
-            border: 1px solid #f0f0f0;
+            border: none;
+            position: relative;
         }
 
-        .race-card:active {
-            transform: translateY(2px);
-            box-shadow: var(--shadow-sm);
+        .race-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .race-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
         }
 
         .card-header {
-            padding: 20px 15px;
+            padding: 35px 25px;
             color: white;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.3rem;
+            text-transform: uppercase;
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4;
             position: relative;
             overflow: hidden;
-            flex-shrink: 0;
+            letter-spacing: 0.5px;
         }
 
-        .card-header.gradient-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .card-header.gradient-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .card-header.gradient-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        .card-header.gradient-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-        .card-header.gradient-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
-
-        .race-info h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-            line-height: 1.3;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
+        .card-logo {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            backdrop-filter: blur(5px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
-        .race-info p {
+        .card-number {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
             font-size: 0.9rem;
-            opacity: 0.95;
-            font-weight: 400;
+            backdrop-filter: blur(5px);
         }
 
-        .card-content {
-            padding: 20px 15px;
+        .card-body {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
             flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            background: #f8f9fa;
         }
 
-        .card-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .btn-copy-race {
-            background: white;
-            color: var(--accent-color);
-            padding: 12px 16px;
-            border-radius: var(--border-radius-md);
-            font-size: 0.95rem;
-            border: 2px solid var(--accent-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            min-height: 44px;
+        /* PULSANTI */
+        .btn {
+            padding: 16px 20px;
+            border-radius: 14px;
+            border: none;
             font-weight: 600;
-        }
-
-        .btn-copy-race:active {
-            background: var(--accent-color);
-            color: white;
-        }
-
-        .btn-copy-race.copied {
-            background: var(--success-color);
-            color: white;
-            border-color: var(--success-color);
-        }
-
-        .race-link {
-            text-decoration: none;
-            color: white;
-            font-weight: 700;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 14px 16px;
-            border-radius: var(--border-radius-md);
-            background: var(--accent-color);
-            transition: all 0.2s ease;
-            font-size: 0.95rem;
-            min-height: 44px;
-            box-shadow: 0 2px 4px rgba(57, 73, 171, 0.2);
+            gap: 12px;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .race-link:active {
-            background: var(--primary-color);
-            transform: translateY(2px);
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.7s;
         }
 
-        .arrow {
-            font-size: 1.1rem;
-            transition: transform 0.2s;
-            font-weight: 800;
+        .btn:hover::before {
+            left: 100%;
         }
 
-        /* MODAL */
-        .edit-modal {
-            display: none;
+        .btn-main {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
+        }
+
+        .btn-main:hover {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 35, 126, 0.4);
+        }
+
+        .btn-copy {
+            background: linear-gradient(135deg, #f0f2f5, #e4e7ec);
+            color: var(--text);
+            border: 2px solid transparent;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .btn-copy:hover {
+            background: linear-gradient(135deg, #e4e7ec, #d5d9e0);
+            border-color: var(--accent);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-copy.success {
+            background: linear-gradient(135deg, #43e97b, #38ef7d);
+            color: white;
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* COLORI DINAMICI - Stesso stile delle gare */
+        .color-1 { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .color-2 { background: linear-gradient(135deg, #f5576c, #f093fb); }
+        .color-3 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+        .color-4 { background: linear-gradient(135deg, #43e97b, #38ef7d); }
+        .color-5 { background: linear-gradient(135deg, #fa709a, #fee140); }
+        .color-6 { background: linear-gradient(135deg, #30cfd0, #330867); }
+        .color-7 { background: linear-gradient(135deg, #a8edea, #fed6e3); }
+        .color-8 { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
+
+        /* LOADER */
+        #loader {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            flex-direction: column;
             justify-content: center;
-            align-items: flex-start;
-            padding: 20px 15px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            backdrop-filter: blur(8px);
-        }
-
-        .modal-content {
-            background-color: var(--card-bg);
-            border-radius: var(--border-radius-xl);
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            animation: modalSlideUp 0.3s ease-out;
-            margin: auto 0;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        @keyframes modalSlideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid #eee;
-            position: sticky;
-            top: 0;
-            background: var(--card-bg);
-            border-radius: var(--border-radius-xl) var(--border-radius-xl) 0 0;
-            z-index: 1;
+            z-index: 2000;
+            gap: 25px;
+            transition: opacity 0.5s ease;
         }
 
-        .modal-title {
-            color: var(--primary-color);
-            font-size: 1.4rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.8rem;
-            color: #777;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .spinner {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid white;
             border-radius: 50%;
-            transition: background 0.2s;
+            animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
         }
 
-        .close-modal:active {
-            background: rgba(0,0,0,0.05);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .modal-body {
-            padding: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
+        .loading-text {
+            color: white;
             font-weight: 600;
-            color: var(--primary-color);
-            font-size: 0.95rem;
-        }
-
-        .form-group label i {
-            color: var(--accent-color);
-            width: 20px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #ddd;
-            border-radius: var(--border-radius-md);
-            font-family: 'Poppins', sans-serif;
-            font-size: 15px;
-            transition: all 0.2s;
-            background: #f8f9fa;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.15);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 12px;
-            padding: 20px;
-            border-top: 1px solid #eee;
-            background: #f8f9fa;
-            border-radius: 0 0 var(--border-radius-xl) var(--border-radius-xl);
-        }
-
-        .modal-actions .btn {
-            flex: 1;
-        }
-
-        .btn-cancel {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-        }
-
-        .btn-save {
-            background: linear-gradient(135deg, var(--success-color), #2ecc71);
+            font-size: 1.2rem;
+            text-align: center;
+            max-width: 300px;
+            line-height: 1.6;
         }
 
         /* NOTIFICA */
-        .notification {
+        #notif {
             position: fixed;
-            bottom: 20px;
-            right: 15px;
-            left: 15px;
-            padding: 16px;
-            background: var(--success-color);
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, var(--success), #2ecc71);
             color: white;
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-lg);
+            padding: 18px 35px;
+            border-radius: 50px;
             display: none;
-            align-items: center;
-            gap: 12px;
-            z-index: 1001;
-            animation: slideInRight 0.3s ease;
-            max-width: 100%;
-            word-wrap: break-word;
+            z-index: 3000;
+            box-shadow: var(--shadow);
+            font-weight: 600;
+            animation: slideUp 0.3s ease-out forwards;
+            min-width: 300px;
+            text-align: center;
         }
 
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .notification i {
-            font-size: 1.5rem;
-            flex-shrink: 0;
-        }
-
-        .notification-text {
-            flex-grow: 1;
-            font-weight: 500;
-            font-size: 0.95rem;
-            line-height: 1.4;
+        @keyframes slideUp {
+            to {
+                transform: translateX(-50%) translateY(0);
+            }
         }
 
         /* FOOTER */
-        .app-footer {
+        .footer {
             text-align: center;
-            padding: 20px 15px;
-            color: #7f8c8d;
+            padding: 30px 20px;
+            margin-top: 60px;
+            color: var(--text-light);
             font-size: 0.9rem;
-            border-top: 1px solid #eee;
-            margin-top: 20px;
-            background: white;
+            border-top: 1px solid rgba(0,0,0,0.1);
         }
 
-        /* MEDIA QUERIES PER TABLET */
-        @media (min-width: 768px) {
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        /* CONTATORE GARE */
+        .race-counter {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            max-width: 300px;
+            margin: 0 auto 50px;
+            border: 2px solid var(--primary);
+            position: relative;
+        }
+
+        .race-counter::before {
+            content: '🏆';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .counter-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 10px 0;
+            display: inline-block;
+            padding: 0 20px;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+        }
+
+        .counter-text {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
             .container {
-                padding: 0 25px;
-                max-width: 1200px;
-            }
-            
-            body {
-                font-size: 15px;
-            }
-            
-            .app-header {
-                margin-bottom: 30px;
-                padding: 30px 0;
-            }
-            
-            .header-content {
-                padding: 0 25px;
-                gap: 20px;
-            }
-            
-            .logo-container {
-                padding: 25px;
-                max-width: 600px;
-                min-height: 140px;
-            }
-            
-            .logo-full-width {
-                max-width: 350px;
-                max-height: 140px;
-            }
-            
-            .app-title {
-                font-size: 2.2rem;
-            }
-            
-            .controls-section {
-                padding: 20px;
-                margin-bottom: 30px;
-                justify-content: flex-end;
-            }
-            
-            .btn {
-                padding: 16px 25px;
-                font-size: 16px;
-                flex: none;
-            }
-            
-            .races-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-            }
-            
-            .race-card {
-                min-height: 200px;
-            }
-            
-            .card-header {
-                padding: 25px 20px;
-            }
-            
-            .race-info h2 {
-                font-size: 1.5rem;
-            }
-            
-            .card-content {
-                padding: 25px 20px;
-            }
-            
-            .card-actions {
-                flex-direction: row;
-                justify-content: space-between;
-            }
-            
-            .btn-copy-race, .race-link {
-                flex: 1;
-                max-width: 48%;
-            }
-            
-            .edit-modal {
-                padding: 40px 20px;
-                align-items: center;
-            }
-            
-            .notification {
-                right: 25px;
-                left: auto;
-                max-width: 400px;
-            }
-        }
-
-        /* MEDIA QUERIES PER DESKTOP */
-        @media (min-width: 1024px) {
-            .races-grid {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: 1fr;
+                padding: 0 20px;
                 gap: 25px;
             }
             
-            .app-title {
-                font-size: 2.5rem;
+            .header-content h1 {
+                font-size: 1.8rem;
             }
             
-            .race-card:hover {
-                transform: translateY(-8px);
-                box-shadow: var(--shadow-lg);
+            .logo-header {
+                height: 100px;
             }
             
-            .race-link:hover {
-                background: var(--primary-color);
-                transform: translateY(-2px);
+            .race-card {
+                margin: 0 10px;
             }
             
-            .btn:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 12px rgba(57, 73, 171, 0.3);
+            .card-header {
+                padding: 30px 20px;
+                font-size: 1.2rem;
             }
             
-            .btn-copy-race:hover {
-                background: var(--accent-color);
-                color: white;
+            .card-body {
+                padding: 25px;
             }
             
-            .close-modal:hover {
-                background: rgba(0,0,0,0.05);
+            .btn {
+                padding: 14px 16px;
+                font-size: 0.95rem;
             }
         }
 
-        /* GRANDI DESKTOP */
-        @media (min-width: 1200px) {
-            .container {
-                padding: 0 40px;
-            }
-            
-            .races-grid {
-                grid-template-columns: repeat(5, 1fr);
-                gap: 30px;
-            }
-            
-            .app-header {
-                margin-bottom: 40px;
-                padding: 40px 0;
-            }
-            
-            .header-content {
-                padding: 0 40px;
-            }
-            
-            .logo-container {
-                max-width: 700px;
-                padding: 30px;
-                min-height: 150px;
-            }
-            
-            .logo-full-width {
-                max-width: 400px;
-                max-height: 150px;
-            }
+        /* ANIMAZIONI */
+        .animate__animated {
+            animation-duration: 0.8s;
         }
 
-        /* DARK MODE */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #121212;
-                --text-color: #e0e0e0;
-                --card-bg: #1e1e1e;
-                --primary-color: #7986cb;
-                --secondary-color: #5c6bc0;
-                --accent-color: #3f51b5;
-            }
-            
-            body {
-                background-color: var(--bg-color);
-                color: var(--text-color);
-            }
-            
-            .app-header {
-                background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
-                border-bottom-color: var(--primary-color);
-            }
-            
-            .logo-container {
-                background: #2d2d2d;
-                border-color: #444;
-            }
-            
-            .controls-section,
-            .race-card,
-            .modal-content,
-            .app-footer {
-                background-color: var(--card-bg);
-                border-color: #444;
-            }
-            
-            .card-content {
-                background: #2d2d2d;
-            }
-            
-            .app-title {
-                color: white;
-            }
-            
-            .form-group input {
-                background: #2d2d2d;
-                border-color: #444;
-                color: var(--text-color);
-            }
-            
-            .modal-actions {
-                background: #2d2d2d;
-                border-color: #444;
-            }
-            
-            .btn-copy-race {
-                background: #2d2d2d;
-                border-color: var(--accent-color);
-                color: var(--accent-color);
-            }
-            
-            .btn-copy-race:hover {
-                background: var(--accent-color);
-                color: white;
-            }
+        /* MESSAGGIO VUOTO */
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 80px 20px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
 
-        /* GESTIONE IPHONE NOTCH */
-        @supports(padding: max(0px)) {
-            .container {
-                padding-left: max(15px, env(safe-area-inset-left));
-                padding-right: max(15px, env(safe-area-inset-right));
-            }
+        .empty-state i {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            color: var(--text-light);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .empty-state p {
+            color: var(--text-light);
+            max-width: 500px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+
+        .retry-btn {
+            padding: 12px 30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .retry-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER SEMPLIFICATO -->
-    <header class="app-header">
+    <div id="loader" class="animate__animated animate__fadeIn">
+        <div class="spinner"></div>
+        <div class="loading-text">
+            <p>Caricamento dashboard...</p>
+            <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">Sincronizzazione gare in corso</p>
+        </div>
+    </div>
+
+    <header class="animate__animated animate__fadeInDown">
+        <img src="logo.png" alt="Logo Polisportiva Juvenilia" class="logo-header">
         <div class="header-content">
-            <div class="logo-container">
-                <img src="logo.png" alt="Logo Gestione Gare" class="logo-full-width">
-                <div class="logo-fallback">
-                    <div class="logo-fallback-icon">
-                        <i class="fas fa-flag-checkered"></i>
-                    </div>
-                    <div class="logo-fallback-text">Gestione Gare</div>
-                </div>
-            </div>
-            <h1 class="app-title">Dashboard Gestione Gare</h1>
+            <h1>Dashboard Gare</h1>
+            <p>Gestione centralizzata delle manifestazioni sportive</p>
         </div>
     </header>
 
-    <!-- CONTENUTO PRINCIPALE -->
-    <main class="container">
-        <!-- CONTROLLI -->
-        <section class="controls-section">
-            <button class="btn btn-edit" id="edit-titles-btn">
-                <i class="fas fa-edit"></i> Modifica Titoli Gare
-            </button>
-        </section>
+    <main>
+        <div id="race-counter" class="race-counter animate__animated animate__fadeIn" style="display: none;">
+            <div class="counter-number" id="counter-value">0</div>
+            <p class="counter-text">Gare attive nel sistema</p>
+        </div>
 
-        <!-- GRIGLIA GARE -->
-        <section class="races-grid">
-            <!-- GARA 1 -->
-            <article class="race-card">
-                <div class="card-header gradient-1">
-                    <div class="race-info">
-                        <h2 class="race-title">Gara 1: Circuito Cittadino</h2>
-                        <p>Gestione iscrizioni e presenze</p>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-actions">
-                        <button class="btn-copy-race" data-link="gara1.html" aria-label="Copia link Gara 1">
-                            <i class="fas fa-link"></i> Copia Link
-                        </button>
-                        <a href="gara1.html" class="race-link" aria-label="Vai alla gestione Gara 1">
-                            Vai alla Gestione
-                            <span class="arrow">→</span>
-                        </a>
-                    </div>
-                </div>
-            </article>
-
-            <!-- GARA 2 -->
-            <article class="race-card">
-                <div class="card-header gradient-2">
-                    <div class="race-info">
-                        <h2 class="race-title">Gara 2: Trail Montano</h2>
-                        <p>Gestione iscrizioni e presenze</p>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-actions">
-                        <button class="btn-copy-race" data-link="gara2.html" aria-label="Copia link Gara 2">
-                            <i class="fas fa-link"></i> Copia Link
-                        </button>
-                        <a href="gara2.html" class="race-link" aria-label="Vai alla gestione Gara 2">
-                            Vai alla Gestione
-                            <span class="arrow">→</span>
-                        </a>
-                    </div>
-                </div>
-            </article>
-
-            <!-- GARA 3 -->
-            <article class="race-card">
-                <div class="card-header gradient-3">
-                    <div class="race-info">
-                        <h2 class="race-title">Gara 3: Mezza Maratona</h2>
-                        <p>Gestione iscrizioni e presenze</p>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-actions">
-                        <button class="btn-copy-race" data-link="gara3.html" aria-label="Copia link Gara 3">
-                            <i class="fas fa-link"></i> Copia Link
-                        </button>
-                        <a href="gara3.html" class="race-link" aria-label="Vai alla gestione Gara 3">
-                            Vai alla Gestione
-                            <span class="arrow">→</span>
-                        </a>
-                    </div>
-                </div>
-            </article>
-
-            <!-- GARA 4 -->
-            <article class="race-card">
-                <div class="card-header gradient-4">
-                    <div class="race-info">
-                        <h2 class="race-title">Gara 4: Granfondo Ciclistica</h2>
-                        <p>Gestione iscrizioni e presenze</p>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-actions">
-                        <button class="btn-copy-race" data-link="gara4.html" aria-label="Copia link Gara 4">
-                            <i class="fas fa-link"></i> Copia Link
-                        </button>
-                        <a href="gara4.html" class="race-link" aria-label="Vai alla gestione Gara 4">
-                            Vai alla Gestione
-                            <span class="arrow">→</span>
-                        </a>
-                    </div>
-                </div>
-            </article>
-
-            <!-- GARA 5 -->
-            <article class="race-card">
-                <div class="card-header gradient-5">
-                    <div class="race-info">
-                        <h2 class="race-title">Gara 5: Duathlon Sprint</h2>
-                        <p>Gestione iscrizioni e presenze</p>
-                    </div>
-                </div>
-                <div class="card-content">
-                    <div class="card-actions">
-                        <button class="btn-copy-race" data-link="gara5.html" aria-label="Copia link Gara 5">
-                            <i class="fas fa-link"></i> Copia Link
-                        </button>
-                        <a href="gara5.html" class="race-link" aria-label="Vai alla gestione Gara 5">
-                            Vai alla Gestione
-                            <span class="arrow">→</span>
-                        </a>
-                    </div>
-                </div>
-            </article>
-        </section>
-
-        <!-- FOOTER -->
-        <footer class="app-footer">
-            <p>&copy; 2026 Sistema Gestione Gare | Versione 4.0</p>
-        </footer>
+        <div class="container" id="race-grid">
+            <!-- Le card delle gare verranno inserite qui dinamicamente -->
+        </div>
     </main>
 
-    <!-- MODAL MODIFICA TITOLI -->
-    <div class="edit-modal" id="edit-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title"><i class="fas fa-edit"></i> Modifica Titoli Gare</h3>
-                <button class="close-modal" id="close-modal" aria-label="Chiudi finestra di modifica">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="edit-form">
-                    <div class="form-group">
-                        <label for="title-1"><i class="fas fa-flag-checkered"></i> Titolo Gara 1:</label>
-                        <input type="text" id="title-1" class="title-input" data-index="1" value="Gara 1: Circuito Cittadino">
-                    </div>
-                    <div class="form-group">
-                        <label for="title-2"><i class="fas fa-mountain"></i> Titolo Gara 2:</label>
-                        <input type="text" id="title-2" class="title-input" data-index="2" value="Gara 2: Trail Montano">
-                    </div>
-                    <div class="form-group">
-                        <label for="title-3"><i class="fas fa-running"></i> Titolo Gara 3:</label>
-                        <input type="text" id="title-3" class="title-input" data-index="3" value="Gara 3: Mezza Maratona">
-                    </div>
-                    <div class="form-group">
-                        <label for="title-4"><i class="fas fa-bicycle"></i> Titolo Gara 4:</label>
-                        <input type="text" id="title-4" class="title-input" data-index="4" value="Gara 4: Granfondo Ciclistica">
-                    </div>
-                    <div class="form-group">
-                        <label for="title-5"><i class="fas fa-swimmer"></i> Titolo Gara 5:</label>
-                        <input type="text" id="title-5" class="title-input" data-index="5" value="Gara 5: Duathlon Sprint">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn btn-cancel" id="cancel-btn">Annulla</button>
-                <button type="submit" class="btn btn-save" id="save-btn">Salva Modifiche</button>
-            </div>
-        </div>
-    </div>
+    <div id="notif"></div>
 
-    <!-- NOTIFICA -->
-    <div class="notification" id="notification" role="alert" aria-live="polite">
-        <i class="fas fa-check-circle"></i>
-        <span class="notification-text" id="notification-text">Operazione completata con successo!</span>
-    </div>
+    <footer class="footer animate__animated animate__fadeInUp">
+        <p>© 2024 Polisportiva Juvenilia - Sistema di gestione gare</p>
+        <p style="margin-top: 5px; font-size: 0.8rem; opacity: 0.7;">
+            <i class="fas fa-lock"></i> Sistema sicuro | 
+            <i class="fas fa-bolt"></i> Performance ottimizzata
+        </p>
+    </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // GESTIONE LOGO - Fallback migliorato
-            const logoImg = document.querySelector('.logo-full-width');
-            const logoFallback = document.querySelector('.logo-fallback');
+        // CONFIGURAZIONE SUPABASE
+        const SUPABASE_URL = 'https://jnfnfszekfstuoiemkgf.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuZm5mc3pla2ZzdHVvaWVta2dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODkzOTEsImV4cCI6MjA4MzQ2NTM5MX0.lh7eRFlg7nnI7kEzVPBL9kNyZWX-XFeWQxVbvmzRlvA';
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Stato per i pulsanti copia
+        let copyButtonsState = {};
+
+        /**
+         * Funzione principale: recupera le tabelle, i titoli e renderizza la pagina
+         */
+        async function initDashboard() {
+            showLoader(true);
+            const grid = document.getElementById('race-grid');
+            const counter = document.getElementById('race-counter');
             
-            if (logoImg) {
-                logoImg.onerror = function() {
-                    this.style.display = 'none';
-                    if (logoFallback) {
-                        logoFallback.style.display = 'flex';
-                    }
-                };
-                
-                // Controlla se l'immagine è già caricata
-                if (logoImg.complete && logoImg.naturalHeight === 0) {
-                    logoImg.style.display = 'none';
-                    if (logoFallback) {
-                        logoFallback.style.display = 'flex';
-                    }
-                }
-            }
-            
-            // COPIA LINK
-            const copyRaceButtons = document.querySelectorAll('.btn-copy-race');
-            const notification = document.getElementById('notification');
-            const notificationText = document.getElementById('notification-text');
-            
-            copyRaceButtons.forEach(button => {
-                button.addEventListener('click', async function() {
-                    const raceLink = this.getAttribute('data-link');
-                    const baseUrl = window.location.origin;
-                    const currentPath = window.location.pathname;
-                    const directory = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
-                    const fullUrl = baseUrl + directory + raceLink;
-                    
-                    try {
-                        await navigator.clipboard.writeText(fullUrl);
-                        
-                        // Feedback visivo
-                        const originalText = this.innerHTML;
-                        this.innerHTML = '<i class="fas fa-check"></i> Copiato!';
-                        this.classList.add('copied');
-                        
-                        // Vibrazione su mobile
-                        if (navigator.vibrate) {
-                            navigator.vibrate(50);
-                        }
-                        
-                        // Notifica
-                        const raceTitle = this.closest('.race-card').querySelector('.race-title').textContent;
-                        notificationText.textContent = `Link di "${raceTitle}" copiato negli appunti!`;
-                        notification.style.backgroundColor = '#3498db';
-                        notification.style.display = 'flex';
-                        
-                        // Reset del bottone
-                        setTimeout(() => {
-                            this.innerHTML = originalText;
-                            this.classList.remove('copied');
-                        }, 2000);
-                        
-                        // Nasconde la notifica
-                        setTimeout(() => {
-                            notification.style.display = 'none';
-                        }, 3000);
-                        
-                    } catch (err) {
-                        // Fallback per browser meno recenti
-                        const textArea = document.createElement('textarea');
-                        textArea.value = fullUrl;
-                        textArea.style.position = 'fixed';
-                        textArea.style.opacity = '0';
-                        document.body.appendChild(textArea);
-                        textArea.select();
-                        
-                        try {
-                            document.execCommand('copy');
-                            // Notifica di successo
-                            const raceTitle = this.closest('.race-card').querySelector('.race-title').textContent;
-                            notificationText.textContent = `Link di "${raceTitle}" copiato negli appunti!`;
-                            notification.style.backgroundColor = '#3498db';
-                        } catch (err) {
-                            // Notifica di errore
-                            notificationText.textContent = 'Errore nella copia del link. Prova a selezionarlo manualmente.';
-                            notification.style.backgroundColor = '#e74c3c';
-                        }
-                        
-                        document.body.removeChild(textArea);
-                        notification.style.display = 'flex';
-                        
-                        setTimeout(() => {
-                            notification.style.display = 'none';
-                        }, 3000);
-                    }
-                });
-            });
-            
-            // MODIFICA TITOLI
-            const editBtn = document.getElementById('edit-titles-btn');
-            const editModal = document.getElementById('edit-modal');
-            const closeModal = document.getElementById('close-modal');
-            const cancelBtn = document.getElementById('cancel-btn');
-            const saveBtn = document.getElementById('save-btn');
-            const editForm = document.getElementById('edit-form');
-            
-            // Salvataggio dei titoli in sessionStorage per maggiore affidabilità
-            function saveTitleToStorage(index, title) {
-                try {
-                    localStorage.setItem(`race-title-${index}`, title);
-                    sessionStorage.setItem(`race-title-${index}`, title);
-                } catch (e) {
-                    console.warn('Impossibile salvare nei localStorage/sessionStorage');
-                }
-            }
-            
-            // Carica i titoli salvati
-            function loadSavedTitles() {
-                for (let i = 1; i <= 5; i++) {
-                    let savedTitle = localStorage.getItem(`race-title-${i}`);
-                    if (!savedTitle) {
-                        savedTitle = sessionStorage.getItem(`race-title-${i}`);
-                    }
-                    if (savedTitle) {
-                        const raceTitle = document.querySelector(`.race-card:nth-child(${i}) .race-title`);
-                        if (raceTitle) {
-                            raceTitle.textContent = savedTitle;
-                        }
-                    }
-                }
-            }
-            
-            // Carica i titoli all'avvio
-            loadSavedTitles();
-            
-            // Apre il modal
-            editBtn.addEventListener('click', function() {
-                const raceCards = document.querySelectorAll('.race-card');
-                raceCards.forEach(card => {
-                    const copyBtn = card.querySelector('.btn-copy-race');
-                    if (copyBtn) {
-                        const link = copyBtn.getAttribute('data-link');
-                        const match = link.match(/gara(\d+)\.html/);
-                        if (match) {
-                            const index = match[1];
-                            const title = card.querySelector('.race-title').textContent;
-                            const input = document.getElementById(`title-${index}`);
-                            if (input) {
-                                input.value = title;
-                            }
-                        }
-                    }
-                });
-                
-                editModal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-                
-                // Focus sul primo campo
-                setTimeout(() => {
-                    document.getElementById('title-1').focus();
-                }, 300);
-            });
-            
-            // Chiude il modal
-            function closeEditModal() {
-                editModal.style.display = 'none';
-                document.body.style.overflow = '';
-                if (document.activeElement && document.activeElement.blur) {
-                    document.activeElement.blur();
-                }
-            }
-            
-            closeModal.addEventListener('click', closeEditModal);
-            cancelBtn.addEventListener('click', closeEditModal);
-            
-            // Chiude il modal cliccando fuori o con ESC
-            editModal.addEventListener('click', function(e) {
-                if (e.target === editModal) {
-                    closeEditModal();
-                }
-            });
-            
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && editModal.style.display === 'flex') {
-                    closeEditModal();
-                }
-                
-                // Salva con Ctrl+Enter o Cmd+Enter
-                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && editModal.style.display === 'flex') {
-                    saveBtn.click();
-                }
-            });
-            
-            // Salva le modifiche
-            saveBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const titleInputs = document.querySelectorAll('.title-input');
-                let hasErrors = false;
-                
-                titleInputs.forEach(input => {
-                    const index = input.getAttribute('data-index');
-                    const newTitle = input.value.trim();
-                    
-                    if (!newTitle) {
-                        input.style.borderColor = '#e74c3c';
-                        hasErrors = true;
-                    } else {
-                        input.style.borderColor = '';
-                        const raceCard = document.querySelector(`.race-card:nth-child(${index}) .race-title`);
-                        if (raceCard) {
-                            raceCard.textContent = newTitle;
-                            saveTitleToStorage(index, newTitle);
-                        }
-                    }
-                });
-                
-                if (hasErrors) {
-                    notificationText.textContent = 'Per favore, compila tutti i campi!';
-                    notification.style.backgroundColor = '#e74c3c';
-                    notification.style.display = 'flex';
-                    
-                    setTimeout(() => {
-                        notification.style.display = 'none';
-                    }, 3000);
+            try {
+                // 1. Chiamata alla funzione RPC per listare le tabelle
+                const { data: tables, error: tableError } = await _supabase.rpc('get_race_tables');
+
+                if (tableError) throw tableError;
+
+                if (!tables || tables.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-trophy"></i>
+                            <h3>Nessuna gara configurata</h3>
+                            <p>Non sono presenti manifestazioni attive nel sistema.<br>Configura una nuova gara per iniziare.</p>
+                            <button onclick="initDashboard()" class="retry-btn">
+                                <i class="fas fa-sync-alt"></i> Ricarica
+                            </button>
+                        </div>`;
+                    counter.style.display = 'none';
                     return;
                 }
-                
-                // Feedback tattile
-                if (navigator.vibrate) {
-                    navigator.vibrate([50, 30, 50]);
-                }
-                
-                // Notifica di successo
-                notificationText.textContent = 'Titoli aggiornati con successo!';
-                notification.style.backgroundColor = '#27ae60';
-                notification.style.display = 'flex';
-                
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                }, 3000);
-                
-                // Chiude il modal
-                closeEditModal();
-            });
-            
-            // Submit form con Enter
-            editForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                saveBtn.click();
-            });
-            
-            // Pulizia dello stile degli input al focus
-            const titleInputs = document.querySelectorAll('.title-input');
-            titleInputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    this.style.borderColor = '';
+
+                // Aggiorna contatore
+                document.getElementById('counter-value').textContent = tables.length;
+                counter.style.display = 'block';
+
+                // 2. Recupera solo i titoli delle gare
+                const titleRequests = tables.map(t => 
+                    _supabase
+                        .from(t.table_name)
+                        .select('valore')
+                        .eq('chiave', 'titolo_gara')
+                        .maybeSingle()
+                );
+
+                const results = await Promise.all(titleRequests);
+
+                // 3. Costruzione della griglia HTML
+                let gridHtml = '';
+                results.forEach((res, index) => {
+                    const tableName = tables[index].table_name;
+                    const raceNumber = tableName.match(/\d+/) ? tableName.match(/\d+/)[0] : (index + 1);
+                    
+                    // Titolo gara
+                    const raceTitle = (res.data && res.data.valore) 
+                        ? res.data.valore 
+                        : `Gara ${raceNumber}`;
+                    
+                    // Icona basata sul numero della gara
+                    const raceIcons = ['🏆', '⚽', '🎯', '🏃', '🏊', '🚴', '🤸', '🎾'];
+                    const raceIcon = raceIcons[index % raceIcons.length] || '🏆';
+
+                    // Rotazione colori (1-8)
+                    const colorIndex = (index % 8) + 1;
+
+                    gridHtml += `
+                        <div class="race-card animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s">
+                            <div class="card-header color-${colorIndex}">
+                                <div class="card-number">${raceNumber}</div>
+                                <div class="card-logo">${raceIcon}</div>
+                                ${raceTitle}
+                            </div>
+                            <div class="card-body">
+                                <a href="gara${raceNumber}.html" class="btn btn-main">
+                                    <i class="fas fa-users"></i> Gestisci Iscrizioni
+                                </a>
+                                
+                                <button class="btn btn-copy" id="copy-btn-${raceNumber}" onclick="copyRaceLink('gara${raceNumber}.html', ${raceNumber})">
+                                    <i class="fas fa-link"></i> Copia Link Diretto
+                                </button>
+                            </div>
+                        </div>`;
                 });
+
+                grid.innerHTML = gridHtml;
+
+            } catch (err) {
+                console.error("Errore critico dashboard:", err);
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle" style="color: #f5576c;"></i>
+                        <h3 style="color: #f5576c;">Errore di connessione</h3>
+                        <p>Impossibile recuperare i dati delle gare.<br>Verifica la connessione e riprova.</p>
+                        <button onclick="initDashboard()" class="retry-btn">
+                            <i class="fas fa-redo"></i> Riprova
+                        </button>
+                    </div>`;
+                counter.style.display = 'none';
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        // Funzione per mostrare/nascondere il caricamento
+        function showLoader(isVisible) {
+            const loader = document.getElementById('loader');
+            if (isVisible) {
+                loader.style.display = 'flex';
+                loader.style.opacity = '1';
+            } else {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
+            }
+        }
+
+        // Funzione per copiare il link della gara
+        function copyRaceLink(fileName, raceNumber) {
+            const fullUrl = window.location.origin + '/' + fileName;
+            
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                // Mostra notifica
+                const notif = document.getElementById('notif');
+                notif.innerHTML = `
+                    <i class="fas fa-check-circle" style="margin-right: 10px;"></i>
+                    Link gara ${raceNumber} copiato!
+                `;
+                notif.style.display = 'block';
+                
+                // Reset notifica dopo 3 secondi
+                setTimeout(() => {
+                    notif.style.display = 'none';
+                }, 3000);
+
+                // Animazione pulsante
+                const btn = document.getElementById(`copy-btn-${raceNumber}`);
+                if (btn) {
+                    btn.classList.add('success');
+                    btn.innerHTML = '<i class="fas fa-check"></i> Link Copiato!';
+                    
+                    // Reset pulsante dopo 2 secondi
+                    setTimeout(() => {
+                        btn.classList.remove('success');
+                        btn.innerHTML = '<i class="fas fa-link"></i> Copia Link Diretto';
+                    }, 2000);
+                }
+
+                // Effetto confetti per la prima copia
+                if (!copyButtonsState[raceNumber]) {
+                    createConfetti(raceNumber);
+                    copyButtonsState[raceNumber] = true;
+                }
+            }).catch(err => {
+                console.error('Errore nella copia:', err);
+                const notif = document.getElementById('notif');
+                notif.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="margin-right: 10px;"></i>
+                    Errore nella copia del link
+                `;
+                notif.style.display = 'block';
+                setTimeout(() => notif.style.display = 'none', 3000);
             });
-        });
+        }
+
+        // Effetto confetti per celebrare la copia
+        function createConfetti(raceNumber) {
+            const card = document.querySelector(`#copy-btn-${raceNumber}`).closest('.race-card');
+            const colors = ['#667eea', '#f5576c', '#43e97b', '#fa709a', '#ffb74d'];
+            
+            for (let i = 0; i < 12; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'absolute';
+                    confetti.style.width = '8px';
+                    confetti.style.height = '8px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.borderRadius = '50%';
+                    confetti.style.top = '50%';
+                    confetti.style.left = '50%';
+                    confetti.style.zIndex = '1000';
+                    confetti.style.pointerEvents = 'none';
+                    
+                    card.appendChild(confetti);
+                    
+                    // Animazione confetti
+                    const angle = Math.random() * Math.PI * 2;
+                    const velocity = 2 + Math.random() * 3;
+                    const vx = Math.cos(angle) * velocity;
+                    const vy = Math.sin(angle) * velocity;
+                    
+                    let x = 0, y = 0;
+                    const animate = () => {
+                        x += vx;
+                        y += vy;
+                        vy += 0.1; // gravità
+                        
+                        confetti.style.transform = `translate(${x}px, ${y}px) rotate(${x * 5}deg)`;
+                        confetti.style.opacity = 1 - (Math.abs(x) + Math.abs(y)) / 100;
+                        
+                        if (Math.abs(x) < 100 && Math.abs(y) < 100) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            confetti.remove();
+                        }
+                    };
+                    
+                    animate();
+                }, i * 100);
+            }
+        }
+
+        // Auto-refresh ogni 5 minuti
+        setInterval(() => {
+            console.log('Auto-refresh dashboard...');
+            initDashboard();
+        }, 5 * 60 * 1000);
+
+        // Avvio al caricamento della pagina
+        window.onload = function() {
+            initDashboard();
+        };
     </script>
 </body>
 </html>
