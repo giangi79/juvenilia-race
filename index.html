@@ -2,62 +2,156 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <!-- VIEWPORT OPTIMIZED PER TUTTI I DISPOSITIVI -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, minimum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    
+    <!-- META TAGS PER IOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Juvenilia Dashboard">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- META TAGS PER ANDROID -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#1a237e">
+    <meta name="application-name" content="Juvenilia Dashboard">
+    
+    <!-- META TAGS PER SAFARI/IOS -->
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="apple-mobile-web-app-orientations" content="portrait">
+    
     <title>Dashboard Polisportiva Juvenilia</title>
     
+    <!-- ICONE PER TUTTE LE PIATTAFORME -->
+    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="apple-touch-startup-image" href="logo.png">
+    
+    <!-- CDN SCRIPT & STYLE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 
     <style>
+        /* RESET UNIVERSALE */
         * { 
             margin: 0; 
             padding: 0; 
             box-sizing: border-box; 
-            font-family: 'Poppins', sans-serif; 
+            -webkit-tap-highlight-color: transparent; /* Rimuove highlight su tap mobile */
+            -webkit-touch-callout: none; /* Disabilita menu contestuale iOS */
+            -webkit-user-select: none; /* Disabilita selezione */
+            user-select: none;
+        }
+        
+        /* Abilita selezione per elementi testuali */
+        .selectable-text {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        
+        body, html {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+            touch-action: manipulation; /* Migliora performance touch */
         }
         
         :root {
+            /* VARIABILI ADATTIVE */
+            --safe-area-top: env(safe-area-inset-top, 0px);
+            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-area-left: env(safe-area-inset-left, 0px);
+            --safe-area-right: env(safe-area-inset-right, 0px);
+            
+            /* COLORI PRINCIPALI */
             --primary: #1a237e;
             --secondary: #283593;
             --accent: #5c6bc0;
             --success: #43e97b;
             --warning: #ffb74d;
+            
+            /* BACKGROUNDS */
             --bg: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
             --card-bg: #ffffff;
             --text: #2c3e50;
             --text-light: #7f8c8d;
-            --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-            --shadow-hover: 0 15px 40px rgba(0, 0, 0, 0.18);
-            --radius: 20px;
-            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            /* DIMENSIONI DINAMICHE */
+            --header-height-mobile: 180px;
+            --header-height-desktop: 220px;
+            --card-min-width: min(350px, 90vw);
+            --grid-gap: clamp(15px, 3vw, 30px);
+            --container-padding: clamp(15px, 4vw, 25px);
+            --font-size-base: clamp(14px, 2.5vw, 16px);
+            --font-size-large: clamp(1.8rem, 5vw, 2.2rem);
+            --font-size-medium: clamp(1.2rem, 4vw, 1.3rem);
+            --font-size-small: clamp(0.9rem, 3vw, 1rem);
+            
+            /* SHADOW & RADIUS */
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.15);
+            --radius: clamp(15px, 4vw, 20px);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* DETECTION DISPOSITIVO */
+        body::after {
+            content: '';
+            display: none;
+        }
+        
+        .device-mobile .container {
+            grid-template-columns: 1fr;
+            padding: 0 clamp(10px, 3vw, 15px);
+        }
+        
+        .device-desktop .container {
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
         }
 
         body { 
             background: var(--bg); 
             color: var(--text); 
             min-height: 100vh;
-            padding-bottom: 40px;
+            padding-bottom: calc(40px + var(--safe-area-bottom));
+            font-size: var(--font-size-base);
+            display: flex;
+            flex-direction: column;
         }
 
-        /* HEADER CON LOGO GRANDE */
+        /* HEADER RESPONSIVE */
         header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white; 
-            padding: 40px 20px;
+            padding: 20px 15px;
             text-align: center;
-            border-bottom-left-radius: 40px; 
-            border-bottom-right-radius: 40px;
+            border-bottom-left-radius: var(--radius); 
+            border-bottom-right-radius: var(--radius);
             box-shadow: var(--shadow); 
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             position: relative;
             overflow: hidden;
-            min-height: 220px;
+            min-height: var(--header-height-mobile);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            padding-top: calc(20px + var(--safe-area-top));
+        }
+
+        @media (min-width: 768px) {
+            header {
+                min-height: var(--header-height-desktop);
+                padding: 30px 20px;
+                margin-bottom: 40px;
+            }
         }
 
         header::before {
@@ -68,59 +162,94 @@
             right: 0;
             height: 100%;
             background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M1200 120L0 16.48 0 0 1200 0 1200 120z" fill="%23ffffff" opacity="0.1"/></svg>');
-            background-size: 100% 100px;
+            background-size: 100% 80px;
             background-repeat: no-repeat;
             background-position: bottom;
         }
 
         .logo-header {
-            height: 120px;
+            height: clamp(80px, 20vw, 120px);
             width: auto;
-            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3));
-            margin-bottom: 20px;
-            border-radius: 15px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            margin-bottom: clamp(10px, 3vw, 20px);
+            border-radius: clamp(10px, 3vw, 15px);
             background: white;
-            padding: 12px;
+            padding: clamp(8px, 2vw, 12px);
             transition: var(--transition);
+            max-width: 100%;
+            object-fit: contain;
         }
 
         .logo-header:hover {
             transform: scale(1.05);
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
+            filter: drop-shadow(0 6px 12px rgba(0,0,0,0.3));
         }
 
         .header-content {
             z-index: 2;
             position: relative;
+            width: 100%;
         }
 
         .header-content h1 {
-            font-size: 2.2rem;
+            font-size: var(--font-size-large);
             font-weight: 800;
-            margin-bottom: 8px;
+            margin-bottom: clamp(5px, 1.5vw, 8px);
             text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            line-height: 1.2;
+            padding: 0 10px;
         }
 
         .header-content p {
-            font-size: 1rem;
+            font-size: clamp(0.9rem, 3vw, 1rem);
             opacity: 0.9;
-            max-width: 600px;
+            max-width: min(600px, 90vw);
             margin: 0 auto;
-            line-height: 1.6;
+            line-height: 1.5;
             font-weight: 300;
         }
 
-        /* CONTAINER PRINCIPALE */
+        /* CONTAINER PRINCIPALE ADATTIVO */
+        main {
+            flex: 1;
+            width: 100%;
+        }
+
         .container {
             max-width: 1300px;
             margin: 0 auto;
-            padding: 0 25px;
+            padding: 0 var(--container-padding);
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 30px;
+            gap: var(--grid-gap);
+            width: 100%;
         }
 
-        /* CARD GARA */
+        /* GRID ADATTIVA */
+        @media (max-width: 479px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (min-width: 480px) and (max-width: 767px) {
+            .container {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+        
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .container {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .container {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+        }
+
+        /* CARD GARA RESPONSIVE */
         .race-card {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -131,11 +260,24 @@
             flex-direction: column;
             border: none;
             position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
         }
 
-        .race-card:hover {
-            transform: translateY(-10px) scale(1.02);
+        .race-card:hover,
+        .race-card:active {
+            transform: translateY(-5px) scale(1.01);
             box-shadow: var(--shadow-hover);
+        }
+
+        @media (hover: none) {
+            .race-card:hover {
+                transform: none;
+            }
+            .race-card:active {
+                transform: scale(0.98);
+            }
         }
 
         .race-card::after {
@@ -149,13 +291,13 @@
         }
 
         .card-header {
-            padding: 35px 25px;
+            padding: clamp(20px, 5vw, 35px) clamp(15px, 4vw, 25px);
             color: white;
             text-align: center;
             font-weight: 700;
-            font-size: 1.3rem;
+            font-size: var(--font-size-medium);
             text-transform: uppercase;
-            min-height: 140px;
+            min-height: clamp(100px, 25vw, 140px);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -164,65 +306,85 @@
             position: relative;
             overflow: hidden;
             letter-spacing: 0.5px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
 
         .card-logo {
-            width: 60px;
-            height: 60px;
+            width: clamp(50px, 12vw, 60px);
+            height: clamp(50px, 12vw, 60px);
             background: rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
+            border-radius: clamp(10px, 3vw, 15px);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 15px;
-            font-size: 1.8rem;
+            margin-bottom: clamp(10px, 3vw, 15px);
+            font-size: clamp(1.5rem, 4vw, 1.8rem);
             backdrop-filter: blur(5px);
             border: 2px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
         }
 
         .card-number {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: clamp(10px, 3vw, 15px);
+            right: clamp(10px, 3vw, 15px);
             background: rgba(255, 255, 255, 0.2);
             color: white;
-            width: 36px;
-            height: 36px;
+            width: clamp(30px, 8vw, 36px);
+            height: clamp(30px, 8vw, 36px);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
             backdrop-filter: blur(5px);
         }
 
         .card-body {
-            padding: 30px;
+            padding: clamp(20px, 5vw, 30px);
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: clamp(15px, 4vw, 20px);
             flex-grow: 1;
         }
 
-        /* PULSANTI */
+        /* PULSANTI TOUCH-FRIENDLY */
         .btn {
-            padding: 16px 20px;
-            border-radius: 14px;
+            padding: clamp(14px, 4vw, 16px) clamp(16px, 4vw, 20px);
+            border-radius: clamp(12px, 3vw, 14px);
             border: none;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: clamp(8px, 2vw, 12px);
             text-decoration: none;
             transition: var(--transition);
-            font-size: 1rem;
+            font-size: var(--font-size-small);
             text-transform: uppercase;
             letter-spacing: 0.5px;
             position: relative;
             overflow: hidden;
+            width: 100%;
+            min-height: 52px;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        /* Dimensione minima touch target 44px (Apple Guidelines) */
+        @media (max-width: 768px) {
+            .btn {
+                min-height: 44px;
+            }
+        }
+
+        .btn:active {
+            transform: scale(0.97);
         }
 
         .btn::before {
@@ -240,13 +402,20 @@
             left: 100%;
         }
 
+        @media (hover: none) {
+            .btn:hover::before {
+                animation: none;
+            }
+        }
+
         .btn-main {
             background: linear-gradient(135deg, var(--primary), var(--accent));
             color: white;
             box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
         }
 
-        .btn-main:hover {
+        .btn-main:hover,
+        .btn-main:active {
             background: linear-gradient(135deg, var(--secondary), var(--primary));
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(26, 35, 126, 0.4);
@@ -259,7 +428,8 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.08);
         }
 
-        .btn-copy:hover {
+        .btn-copy:hover,
+        .btn-copy:active {
             background: linear-gradient(135deg, #e4e7ec, #d5d9e0);
             border-color: var(--accent);
             color: var(--primary);
@@ -278,7 +448,7 @@
             100% { transform: scale(1); }
         }
 
-        /* COLORI DINAMICI - Stesso stile delle gare */
+        /* COLORI DINAMICI */
         .color-1 { background: linear-gradient(135deg, #667eea, #764ba2); }
         .color-2 { background: linear-gradient(135deg, #f5576c, #f093fb); }
         .color-3 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
@@ -288,7 +458,7 @@
         .color-7 { background: linear-gradient(135deg, #a8edea, #fed6e3); }
         .color-8 { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
 
-        /* LOADER */
+        /* LOADER RESPONSIVE */
         #loader {
             position: fixed;
             top: 0;
@@ -301,13 +471,14 @@
             justify-content: center;
             align-items: center;
             z-index: 2000;
-            gap: 25px;
+            gap: clamp(15px, 4vw, 25px);
             transition: opacity 0.5s ease;
+            padding: var(--safe-area-top) var(--safe-area-right) var(--safe-area-bottom) var(--safe-area-left);
         }
 
         .spinner {
-            width: 70px;
-            height: 70px;
+            width: clamp(50px, 12vw, 70px);
+            height: clamp(50px, 12vw, 70px);
             border: 5px solid rgba(255, 255, 255, 0.1);
             border-top: 5px solid white;
             border-radius: 50%;
@@ -322,29 +493,33 @@
         .loading-text {
             color: white;
             font-weight: 600;
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 3vw, 1.2rem);
             text-align: center;
-            max-width: 300px;
+            max-width: min(300px, 90vw);
             line-height: 1.6;
+            padding: 0 20px;
         }
 
-        /* NOTIFICA */
+        /* NOTIFICA MOBILE-FRIENDLY */
         #notif {
             position: fixed;
-            bottom: 40px;
+            bottom: calc(20px + var(--safe-area-bottom));
             left: 50%;
             transform: translateX(-50%) translateY(100px);
             background: linear-gradient(135deg, var(--success), #2ecc71);
             color: white;
-            padding: 18px 35px;
+            padding: clamp(12px, 3vw, 18px) clamp(20px, 5vw, 35px);
             border-radius: 50px;
             display: none;
             z-index: 3000;
             box-shadow: var(--shadow);
             font-weight: 600;
             animation: slideUp 0.3s ease-out forwards;
-            min-width: 300px;
+            width: min(300px, 90vw);
             text-align: center;
+            font-size: var(--font-size-small);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         @keyframes slideUp {
@@ -353,37 +528,16 @@
             }
         }
 
-        /* FOOTER */
-        .footer {
-            text-align: center;
-            padding: 30px 20px;
-            margin-top: 60px;
-            color: var(--text-light);
-            font-size: 0.9rem;
-            border-top: 1px solid rgba(0,0,0,0.1);
-        }
-
-        .footer a {
-            color: var(--primary);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .footer a:hover {
-            color: var(--secondary);
-            text-decoration: underline;
-        }
-
-        /* CONTATORE GARE */
+        /* CONTATORE GARE RESPONSIVE */
         .race-counter {
             text-align: center;
-            margin-bottom: 40px;
-            padding: 20px;
+            margin-bottom: clamp(20px, 5vw, 40px);
+            padding: clamp(15px, 4vw, 20px);
             background: var(--card-bg);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            max-width: 300px;
-            margin: 0 auto 50px;
+            max-width: min(300px, 90vw);
+            margin: 0 auto clamp(30px, 6vw, 50px);
             border: 2px solid var(--primary);
             position: relative;
         }
@@ -406,103 +560,213 @@
         }
 
         .counter-number {
-            font-size: 3rem;
+            font-size: clamp(2rem, 8vw, 3rem);
             font-weight: 800;
             color: var(--primary);
-            margin: 10px 0;
+            margin: clamp(5px, 2vw, 10px) 0;
             display: inline-block;
-            padding: 0 20px;
+            padding: 0 clamp(10px, 3vw, 20px);
             text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
         }
 
         .counter-text {
             color: var(--text-light);
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 3vw, 0.9rem);
         }
 
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-                padding: 0 20px;
-                gap: 25px;
-            }
-            
-            .header-content h1 {
-                font-size: 1.8rem;
-            }
-            
-            .logo-header {
-                height: 100px;
-            }
-            
-            .race-card {
-                margin: 0 10px;
-            }
-            
-            .card-header {
-                padding: 30px 20px;
-                font-size: 1.2rem;
-            }
-            
-            .card-body {
-                padding: 25px;
-            }
-            
-            .btn {
-                padding: 14px 16px;
-                font-size: 0.95rem;
-            }
+        /* FOOTER RESPONSIVE */
+        .footer {
+            text-align: center;
+            padding: clamp(20px, 5vw, 30px) clamp(15px, 4vw, 20px);
+            margin-top: clamp(30px, 6vw, 60px);
+            color: var(--text-light);
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding-bottom: calc(clamp(20px, 5vw, 30px) + var(--safe-area-bottom));
         }
 
-        /* ANIMAZIONI */
-        .animate__animated {
-            animation-duration: 0.8s;
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
         }
 
-        /* MESSAGGIO VUOTO */
+        .footer a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        /* MESSAGGIO VUOTO RESPONSIVE */
         .empty-state {
             grid-column: 1/-1;
             text-align: center;
-            padding: 80px 20px;
+            padding: clamp(40px, 10vw, 80px) clamp(15px, 4vw, 20px);
             background: var(--card-bg);
             border-radius: var(--radius);
             box-shadow: var(--shadow);
+            margin: clamp(20px, 5vw, 40px) auto;
+            max-width: min(500px, 90vw);
         }
 
         .empty-state i {
-            font-size: 4rem;
+            font-size: clamp(3rem, 12vw, 4rem);
             color: #ddd;
-            margin-bottom: 20px;
+            margin-bottom: clamp(15px, 4vw, 20px);
         }
 
         .empty-state h3 {
             color: var(--text-light);
-            margin-bottom: 15px;
+            margin-bottom: clamp(10px, 3vw, 15px);
             font-weight: 600;
+            font-size: clamp(1.1rem, 4vw, 1.3rem);
         }
 
         .empty-state p {
             color: var(--text-light);
-            max-width: 500px;
-            margin: 0 auto 30px;
+            max-width: min(500px, 90vw);
+            margin: 0 auto clamp(20px, 5vw, 30px);
             line-height: 1.6;
+            font-size: var(--font-size-small);
         }
 
         .retry-btn {
-            padding: 12px 30px;
+            padding: clamp(10px, 3vw, 12px) clamp(20px, 5vw, 30px);
             background: var(--primary);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: clamp(8px, 2vw, 10px);
             cursor: pointer;
             font-weight: 600;
             transition: var(--transition);
+            font-size: var(--font-size-small);
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+
+        .retry-btn:active {
+            transform: scale(0.95);
         }
 
         .retry-btn:hover {
             background: var(--secondary);
             transform: translateY(-2px);
+        }
+
+        /* SCROLLBAR PERSONALIZZATA */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* IOS SPECIFIC FIXES */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                min-height: -webkit-fill-available;
+            }
+            
+            .btn {
+                -webkit-appearance: none;
+                border-radius: clamp(12px, 3vw, 14px);
+            }
+            
+            input, textarea {
+                border-radius: 10px;
+                -webkit-appearance: none;
+            }
+        }
+
+        /* ANDROID SPECIFIC FIXES */
+        @supports not (-webkit-touch-callout: none) {
+            .btn {
+                outline: none;
+            }
+            
+            .btn:focus {
+                outline: 2px solid var(--accent);
+                outline-offset: 2px;
+            }
+        }
+
+        /* ANIMAZIONI PER PERFORMANCE */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* ORIENTAMENTO LANDSCAPE */
+        @media (orientation: landscape) and (max-height: 600px) {
+            header {
+                min-height: clamp(120px, 30vh, 150px);
+                padding: 15px;
+            }
+            
+            .logo-header {
+                height: clamp(60px, 15vh, 80px);
+            }
+            
+            .container {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+            
+            .card-header {
+                min-height: clamp(80px, 20vh, 100px);
+                padding: 15px;
+            }
+        }
+
+        /* DARK MODE SUPPORT */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                --card-bg: #2d3748;
+                --text: #e2e8f0;
+                --text-light: #a0aec0;
+                --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
+            }
+            
+            .btn-copy {
+                background: linear-gradient(135deg, #4a5568, #2d3748);
+                color: #e2e8f0;
+            }
+            
+            .btn-copy:hover {
+                background: linear-gradient(135deg, #2d3748, #4a5568);
+            }
+            
+            .empty-state {
+                background: #2d3748;
+            }
+        }
+
+        /* HIGH CONTRAST MODE */
+        @media (prefers-contrast: high) {
+            .btn {
+                border: 2px solid currentColor;
+            }
+            
+            .race-card {
+                border: 2px solid var(--primary);
+            }
         }
     </style>
 </head>
@@ -512,7 +776,7 @@
         <div class="spinner"></div>
         <div class="loading-text">
             <p>Caricamento dashboard...</p>
-            <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">Sincronizzazione gare in corso</p>
+            <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">Rilevamento dispositivo in corso</p>
         </div>
     </div>
 
@@ -540,12 +804,105 @@
     <footer class="footer animate__animated animate__fadeInUp">
         <p>© 2024 Polisportiva Juvenilia - Sistema di gestione gare</p>
         <p style="margin-top: 5px; font-size: 0.8rem; opacity: 0.7;">
-            <i class="fas fa-lock"></i> Sistema sicuro | 
-            <i class="fas fa-bolt"></i> Performance ottimizzata
+            <i class="fas fa-mobile-alt"></i> Ottimizzato per mobile | 
+            <i class="fas fa-desktop"></i> Desktop ready
         </p>
     </footer>
 
     <script>
+        // DETECTION DISPOSITIVO E BROWSER
+        function detectDevice() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const body = document.body;
+            
+            // Rimuovi classi precedenti
+            body.classList.remove('device-mobile', 'device-tablet', 'device-desktop', 'ios-device', 'android-device');
+            
+            // Rileva sistema operativo
+            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+                body.classList.add('ios-device');
+            } else if (/android/i.test(userAgent)) {
+                body.classList.add('android-device');
+            }
+            
+            // Rileva dimensioni dispositivo
+            const width = window.innerWidth;
+            if (width <= 768) {
+                body.classList.add('device-mobile');
+            } else if (width <= 1024) {
+                body.classList.add('device-tablet');
+            } else {
+                body.classList.add('device-desktop');
+            }
+            
+            // Log per debug
+            console.log('Dispositivo rilevato:', {
+                userAgent: userAgent,
+                width: width,
+                classes: body.className,
+                isIOS: /iPad|iPhone|iPod/.test(userAgent),
+                isAndroid: /android/i.test(userAgent),
+                isMobile: width <= 768
+            });
+        }
+
+        // GESTIONE SAFE AREA PER IOS
+        function setupSafeArea() {
+            const doc = document.documentElement;
+            const style = document.createElement('style');
+            
+            // Calcola altezza safe area
+            const safeAreaTop = 'env(safe-area-inset-top, 0px)';
+            const safeAreaBottom = 'env(safe-area-inset-bottom, 0px)';
+            
+            style.textContent = `
+                :root {
+                    --safe-area-top: ${safeAreaTop};
+                    --safe-area-bottom: ${safeAreaBottom};
+                }
+                
+                .ios-device header {
+                    padding-top: calc(20px + ${safeAreaTop});
+                }
+                
+                .ios-device .footer {
+                    padding-bottom: calc(20px + ${safeAreaBottom});
+                }
+            `;
+            
+            document.head.appendChild(style);
+        }
+
+        // OTTIMIZZAZIONE TOUCH PER ANDROID
+        function optimizeForAndroid() {
+            if (document.body.classList.contains('android-device')) {
+                // Disabilita effetti hover sui dispositivi touch
+                const style = document.createElement('style');
+                style.textContent = `
+                    @media (hover: none) {
+                        .btn:hover {
+                            transform: none !important;
+                        }
+                        .race-card:hover {
+                            transform: none !important;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        // PREVENZIONE ZOOM SU INPUT (iOS)
+        function preventZoomOnInput() {
+            if (document.body.classList.contains('ios-device')) {
+                document.addEventListener('touchstart', function(event) {
+                    if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+                        event.target.style.fontSize = '16px'; // Previene zoom automatico
+                    }
+                });
+            }
+        }
+
         // CONFIGURAZIONE SUPABASE
         const SUPABASE_URL = 'https://jnfnfszekfstuoiemkgf.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuZm5mc3pla2ZzdHVvaWVta2dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODkzOTEsImV4cCI6MjA4MzQ2NTM5MX0.lh7eRFlg7nnI7kEzVPBL9kNyZWX-XFeWQxVbvmzRlvA';
@@ -598,7 +955,7 @@
 
                 const results = await Promise.all(titleRequests);
 
-                // 3. Costruzione della griglia HTML
+                // 3. Costruzione della griglia HTML con layout adattivo
                 let gridHtml = '';
                 results.forEach((res, index) => {
                     const tableName = tables[index].table_name;
@@ -668,43 +1025,74 @@
             }
         }
 
-        // Funzione per copiare il link della gara
+        // Funzione per copiare il link della gara (ottimizzata per mobile)
         function copyRaceLink(fileName, raceNumber) {
             const fullUrl = window.location.origin + '/' + fileName;
             
-            navigator.clipboard.writeText(fullUrl).then(() => {
-                // Mostra notifica
-                const notif = document.getElementById('notif');
-                notif.innerHTML = `
-                    <i class="fas fa-check-circle" style="margin-right: 10px;"></i>
-                    Link gara ${raceNumber} copiato!
-                `;
-                notif.style.display = 'block';
+            // Usa Clipboard API con fallback
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(fullUrl).then(() => {
+                    showCopySuccess(raceNumber);
+                }).catch(err => {
+                    fallbackCopy(fullUrl, raceNumber);
+                });
+            } else {
+                fallbackCopy(fullUrl, raceNumber);
+            }
+        }
+
+        function showCopySuccess(raceNumber) {
+            // Mostra notifica
+            const notif = document.getElementById('notif');
+            notif.innerHTML = `
+                <i class="fas fa-check-circle" style="margin-right: 10px;"></i>
+                Link gara ${raceNumber} copiato!
+            `;
+            notif.style.display = 'block';
+            
+            // Reset notifica dopo 3 secondi
+            setTimeout(() => {
+                notif.style.display = 'none';
+            }, 3000);
+
+            // Animazione pulsante
+            const btn = document.getElementById(`copy-btn-${raceNumber}`);
+            if (btn) {
+                btn.classList.add('success');
+                btn.innerHTML = '<i class="fas fa-check"></i> Copiato!';
                 
-                // Reset notifica dopo 3 secondi
+                // Reset pulsante dopo 2 secondi
                 setTimeout(() => {
-                    notif.style.display = 'none';
-                }, 3000);
+                    btn.classList.remove('success');
+                    btn.innerHTML = '<i class="fas fa-link"></i> Copia Link Diretto';
+                }, 2000);
+            }
 
-                // Animazione pulsante
-                const btn = document.getElementById(`copy-btn-${raceNumber}`);
-                if (btn) {
-                    btn.classList.add('success');
-                    btn.innerHTML = '<i class="fas fa-check"></i> Link Copiato!';
-                    
-                    // Reset pulsante dopo 2 secondi
-                    setTimeout(() => {
-                        btn.classList.remove('success');
-                        btn.innerHTML = '<i class="fas fa-link"></i> Copia Link Diretto';
-                    }, 2000);
-                }
+            // Effetto confetti per la prima copia
+            if (!copyButtonsState[raceNumber]) {
+                createConfetti(raceNumber);
+                copyButtonsState[raceNumber] = true;
+            }
+        }
 
-                // Effetto confetti per la prima copia
-                if (!copyButtonsState[raceNumber]) {
-                    createConfetti(raceNumber);
-                    copyButtonsState[raceNumber] = true;
+        // Fallback per dispositivi che non supportano Clipboard API
+        function fallbackCopy(text, raceNumber) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopySuccess(raceNumber);
+                } else {
+                    throw new Error('Fallback copy failed');
                 }
-            }).catch(err => {
+            } catch (err) {
                 console.error('Errore nella copia:', err);
                 const notif = document.getElementById('notif');
                 notif.innerHTML = `
@@ -713,7 +1101,9 @@
                 `;
                 notif.style.display = 'block';
                 setTimeout(() => notif.style.display = 'none', 3000);
-            });
+            }
+            
+            document.body.removeChild(textArea);
         }
 
         // Effetto confetti per celebrare la copia
@@ -721,24 +1111,25 @@
             const card = document.querySelector(`#copy-btn-${raceNumber}`).closest('.race-card');
             const colors = ['#667eea', '#f5576c', '#43e97b', '#fa709a', '#ffb74d'];
             
-            for (let i = 0; i < 12; i++) {
+            for (let i = 0; i < 8; i++) { // Ridotto per performance mobile
                 setTimeout(() => {
                     const confetti = document.createElement('div');
                     confetti.style.position = 'absolute';
-                    confetti.style.width = '8px';
-                    confetti.style.height = '8px';
+                    confetti.style.width = '6px';
+                    confetti.style.height = '6px';
                     confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
                     confetti.style.borderRadius = '50%';
                     confetti.style.top = '50%';
                     confetti.style.left = '50%';
                     confetti.style.zIndex = '1000';
                     confetti.style.pointerEvents = 'none';
+                    confetti.style.willChange = 'transform, opacity';
                     
                     card.appendChild(confetti);
                     
-                    // Animazione confetti
+                    // Animazione confetti ottimizzata
                     const angle = Math.random() * Math.PI * 2;
-                    const velocity = 2 + Math.random() * 3;
+                    const velocity = 1.5 + Math.random() * 2;
                     const vx = Math.cos(angle) * velocity;
                     const vy = Math.sin(angle) * velocity;
                     
@@ -746,12 +1137,12 @@
                     const animate = () => {
                         x += vx;
                         y += vy;
-                        vy += 0.1; // gravità
+                        vy += 0.08; // gravità ridotta
                         
-                        confetti.style.transform = `translate(${x}px, ${y}px) rotate(${x * 5}deg)`;
-                        confetti.style.opacity = 1 - (Math.abs(x) + Math.abs(y)) / 100;
+                        confetti.style.transform = `translate(${x}px, ${y}px) rotate(${x * 3}deg)`;
+                        confetti.style.opacity = 1 - (Math.abs(x) + Math.abs(y)) / 80;
                         
-                        if (Math.abs(x) < 100 && Math.abs(y) < 100) {
+                        if (Math.abs(x) < 80 && Math.abs(y) < 80) {
                             requestAnimationFrame(animate);
                         } else {
                             confetti.remove();
@@ -759,20 +1150,86 @@
                     };
                     
                     animate();
-                }, i * 100);
+                }, i * 120);
             }
         }
 
-        // Auto-refresh ogni 5 minuti
-        setInterval(() => {
-            console.log('Auto-refresh dashboard...');
-            initDashboard();
-        }, 5 * 60 * 1000);
+        // GESTIONE ORIENTAMENTO E RESIZE
+        let resizeTimeout;
+        function handleResize() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                detectDevice();
+                optimizeForAndroid();
+            }, 250);
+        }
 
-        // Avvio al caricamento della pagina
+        // PREVENZIONE SCROLL CHAOTIC SU IOS
+        function preventIOSBounce() {
+            if (document.body.classList.contains('ios-device')) {
+                document.body.addEventListener('touchmove', function(e) {
+                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+            }
+        }
+
+        // INIZIALIZZAZIONE
         window.onload = function() {
+            // Setup iniziale
+            detectDevice();
+            setupSafeArea();
+            optimizeForAndroid();
+            preventZoomOnInput();
+            preventIOSBounce();
+            
+            // Event listeners
+            window.addEventListener('resize', handleResize);
+            window.addEventListener('orientationchange', handleResize);
+            
+            // Avvio dashboard
             initDashboard();
+            
+            // Log ambiente
+            console.log('Ambiente caricato:', {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                screen: {
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                    pixelRatio: window.devicePixelRatio
+                },
+                touch: 'ontouchstart' in window
+            });
         };
+
+        // GESTIONE OFFLINE
+        window.addEventListener('online', () => {
+            const notif = document.getElementById('notif');
+            notif.innerHTML = '<i class="fas fa-wifi"></i> Connessione ripristinata';
+            notif.style.display = 'block';
+            setTimeout(() => {
+                notif.style.display = 'none';
+                initDashboard(); // Ricarica i dati
+            }, 2000);
+        });
+
+        window.addEventListener('offline', () => {
+            const notif = document.getElementById('notif');
+            notif.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Connessione assente';
+            notif.style.display = 'block';
+            notif.style.background = 'linear-gradient(135deg, #f5576c, #d32f2f)';
+            setTimeout(() => notif.style.display = 'none', 3000);
+        });
+
+        // Auto-refresh ogni 10 minuti (ridotto per risparmio batteria mobile)
+        setInterval(() => {
+            if (navigator.onLine) {
+                console.log('Auto-refresh dashboard...');
+                initDashboard();
+            }
+        }, 10 * 60 * 1000);
     </script>
 </body>
 </html>
