@@ -22,11 +22,13 @@
     
     <title>Dashboard Polisportiva Juvenilia</title>
     
-    <!-- ICONE PER TUTTE LE PIATTAFORME -->
-    <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="logo.png">
-    <link rel="apple-touch-icon" href="logo.png">
-    <link rel="apple-touch-startup-image" href="logo.png">
+    <!-- ICONE - CORRETTO: favicon.ico come icona principale -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <!-- Icone aggiuntive opzionali (se esistono) -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" href="logo.png"> <!-- Usa logo.png per iOS -->
     
     <!-- CDN SCRIPT & STYLE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -167,6 +169,7 @@
             background-position: bottom;
         }
 
+        /* LOGO ORIGINALE - COME PRIMA */
         .logo-header {
             height: clamp(80px, 20vw, 120px);
             width: auto;
@@ -847,6 +850,7 @@
     </div>
 
     <header class="animate__animated animate__fadeInDown">
+        <!-- LOGO ORIGINALE - COME PRIMA -->
         <img src="logo.png" alt="Logo Polisportiva Juvenilia" class="logo-header">
         <div class="header-content">
             <h1>Dashboard Gare</h1>
@@ -868,7 +872,7 @@
     <div id="notif"></div>
 
     <footer class="footer animate__animated animate__fadeInUp">
-        <p>© 2024 Polisportiva Juvenilia - Sistema di gestione gare</p>
+        <p>© 2026 Polisportiva Juvenilia - Sistema di gestione gare</p>
         <p style="margin-top: 5px; font-size: 0.8rem; opacity: 0.7;">
             <i class="fas fa-mobile-alt"></i> Ottimizzato per mobile | 
             <i class="fas fa-desktop"></i> Desktop ready
