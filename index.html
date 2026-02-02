@@ -178,6 +178,11 @@
             transition: var(--transition);
             max-width: 100%;
             object-fit: contain;
+            /* MODIFICA 7: Ottimizzazione Immagini */
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            content-visibility: auto;
+            contain: layout style paint;
         }
 
         .logo-header:hover {
@@ -222,6 +227,27 @@
             display: grid;
             gap: var(--grid-gap);
             width: 100%;
+            /* MODIFICA 2: Smooth scrolling iOS */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* MODIFICA 2: Prevenire layout shift */
+        #race-grid {
+            min-height: 300px;
+        }
+
+        /* MODIFICA 2: Ottimizza animazioni per dispositivi entry-level */
+        @media (prefers-reduced-motion: no-preference) {
+            .animate__animated {
+                animation-duration: 0.5s !important;
+            }
+        }
+
+        /* MODIFICA 2: Riduci ombre su dispositivi low-end */
+        @media (max-width: 768px) and (prefers-reduced-transparency: reduce) {
+            .race-card, .btn {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            }
         }
 
         /* GRID ADATTIVA */
@@ -376,6 +402,12 @@
             user-select: none;
         }
 
+        /* MODIFICA 5: Focus visibile per tastiera */
+        .btn:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 2px;
+        }
+
         /* Dimensione minima touch target 44px (Apple Guidelines) */
         @media (max-width: 768px) {
             .btn {
@@ -457,6 +489,22 @@
         .color-6 { background: linear-gradient(135deg, #30cfd0, #330867); }
         .color-7 { background: linear-gradient(135deg, #a8edea, #fed6e3); }
         .color-8 { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
+
+        /* MODIFICA 5: Contrasto alto per accessibilità */
+        @media (prefers-contrast: high) {
+            :root {
+                --primary: #0000a4;
+                --accent: #0057b7;
+            }
+            
+            .btn {
+                border: 3px solid currentColor;
+            }
+            
+            .race-card {
+                border: 3px solid var(--primary);
+            }
+        }
 
         /* LOADER RESPONSIVE */
         #loader {
@@ -687,6 +735,11 @@
                 border-radius: 10px;
                 -webkit-appearance: none;
             }
+            
+            /* Smooth scrolling per iOS */
+            .container {
+                -webkit-overflow-scrolling: touch;
+            }
         }
 
         /* ANDROID SPECIFIC FIXES */
@@ -701,7 +754,20 @@
             }
         }
 
-        /* ANIMAZIONI PER PERFORMANCE */
+        /* MODIFICA 5: Supporto per screen readers */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* MODIFICA 5: Riduce movimento per chi lo preferisce */
         @media (prefers-reduced-motion: reduce) {
             *,
             *::before,
@@ -810,20 +876,37 @@
     </footer>
 
     <script>
+        // MODIFICA 3: Gestione errori migliorata e cache offline
+        let cachedRacesData = null;
+        let lastFetchTime = 0;
+        const CACHE_DURATION = 5 * 60 * 1000; // 5 minuti
+
         // DETECTION DISPOSITIVO E BROWSER
         function detectDevice() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
             const body = document.body;
             
             // Rimuovi classi precedenti
-            body.classList.remove('device-mobile', 'device-tablet', 'device-desktop', 'ios-device', 'android-device');
+            body.classList.remove('device-mobile', 'device-tablet', 'device-desktop', 'ios-device', 'android-device', 'safari-browser', 'chrome-browser');
+            
+            // MODIFICA 3: Rileva iOS più accuratamente
+            const isIOS = /iPad|iPhone|iPod/.test(userAgent) || 
+                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
+            // MODIFICA 3: Rileva browser specifici
+            const isSafari = /^((?!chrome|android).)*safari/i.test(userAgent);
+            const isChrome = /chrome/i.test(ua) && !/edge/i.test(userAgent);
             
             // Rileva sistema operativo
-            if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            if (isIOS) {
                 body.classList.add('ios-device');
             } else if (/android/i.test(userAgent)) {
                 body.classList.add('android-device');
             }
+            
+            // MODIFICA 3: Aggiungi classi per browser specifici
+            if (isSafari) body.classList.add('safari-browser');
+            if (isChrome) body.classList.add('chrome-browser');
             
             // Rileva dimensioni dispositivo
             const width = window.innerWidth;
@@ -835,15 +918,17 @@
                 body.classList.add('device-desktop');
             }
             
-            // Log per debug
-            console.log('Dispositivo rilevato:', {
-                userAgent: userAgent,
-                width: width,
-                classes: body.className,
-                isIOS: /iPad|iPhone|iPod/.test(userAgent),
-                isAndroid: /android/i.test(userAgent),
-                isMobile: width <= 768
-            });
+            // MODIFICA 3: Log ridotto per produzione
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.log('Dispositivo rilevato:', {
+                    userAgent: userAgent,
+                    width: width,
+                    classes: body.className,
+                    isIOS: isIOS,
+                    isAndroid: /android/i.test(userAgent),
+                    isMobile: width <= 768
+                });
+            }
         }
 
         // GESTIONE SAFE AREA PER IOS
@@ -913,55 +998,101 @@
         let copyButtonsState = {};
 
         /**
-         * FUNZIONE CORRETTA PER COPIARE IL LINK COMPLETO CON PERCORSO
+         * MODIFICA 6: Funzione semplificata per copiare link
          */
         function getFullRaceLink(fileName) {
-            // Ottieni l'URL base corrente
-            const currentUrl = window.location.href;
-            
-            // Estrai il percorso base fino alla directory corrente
-            const url = new URL(currentUrl);
-            const pathParts = url.pathname.split('/');
-            
-            // Costruisci il percorso base (rimuovi index.html se presente)
-            let basePath = '/';
-            if (pathParts.length > 1) {
-                // Trova se siamo nella directory juvenilia-race
-                const juveniliaIndex = pathParts.indexOf('juvenilia-race');
-                if (juveniliaIndex !== -1) {
-                    // Prendi tutto il percorso fino a juvenilia-race compreso
-                    basePath = pathParts.slice(0, juveniliaIndex + 1).join('/') + '/';
-                } else {
-                    // Altrimenti usa il percorso corrente senza il nome file
-                    basePath = pathParts.slice(0, -1).join('/') + '/';
-                }
-            }
-            
-            // Assicurati che basePath termini con /
-            if (!basePath.endsWith('/')) {
-                basePath += '/';
-            }
-            
-            // Se basePath è solo '/', aggiungi juvenilia-race/
-            if (basePath === '/') {
-                basePath = '/juvenilia-race/';
-            }
-            
-            // Costruisci l'URL completo
-            const fullUrl = `${url.origin}${basePath}${fileName}`;
-            
-            console.log('Link generato:', {
-                origin: url.origin,
-                basePath: basePath,
-                fileName: fileName,
-                fullUrl: fullUrl
-            });
-            
-            return fullUrl;
+            // Usa URL relativo se siamo nella stessa directory
+            const baseUrl = window.location.href.replace(/\/[^\/]*$/, '/');
+            return `${baseUrl}${fileName}`;
         }
 
         /**
-         * Funzione principale: recupera le tabelle, i titoli e renderizza la pagina
+         * MODIFICA 3: Funzione per fetch dati con cache
+         */
+        async function fetchRaceData() {
+            const now = Date.now();
+            
+            // Usa cache se disponibile e ancora valida
+            if (cachedRacesData && (now - lastFetchTime) < CACHE_DURATION) {
+                console.log('Usando dati dalla cache');
+                return cachedRacesData;
+            }
+            
+            console.log('Fetch dati dal server');
+            const { data: tables, error: tableError } = await _supabase.rpc('get_race_tables');
+            
+            if (tableError) throw tableError;
+            if (!tables || tables.length === 0) return [];
+            
+            // Recupera solo i titoli delle gare
+            const titleRequests = tables.map(t => 
+                _supabase
+                    .from(t.table_name)
+                    .select('valore')
+                    .eq('chiave', 'titolo_gara')
+                    .maybeSingle()
+            );
+            
+            const results = await Promise.all(titleRequests);
+            
+            // Formatta i dati
+            const raceData = results.map((res, index) => {
+                const tableName = tables[index].table_name;
+                const raceNumber = tableName.match(/\d+/) ? tableName.match(/\d+/)[0] : (index + 1);
+                const raceTitle = (res.data && res.data.valore) ? res.data.valore : `Gara ${raceNumber}`;
+                
+                return {
+                    tableName,
+                    raceNumber,
+                    raceTitle,
+                    fileName: `gara${raceNumber}.html`
+                };
+            });
+            
+            // Aggiorna cache
+            cachedRacesData = raceData;
+            lastFetchTime = now;
+            
+            // Salva in localStorage per offline
+            try {
+                localStorage.setItem('racesCache', JSON.stringify({
+                    data: raceData,
+                    timestamp: now
+                }));
+            } catch (e) {
+                console.warn('Impossibile salvare in localStorage:', e);
+            }
+            
+            return raceData;
+        }
+
+        /**
+         * MODIFICA 3: Funzione per caricare dati da cache offline
+         */
+        async function loadFromOfflineCache() {
+            try {
+                const cached = localStorage.getItem('racesCache');
+                if (!cached) return null;
+                
+                const { data, timestamp } = JSON.parse(cached);
+                const now = Date.now();
+                
+                // Cache valida per 30 minuti in modalità offline
+                if (now - timestamp < 30 * 60 * 1000) {
+                    console.log('Caricamento da cache offline');
+                    cachedRacesData = data;
+                    lastFetchTime = timestamp;
+                    return data;
+                }
+            } catch (e) {
+                console.warn('Errore nel caricamento cache offline:', e);
+            }
+            
+            return null;
+        }
+
+        /**
+         * MODIFICA 3: Funzione principale migliorata con gestione errori
          */
         async function initDashboard() {
             showLoader(true);
@@ -969,94 +1100,126 @@
             const counter = document.getElementById('race-counter');
             
             try {
-                // 1. Chiamata alla funzione RPC per listare le tabelle
-                const { data: tables, error: tableError } = await _supabase.rpc('get_race_tables');
-
-                if (tableError) throw tableError;
-
-                if (!tables || tables.length === 0) {
-                    grid.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-trophy"></i>
-                            <h3>Nessuna gara configurata</h3>
-                            <p>Non sono presenti manifestazioni attive nel sistema.<br>Configura una nuova gara per iniziare.</p>
-                            <button onclick="initDashboard()" class="retry-btn">
-                                <i class="fas fa-sync-alt"></i> Ricarica
-                            </button>
-                        </div>`;
-                    counter.style.display = 'none';
+                // Timeout per richieste lente
+                const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('Timeout caricamento')), 15000);
+                });
+                
+                const dataPromise = fetchRaceData();
+                const raceData = await Promise.race([dataPromise, timeoutPromise]);
+                
+                if (!raceData || raceData.length === 0) {
+                    showNoRacesMessage(grid, counter);
                     return;
                 }
-
+                
                 // Aggiorna contatore
-                document.getElementById('counter-value').textContent = tables.length;
+                document.getElementById('counter-value').textContent = raceData.length;
                 counter.style.display = 'block';
-
-                // 2. Recupera solo i titoli delle gare
-                const titleRequests = tables.map(t => 
-                    _supabase
-                        .from(t.table_name)
-                        .select('valore')
-                        .eq('chiave', 'titolo_gara')
-                        .maybeSingle()
-                );
-
-                const results = await Promise.all(titleRequests);
-
-                // 3. Costruzione della griglia HTML con layout adattivo
-                let gridHtml = '';
-                results.forEach((res, index) => {
-                    const tableName = tables[index].table_name;
-                    const raceNumber = tableName.match(/\d+/) ? tableName.match(/\d+/)[0] : (index + 1);
-                    
-                    // Titolo gara
-                    const raceTitle = (res.data && res.data.valore) 
-                        ? res.data.valore 
-                        : `Gara ${raceNumber}`;
-                    
-                    // Icona basata sul numero della gara
-                    const raceIcons = ['🏆', '⚽', '🎯', '🏃', '🏊', '🚴', '🤸', '🎾'];
-                    const raceIcon = raceIcons[index % raceIcons.length] || '🏆';
-
-                    // Rotazione colori (1-8)
-                    const colorIndex = (index % 8) + 1;
-
-                    gridHtml += `
-                        <div class="race-card animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s">
-                            <div class="card-header color-${colorIndex}">
-                                <div class="card-number">${raceNumber}</div>
-                                <div class="card-logo">${raceIcon}</div>
-                                ${raceTitle}
-                            </div>
-                            <div class="card-body">
-                                <a href="gara${raceNumber}.html" class="btn btn-main">
-                                    <i class="fas fa-users"></i> Gestisci Iscrizioni
-                                </a>
-                                
-                                <button class="btn btn-copy" id="copy-btn-${raceNumber}" onclick="copyRaceLink('gara${raceNumber}.html', ${raceNumber})">
-                                    <i class="fas fa-link"></i> Copia Link Diretto
-                                </button>
-                            </div>
-                        </div>`;
-                });
-
-                grid.innerHTML = gridHtml;
-
+                
+                // Renderizza la griglia
+                renderRaceGrid(grid, raceData);
+                
             } catch (err) {
-                console.error("Errore critico dashboard:", err);
-                grid.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle" style="color: #f5576c;"></i>
-                        <h3 style="color: #f5576c;">Errore di connessione</h3>
-                        <p>Impossibile recuperare i dati delle gare.<br>Verifica la connessione e riprova.</p>
-                        <button onclick="initDashboard()" class="retry-btn">
-                            <i class="fas fa-redo"></i> Riprova
-                        </button>
-                    </div>`;
-                counter.style.display = 'none';
+                console.error("Errore caricamento:", err);
+                
+                // Prova a usare cache offline
+                if (!navigator.onLine) {
+                    const offlineData = await loadFromOfflineCache();
+                    if (offlineData && offlineData.length > 0) {
+                        renderRaceGrid(grid, offlineData);
+                        
+                        // Mostra notifica modalità offline
+                        const notif = document.getElementById('notif');
+                        notif.innerHTML = `
+                            <i class="fas fa-wifi-slash" style="margin-right: 10px;"></i>
+                            Modalità offline - Dati in cache
+                        `;
+                        notif.style.display = 'block';
+                        setTimeout(() => notif.style.display = 'none', 3000);
+                        
+                        return;
+                    }
+                }
+                
+                // Mostra errore
+                showErrorMessage(grid, counter, err);
+                
             } finally {
                 showLoader(false);
             }
+        }
+
+        /**
+         * MODIFICA 3: Funzione per renderizzare la griglia
+         */
+        function renderRaceGrid(gridElement, raceData) {
+            // Icone basate sul numero della gara
+            const raceIcons = ['🏆', '⚽', '🎯', '🏃', '🏊', '🚴', '🤸', '🎾'];
+            
+            let gridHtml = '';
+            raceData.forEach((race, index) => {
+                const raceIcon = raceIcons[index % raceIcons.length] || '🏆';
+                const colorIndex = (index % 8) + 1;
+                
+                gridHtml += `
+                    <div class="race-card animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s">
+                        <div class="card-header color-${colorIndex}">
+                            <div class="card-number">${race.raceNumber}</div>
+                            <div class="card-logo">${raceIcon}</div>
+                            ${race.raceTitle}
+                        </div>
+                        <div class="card-body">
+                            <a href="${race.fileName}" class="btn btn-main">
+                                <i class="fas fa-users"></i> Gestisci Iscrizioni
+                            </a>
+                            
+                            <button class="btn btn-copy" id="copy-btn-${race.raceNumber}" 
+                                    onclick="copyRaceLink('${race.fileName}', ${race.raceNumber})">
+                                <i class="fas fa-link"></i> Copia Link Diretto
+                            </button>
+                        </div>
+                    </div>`;
+            });
+            
+            gridElement.innerHTML = gridHtml;
+        }
+
+        /**
+         * MODIFICA 3: Messaggio nessuna gara
+         */
+        function showNoRacesMessage(grid, counter) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-trophy"></i>
+                    <h3>Nessuna gara configurata</h3>
+                    <p>Non sono presenti manifestazioni attive nel sistema.<br>Configura una nuova gara per iniziare.</p>
+                    <button onclick="initDashboard()" class="retry-btn">
+                        <i class="fas fa-sync-alt"></i> Ricarica
+                    </button>
+                </div>`;
+            counter.style.display = 'none';
+        }
+
+        /**
+         * MODIFICA 3: Messaggio errore
+         */
+        function showErrorMessage(grid, counter, error) {
+            const isOnline = navigator.onLine;
+            const errorMessage = isOnline 
+                ? `Errore di connessione: ${error.message || 'Sconosciuto'}`
+                : 'Connessione internet assente';
+            
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle" style="color: #f5576c;"></i>
+                    <h3 style="color: #f5576c;">${isOnline ? 'Errore di connessione' : 'Connessione assente'}</h3>
+                    <p>${errorMessage}<br>Verifica la connessione e riprova.</p>
+                    <button onclick="initDashboard()" class="retry-btn">
+                        <i class="fas fa-redo"></i> Riprova
+                    </button>
+                </div>`;
+            counter.style.display = 'none';
         }
 
         // Funzione per mostrare/nascondere il caricamento
@@ -1077,11 +1240,10 @@
         function copyRaceLink(fileName, raceNumber) {
             const fullUrl = getFullRaceLink(fileName);
             
-            console.log('Copia link:', {
-                fileName: fileName,
-                raceNumber: raceNumber,
-                fullUrl: fullUrl
-            });
+            // Log solo in sviluppo
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.log('Copia link:', { fileName, raceNumber, fullUrl });
+            }
             
             // Usa Clipboard API con fallback
             if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -1230,6 +1392,9 @@
             }
         }
 
+        // MODIFICA 3: Metriche Performance
+        const perfStart = performance.now();
+
         // INIZIALIZZAZIONE
         window.onload = function() {
             // Setup iniziale
@@ -1246,18 +1411,30 @@
             // Avvio dashboard
             initDashboard();
             
-            // Log ambiente
-            console.log('Ambiente caricato:', {
-                userAgent: navigator.userAgent,
-                platform: navigator.platform,
-                screen: {
-                    width: window.innerWidth,
-                    height: window.innerHeight,
-                    pixelRatio: window.devicePixelRatio
-                },
-                touch: 'ontouchstart' in window,
-                currentPath: window.location.pathname,
-                fullPath: window.location.href
+            // MODIFICA 3: Log metriche performance
+            window.addEventListener('load', () => {
+                const loadTime = performance.now() - perfStart;
+                
+                if (loadTime > 3000) {
+                    console.warn(`Load time alto: ${Math.round(loadTime)}ms`);
+                }
+                
+                // Log solo in sviluppo
+                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                    console.log('Ambiente caricato:', {
+                        loadTime: Math.round(loadTime),
+                        userAgent: navigator.userAgent,
+                        platform: navigator.platform,
+                        screen: {
+                            width: window.innerWidth,
+                            height: window.innerHeight,
+                            pixelRatio: window.devicePixelRatio
+                        },
+                        touch: 'ontouchstart' in window,
+                        currentPath: window.location.pathname,
+                        fullPath: window.location.href
+                    });
+                }
             });
         };
 
