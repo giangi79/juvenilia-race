@@ -881,7 +881,7 @@
         let lastFetchTime = 0;
         const CACHE_DURATION = 5 * 60 * 1000; // 5 minuti
 
-        // DETECTION DISPOSITIVO E BROWSER
+        // DETECTION DISPOSITIVO E BROWSER - CORRETTO
         function detectDevice() {
             const userAgent = navigator.userAgent || navigator.vendor || window.opera;
             const body = document.body;
@@ -889,13 +889,13 @@
             // Rimuovi classi precedenti
             body.classList.remove('device-mobile', 'device-tablet', 'device-desktop', 'ios-device', 'android-device', 'safari-browser', 'chrome-browser');
             
-            // MODIFICA 3: Rileva iOS più accuratamente
+            // Rileva iOS più accuratamente
             const isIOS = /iPad|iPhone|iPod/.test(userAgent) || 
                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             
-            // MODIFICA 3: Rileva browser specifici
+            // Rileva browser specifici
             const isSafari = /^((?!chrome|android).)*safari/i.test(userAgent);
-            const isChrome = /chrome/i.test(ua) && !/edge/i.test(userAgent);
+            const isChrome = /chrome/i.test(userAgent) && !/edge/i.test(userAgent);
             
             // Rileva sistema operativo
             if (isIOS) {
@@ -904,7 +904,7 @@
                 body.classList.add('android-device');
             }
             
-            // MODIFICA 3: Aggiungi classi per browser specifici
+            // Aggiungi classi per browser specifici
             if (isSafari) body.classList.add('safari-browser');
             if (isChrome) body.classList.add('chrome-browser');
             
@@ -918,10 +918,10 @@
                 body.classList.add('device-desktop');
             }
             
-            // MODIFICA 3: Log ridotto per produzione
+            // Log solo in sviluppo
             if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
                 console.log('Dispositivo rilevato:', {
-                    userAgent: userAgent,
+                    userAgent: userAgent.substring(0, 100) + '...',
                     width: width,
                     classes: body.className,
                     isIOS: isIOS,
@@ -1021,8 +1021,17 @@
             console.log('Fetch dati dal server');
             const { data: tables, error: tableError } = await _supabase.rpc('get_race_tables');
             
-            if (tableError) throw tableError;
-            if (!tables || tables.length === 0) return [];
+            if (tableError) {
+                console.error('Errore Supabase:', tableError);
+                throw tableError;
+            }
+            
+            if (!tables || tables.length === 0) {
+                console.log('Nessuna tabella trovata');
+                return [];
+            }
+            
+            console.log('Trovate tabelle:', tables.length);
             
             // Recupera solo i titoli delle gare
             const titleRequests = tables.map(t => 
@@ -1100,18 +1109,23 @@
             const counter = document.getElementById('race-counter');
             
             try {
+                console.log('Inizializzazione dashboard...');
+                
                 // Timeout per richieste lente
                 const timeoutPromise = new Promise((_, reject) => {
-                    setTimeout(() => reject(new Error('Timeout caricamento')), 15000);
+                    setTimeout(() => reject(new Error('Timeout caricamento (15s)')), 15000);
                 });
                 
                 const dataPromise = fetchRaceData();
                 const raceData = await Promise.race([dataPromise, timeoutPromise]);
                 
                 if (!raceData || raceData.length === 0) {
+                    console.log('Nessun dato gara trovato');
                     showNoRacesMessage(grid, counter);
                     return;
                 }
+                
+                console.log('Dati caricati:', raceData.length, 'gare');
                 
                 // Aggiorna contatore
                 document.getElementById('counter-value').textContent = raceData.length;
@@ -1125,8 +1139,10 @@
                 
                 // Prova a usare cache offline
                 if (!navigator.onLine) {
+                    console.log('Modalità offline, provo cache...');
                     const offlineData = await loadFromOfflineCache();
                     if (offlineData && offlineData.length > 0) {
+                        console.log('Cache offline trovata:', offlineData.length, 'gare');
                         renderRaceGrid(grid, offlineData);
                         
                         // Mostra notifica modalità offline
@@ -1143,10 +1159,12 @@
                 }
                 
                 // Mostra errore
+                console.error('Mostro messaggio errore:', err.message);
                 showErrorMessage(grid, counter, err);
                 
             } finally {
                 showLoader(false);
+                console.log('Dashboard inizializzata');
             }
         }
 
@@ -1250,6 +1268,7 @@
                 navigator.clipboard.writeText(fullUrl).then(() => {
                     showCopySuccess(raceNumber, fullUrl);
                 }).catch(err => {
+                    console.warn('Clipboard API fallback:', err);
                     fallbackCopy(fullUrl, raceNumber);
                 });
             } else {
@@ -1326,6 +1345,8 @@
         // Effetto confetti per celebrare la copia
         function createConfetti(raceNumber) {
             const card = document.querySelector(`#copy-btn-${raceNumber}`).closest('.race-card');
+            if (!card) return;
+            
             const colors = ['#667eea', '#f5576c', '#43e97b', '#fa709a', '#ffb74d'];
             
             for (let i = 0; i < 8; i++) { // Ridotto per performance mobile
@@ -1397,6 +1418,8 @@
 
         // INIZIALIZZAZIONE
         window.onload = function() {
+            console.log('Pagina caricata, inizializzazione...');
+            
             // Setup iniziale
             detectDevice();
             setupSafeArea();
@@ -1423,7 +1446,7 @@
                 if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
                     console.log('Ambiente caricato:', {
                         loadTime: Math.round(loadTime),
-                        userAgent: navigator.userAgent,
+                        userAgent: navigator.userAgent.substring(0, 100) + '...',
                         platform: navigator.platform,
                         screen: {
                             width: window.innerWidth,
@@ -1440,6 +1463,7 @@
 
         // GESTIONE OFFLINE
         window.addEventListener('online', () => {
+            console.log('Connessione ripristinata');
             const notif = document.getElementById('notif');
             notif.innerHTML = '<i class="fas fa-wifi"></i> Connessione ripristinata';
             notif.style.display = 'block';
@@ -1450,6 +1474,7 @@
         });
 
         window.addEventListener('offline', () => {
+            console.log('Connessione persa');
             const notif = document.getElementById('notif');
             notif.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Connessione assente';
             notif.style.display = 'block';
