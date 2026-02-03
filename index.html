@@ -46,6 +46,7 @@
             -webkit-touch-callout: none; /* Disabilita menu contestuale iOS */
             -webkit-user-select: none; /* Disabilita selezione */
             user-select: none;
+            touch-action: pan-x pan-y;
         }
         
         /* Abilita selezione per elementi testuali */
@@ -78,6 +79,8 @@
             --accent: #5c6bc0;
             --success: #43e97b;
             --warning: #ffb74d;
+            --drag-color: #ff9800;
+            --drag-accent: #ff5722;
             
             /* BACKGROUNDS */
             --bg: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
@@ -101,6 +104,8 @@
             --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.15);
             --radius: clamp(15px, 4vw, 20px);
             --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --drag-transition: all 0.3s cubic-bezier(0.2, 0.8, 0.4, 1);
+            --swap-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* DETECTION DISPOSITIVO */
@@ -181,7 +186,6 @@
             transition: var(--transition);
             max-width: 100%;
             object-fit: contain;
-            /* MODIFICA 7: Ottimizzazione Immagini */
             image-rendering: -webkit-optimize-contrast;
             image-rendering: crisp-edges;
             content-visibility: auto;
@@ -217,6 +221,66 @@
             font-weight: 300;
         }
 
+        /* CONTROLLI RIORDINO */
+        .reorder-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px auto 30px;
+            padding: 0 20px;
+            max-width: 500px;
+        }
+
+        .reorder-btn {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            font-size: var(--font-size-small);
+            box-shadow: 0 4px 12px rgba(26, 35, 126, 0.2);
+            touch-action: manipulation;
+            min-height: 44px;
+        }
+
+        .reorder-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 35, 126, 0.3);
+        }
+
+        .reorder-btn:active {
+            transform: scale(0.98);
+        }
+
+        .reorder-btn.active {
+            background: linear-gradient(135deg, #43e97b, #38ef7d);
+        }
+
+        .reorder-info {
+            text-align: center;
+            color: var(--text-light);
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            margin: 10px auto 20px;
+            padding: 0 20px;
+            max-width: 500px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: rgba(67, 233, 123, 0.1);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--success);
+        }
+
+        .reorder-info.show {
+            opacity: 1;
+        }
+
         /* CONTAINER PRINCIPALE ADATTIVO */
         main {
             flex: 1;
@@ -230,27 +294,8 @@
             display: grid;
             gap: var(--grid-gap);
             width: 100%;
-            /* MODIFICA 2: Smooth scrolling iOS */
             -webkit-overflow-scrolling: touch;
-        }
-
-        /* MODIFICA 2: Prevenire layout shift */
-        #race-grid {
-            min-height: 300px;
-        }
-
-        /* MODIFICA 2: Ottimizza animazioni per dispositivi entry-level */
-        @media (prefers-reduced-motion: no-preference) {
-            .animate__animated {
-                animation-duration: 0.5s !important;
-            }
-        }
-
-        /* MODIFICA 2: Riduci ombre su dispositivi low-end */
-        @media (max-width: 768px) and (prefers-reduced-transparency: reduce) {
-            .race-card, .btn {
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
-            }
+            position: relative;
         }
 
         /* GRID ADATTIVA */
@@ -287,26 +332,25 @@
             transition: var(--transition);
             display: flex;
             flex-direction: column;
-            border: none;
+            border: 2px solid transparent;
             position: relative;
             width: 100%;
             max-width: 100%;
             margin: 0 auto;
         }
 
-        .race-card:hover,
-        .race-card:active {
-            transform: translateY(-5px) scale(1.01);
+        .race-card:hover {
+            transform: translateY(-4px);
             box-shadow: var(--shadow-hover);
         }
 
-        @media (hover: none) {
-            .race-card:hover {
-                transform: none;
-            }
-            .race-card:active {
-                transform: scale(0.98);
-            }
+        .race-card.reorder-mode {
+            border: 2px solid var(--success);
+            background-color: rgba(67, 233, 123, 0.05);
+        }
+
+        .race-card.reorder-mode .card-header {
+            padding-top: 50px;
         }
 
         .race-card::after {
@@ -372,6 +416,59 @@
             backdrop-filter: blur(5px);
         }
 
+        .reorder-buttons {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: none;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .reorder-mode .reorder-buttons {
+            display: flex;
+        }
+
+        .move-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .move-btn:hover {
+            background: white;
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .move-btn:active {
+            transform: scale(0.95);
+        }
+
+        .move-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .move-btn.up {
+            color: var(--success);
+        }
+
+        .move-btn.down {
+            color: var(--accent);
+        }
+
         .card-body {
             padding: clamp(20px, 5vw, 30px);
             display: flex;
@@ -405,7 +502,6 @@
             user-select: none;
         }
 
-        /* MODIFICA 5: Focus visibile per tastiera */
         .btn:focus-visible {
             outline: 3px solid var(--accent);
             outline-offset: 2px;
@@ -474,13 +570,45 @@
         .btn-copy.success {
             background: linear-gradient(135deg, #43e97b, #38ef7d);
             color: white;
-            animation: pulse 0.5s ease-in-out;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        /* ANIMAZIONE SPOSTAMENTO */
+        @keyframes move-up {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(-10px);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes move-down {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translateY(10px);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .move-up-animation {
+            animation: move-up 0.3s ease;
+        }
+
+        .move-down-animation {
+            animation: move-down 0.3s ease;
         }
 
         /* COLORI DINAMICI */
@@ -493,29 +621,13 @@
         .color-7 { background: linear-gradient(135deg, #a8edea, #fed6e3); }
         .color-8 { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
 
-        /* MODIFICA 5: Contrasto alto per accessibilità */
-        @media (prefers-contrast: high) {
-            :root {
-                --primary: #0000a4;
-                --accent: #0057b7;
-            }
-            
-            .btn {
-                border: 3px solid currentColor;
-            }
-            
-            .race-card {
-                border: 3px solid var(--primary);
-            }
-        }
-
         /* LOADER RESPONSIVE */
         #loader {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             display: flex;
             flex-direction: column;
@@ -523,17 +635,18 @@
             align-items: center;
             z-index: 2000;
             gap: clamp(15px, 4vw, 25px);
-            transition: opacity 0.5s ease;
-            padding: var(--safe-area-top) var(--safe-area-right) var(--safe-area-bottom) var(--safe-area-left);
+            transition: opacity 0.3s ease;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            overflow: hidden;
         }
 
         .spinner {
             width: clamp(50px, 12vw, 70px);
             height: clamp(50px, 12vw, 70px);
-            border: 5px solid rgba(255, 255, 255, 0.1);
-            border-top: 5px solid white;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid white;
             border-radius: 50%;
-            animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+            animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
@@ -569,8 +682,6 @@
             width: min(300px, 90vw);
             text-align: center;
             font-size: var(--font-size-small);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
         }
 
         @keyframes slideUp {
@@ -703,26 +814,6 @@
             transform: translateY(-2px);
         }
 
-        /* SCROLLBAR PERSONALIZZATA */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
-        }
-
         /* IOS SPECIFIC FIXES */
         @supports (-webkit-touch-callout: none) {
             body {
@@ -734,71 +825,8 @@
                 border-radius: clamp(12px, 3vw, 14px);
             }
             
-            input, textarea {
-                border-radius: 10px;
-                -webkit-appearance: none;
-            }
-            
-            /* Smooth scrolling per iOS */
             .container {
                 -webkit-overflow-scrolling: touch;
-            }
-        }
-
-        /* ANDROID SPECIFIC FIXES */
-        @supports not (-webkit-touch-callout: none) {
-            .btn {
-                outline: none;
-            }
-            
-            .btn:focus {
-                outline: 2px solid var(--accent);
-                outline-offset: 2px;
-            }
-        }
-
-        /* MODIFICA 5: Supporto per screen readers */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
-        }
-
-        /* MODIFICA 5: Riduce movimento per chi lo preferisce */
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-
-        /* ORIENTAMENTO LANDSCAPE */
-        @media (orientation: landscape) and (max-height: 600px) {
-            header {
-                min-height: clamp(120px, 30vh, 150px);
-                padding: 15px;
-            }
-            
-            .logo-header {
-                height: clamp(60px, 15vh, 80px);
-            }
-            
-            .container {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            }
-            
-            .card-header {
-                min-height: clamp(80px, 20vh, 100px);
-                padding: 15px;
             }
         }
 
@@ -825,16 +853,14 @@
             .empty-state {
                 background: #2d3748;
             }
-        }
-
-        /* HIGH CONTRAST MODE */
-        @media (prefers-contrast: high) {
-            .btn {
-                border: 2px solid currentColor;
+            
+            .move-btn {
+                background: rgba(45, 55, 72, 0.9);
+                color: #e2e8f0;
             }
             
-            .race-card {
-                border: 2px solid var(--primary);
+            .move-btn:hover {
+                background: #4a5568;
             }
         }
     </style>
@@ -850,7 +876,6 @@
     </div>
 
     <header class="animate__animated animate__fadeInDown">
-        <!-- LOGO ORIGINALE - COME PRIMA -->
         <img src="logo.png" alt="Logo Polisportiva Juvenilia" class="logo-header">
         <div class="header-content">
             <h1>Dashboard Gare</h1>
@@ -859,6 +884,25 @@
     </header>
 
     <main>
+        <div class="reorder-controls">
+            <button id="toggle-reorder" class="reorder-btn">
+                <i class="fas fa-sort"></i>
+                <span id="reorder-text">Modalità Riordina</span>
+            </button>
+            <button id="save-order" class="reorder-btn" style="display: none;">
+                <i class="fas fa-save"></i>
+                Salva Ordine
+            </button>
+            <button id="reset-order" class="reorder-btn" style="display: none;">
+                <i class="fas fa-undo"></i>
+                Reset
+            </button>
+        </div>
+        
+        <div class="reorder-info" id="reorder-info">
+            <i class="fas fa-arrow-up"></i> Clicca sulle frecce per spostare le card su/giù. Clicca "Salva Ordine" per confermare.
+        </div>
+
         <div id="race-counter" class="race-counter animate__animated animate__fadeIn" style="display: none;">
             <div class="counter-number" id="counter-value">0</div>
             <p class="counter-text">Gare attive nel sistema</p>
@@ -875,121 +919,234 @@
         <p>© 2026 Polisportiva Juvenilia - Sistema di gestione gare</p>
         <p style="margin-top: 5px; font-size: 0.8rem; opacity: 0.7;">
             <i class="fas fa-mobile-alt"></i> Ottimizzato per mobile | 
-            <i class="fas fa-desktop"></i> Desktop ready
+            <i class="fas fa-desktop"></i> Desktop ready |
+            <i class="fas fa-arrows-alt-v"></i> Riordino semplice
         </p>
     </footer>
 
     <script>
-        // MODIFICA 3: Gestione errori migliorata e cache offline
-        let cachedRacesData = null;
-        let lastFetchTime = 0;
-        const CACHE_DURATION = 5 * 60 * 1000; // 5 minuti
+        // ============ SISTEMA RIORDINO SEMPLICE ============
+        let isReorderMode = false;
+        let originalOrder = [];
+        let currentOrder = [];
+        let racesData = [];
 
-        // DETECTION DISPOSITIVO E BROWSER - CORRETTO
-        function detectDevice() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        // TOGGLE REORDER MODE
+        function toggleReorderMode() {
+            isReorderMode = !isReorderMode;
             const body = document.body;
+            const toggleBtn = document.getElementById('toggle-reorder');
+            const saveBtn = document.getElementById('save-order');
+            const resetBtn = document.getElementById('reset-order');
+            const reorderInfo = document.getElementById('reorder-info');
+            const reorderText = document.getElementById('reorder-text');
             
-            // Rimuovi classi precedenti
-            body.classList.remove('device-mobile', 'device-tablet', 'device-desktop', 'ios-device', 'android-device', 'safari-browser', 'chrome-browser');
-            
-            // Rileva iOS più accuratamente
-            const isIOS = /iPad|iPhone|iPod/.test(userAgent) || 
-                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            
-            // Rileva browser specifici
-            const isSafari = /^((?!chrome|android).)*safari/i.test(userAgent);
-            const isChrome = /chrome/i.test(userAgent) && !/edge/i.test(userAgent);
-            
-            // Rileva sistema operativo
-            if (isIOS) {
-                body.classList.add('ios-device');
-            } else if (/android/i.test(userAgent)) {
-                body.classList.add('android-device');
-            }
-            
-            // Aggiungi classi per browser specifici
-            if (isSafari) body.classList.add('safari-browser');
-            if (isChrome) body.classList.add('chrome-browser');
-            
-            // Rileva dimensioni dispositivo
-            const width = window.innerWidth;
-            if (width <= 768) {
-                body.classList.add('device-mobile');
-            } else if (width <= 1024) {
-                body.classList.add('device-tablet');
+            if (isReorderMode) {
+                toggleBtn.classList.add('active');
+                reorderText.textContent = 'Esci da Modalità Riordina';
+                saveBtn.style.display = 'flex';
+                resetBtn.style.display = 'flex';
+                reorderInfo.classList.add('show');
+                
+                // Attiva modalità riordino su tutte le card
+                activateReorderMode();
+                showNotification('Modalità riordina attiva. Usa le frecce per spostare le card.', 'info');
             } else {
-                body.classList.add('device-desktop');
-            }
-            
-            // Log solo in sviluppo
-            if (false) {
-                console.log('Dispositivo rilevato:', {
-                    userAgent: userAgent.substring(0, 100) + '...',
-                    width: width,
-                    classes: body.className,
-                    isIOS: isIOS,
-                    isAndroid: /android/i.test(userAgent),
-                    isMobile: width <= 768
-                });
+                toggleBtn.classList.remove('active');
+                reorderText.textContent = 'Modalità Riordina';
+                saveBtn.style.display = 'none';
+                resetBtn.style.display = 'none';
+                reorderInfo.classList.remove('show');
+                
+                // Disattiva modalità riordino
+                deactivateReorderMode();
             }
         }
 
-        // GESTIONE SAFE AREA PER IOS
-        function setupSafeArea() {
-            const doc = document.documentElement;
-            const style = document.createElement('style');
+        function activateReorderMode() {
+            const cards = document.querySelectorAll('.race-card');
+            cards.forEach(card => {
+                card.classList.add('reorder-mode');
+                
+                // Salva ordine originale all'attivazione
+                saveOriginalOrder();
+            });
+        }
+
+        function deactivateReorderMode() {
+            const cards = document.querySelectorAll('.race-card');
+            cards.forEach(card => {
+                card.classList.remove('reorder-mode');
+            });
+        }
+
+        function saveOriginalOrder() {
+            const cards = Array.from(document.querySelectorAll('.race-card'));
+            originalOrder = cards.map(card => card.id);
+            currentOrder = [...originalOrder];
+        }
+
+        // FUNZIONI PER SPOSTARE LE CARD
+        function moveCardUp(cardId) {
+            const container = document.getElementById('race-grid');
+            const cards = Array.from(container.querySelectorAll('.race-card'));
+            const currentIndex = cards.findIndex(card => card.id === cardId);
             
-            // Calcola altezza safe area
-            const safeAreaTop = 'env(safe-area-inset-top, 0px)';
-            const safeAreaBottom = 'env(safe-area-inset-bottom, 0px)';
+            if (currentIndex > 0) {
+                // Sposta la card in alto
+                const cardToMove = cards[currentIndex];
+                const cardAbove = cards[currentIndex - 1];
+                
+                // Animazione
+                cardToMove.classList.add('move-up-animation');
+                cardAbove.classList.add('move-down-animation');
+                
+                setTimeout(() => {
+                    // Scambia fisicamente le card
+                    container.insertBefore(cardToMove, cardAbove);
+                    
+                    // Rimuovi animazioni
+                    cardToMove.classList.remove('move-up-animation');
+                    cardAbove.classList.remove('move-down-animation');
+                    
+                    // Aggiorna ordine
+                    updateCardOrder();
+                    updateMoveButtons();
+                    
+                    // Feedback visivo
+                    showNotification(`"${getCardTitle(cardId)}" spostata in alto`, 'info');
+                }, 300);
+            }
+        }
+
+        function moveCardDown(cardId) {
+            const container = document.getElementById('race-grid');
+            const cards = Array.from(container.querySelectorAll('.race-card'));
+            const currentIndex = cards.findIndex(card => card.id === cardId);
             
-            style.textContent = `
-                :root {
-                    --safe-area-top: ${safeAreaTop};
-                    --safe-area-bottom: ${safeAreaBottom};
+            if (currentIndex < cards.length - 1) {
+                // Sposta la card in basso
+                const cardToMove = cards[currentIndex];
+                const cardBelow = cards[currentIndex + 1];
+                
+                // Animazione
+                cardToMove.classList.add('move-down-animation');
+                cardBelow.classList.add('move-up-animation');
+                
+                setTimeout(() => {
+                    // Scambia fisicamente le card
+                    container.insertBefore(cardBelow, cardToMove);
+                    
+                    // Rimuovi animazioni
+                    cardToMove.classList.remove('move-down-animation');
+                    cardBelow.classList.remove('move-up-animation');
+                    
+                    // Aggiorna ordine
+                    updateCardOrder();
+                    updateMoveButtons();
+                    
+                    // Feedback visivo
+                    showNotification(`"${getCardTitle(cardId)}" spostata in basso`, 'info');
+                }, 300);
+            }
+        }
+
+        function getCardTitle(cardId) {
+            const card = document.getElementById(cardId);
+            if (card) {
+                const header = card.querySelector('.card-header');
+                return header ? header.textContent.trim() : 'Card';
+            }
+            return 'Card';
+        }
+
+        function updateCardOrder() {
+            const cards = Array.from(document.querySelectorAll('.race-card'));
+            currentOrder = cards.map(card => card.id);
+        }
+
+        function updateMoveButtons() {
+            const cards = document.querySelectorAll('.race-card');
+            cards.forEach((card, index) => {
+                const upBtn = card.querySelector('.move-btn.up');
+                const downBtn = card.querySelector('.move-btn.down');
+                
+                if (upBtn) {
+                    upBtn.disabled = index === 0;
+                    upBtn.style.opacity = index === 0 ? '0.5' : '1';
                 }
                 
-                .ios-device header {
-                    padding-top: calc(20px + ${safeAreaTop});
+                if (downBtn) {
+                    downBtn.disabled = index === cards.length - 1;
+                    downBtn.style.opacity = index === cards.length - 1 ? '0.5' : '1';
                 }
+            });
+        }
+
+        // SALVA E RESET ORDINE
+        function saveOrder() {
+            try {
+                localStorage.setItem('racesCustomOrder', JSON.stringify(currentOrder));
+                originalOrder = [...currentOrder];
+                showNotification('Ordine salvato con successo!', 'success');
                 
-                .ios-device .footer {
-                    padding-bottom: calc(20px + ${safeAreaBottom});
+                // Esci dalla modalità riordino
+                toggleReorderMode();
+            } catch (e) {
+                console.warn('Errore nel salvataggio:', e);
+                showNotification('Errore nel salvataggio', 'warning');
+            }
+        }
+
+        function resetOrder() {
+            if (confirm('Vuoi ripristinare l\'ordine originale?')) {
+                const container = document.getElementById('race-grid');
+                const cards = Array.from(container.querySelectorAll('.race-card'));
+                
+                // Ordina le card secondo l'ordine originale
+                cards.sort((a, b) => {
+                    const aIndex = originalOrder.indexOf(a.id);
+                    const bIndex = originalOrder.indexOf(b.id);
+                    return aIndex - bIndex;
+                });
+                
+                // Rimuovi e riaggiungi in ordine
+                cards.forEach(card => {
+                    container.appendChild(card);
+                });
+                
+                updateCardOrder();
+                updateMoveButtons();
+                
+                localStorage.removeItem('racesCustomOrder');
+                
+                showNotification('Ordine ripristinato', 'info');
+                
+                if (isReorderMode) {
+                    toggleReorderMode();
                 }
+            }
+        }
+
+        // ============ FUNZIONI ESISTENTI ============
+        function showNotification(message, type = 'success') {
+            const notif = document.getElementById('notif');
+            
+            let bgColor = 'linear-gradient(135deg, var(--success), #2ecc71)';
+            if (type === 'info') bgColor = 'linear-gradient(135deg, var(--accent), #5c6bc0)';
+            if (type === 'warning') bgColor = 'linear-gradient(135deg, var(--warning), #ff9800)';
+            
+            notif.style.background = bgColor;
+            notif.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}" 
+                   style="margin-right: 10px;"></i>
+                ${message}
             `;
+            notif.style.display = 'block';
             
-            document.head.appendChild(style);
-        }
-
-        // OTTIMIZZAZIONE TOUCH PER ANDROID
-        function optimizeForAndroid() {
-            if (document.body.classList.contains('android-device')) {
-                // Disabilita effetti hover sui dispositivi touch
-                const style = document.createElement('style');
-                style.textContent = `
-                    @media (hover: none) {
-                        .btn:hover {
-                            transform: none !important;
-                        }
-                        .race-card:hover {
-                            transform: none !important;
-                        }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-        }
-
-        // PREVENZIONE ZOOM SU INPUT (iOS)
-        function preventZoomOnInput() {
-            if (document.body.classList.contains('ios-device')) {
-                document.addEventListener('touchstart', function(event) {
-                    if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
-                        event.target.style.fontSize = '16px'; // Previene zoom automatico
-                    }
-                });
-            }
+            setTimeout(() => {
+                notif.style.display = 'none';
+            }, 3000);
         }
 
         // CONFIGURAZIONE SUPABASE
@@ -998,46 +1155,36 @@
         
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Stato per i pulsanti copia
+        let cachedRacesData = null;
+        let lastFetchTime = 0;
+        const CACHE_DURATION = 5 * 60 * 1000;
+        
         let copyButtonsState = {};
+        const copiedLinksCache = new Map();
+        const COPY_COOLDOWN = 2000;
 
-        /**
-         * MODIFICA 6: Funzione semplificata per copiare link
-         */
         function getFullRaceLink(fileName) {
-            // Usa URL relativo se siamo nella stessa directory
             const baseUrl = window.location.href.replace(/\/[^\/]*$/, '/');
             return `${baseUrl}${fileName}`;
         }
 
-        /**
-         * MODIFICA 3: Funzione per fetch dati con cache
-         */
         async function fetchRaceData() {
             const now = Date.now();
             
-            // Usa cache se disponibile e ancora valida
             if (cachedRacesData && (now - lastFetchTime) < CACHE_DURATION) {
-                console.log('Usando dati dalla cache');
                 return cachedRacesData;
             }
             
-            console.log('Fetch dati dal server');
             const { data: tables, error: tableError } = await _supabase.rpc('get_race_tables');
             
             if (tableError) {
-                console.error('Errore Supabase:', tableError);
                 throw tableError;
             }
             
             if (!tables || tables.length === 0) {
-                console.log('Nessuna tabella trovata');
                 return [];
             }
             
-            console.log('Trovate tabelle:', tables.length);
-            
-            // Recupera solo i titoli delle gare
             const titleRequests = tables.map(t => 
                 _supabase
                     .from(t.table_name)
@@ -1048,7 +1195,6 @@
             
             const results = await Promise.all(titleRequests);
             
-            // Formatta i dati
             const raceData = results.map((res, index) => {
                 const tableName = tables[index].table_name;
                 const raceNumber = tableName.match(/\d+/) ? tableName.match(/\d+/)[0] : (index + 1);
@@ -1058,15 +1204,15 @@
                     tableName,
                     raceNumber,
                     raceTitle,
-                    fileName: `gara${raceNumber}.html`
+                    fileName: `gara${raceNumber}.html`,
+                    id: `race-${raceNumber}`
                 };
             });
             
-            // Aggiorna cache
             cachedRacesData = raceData;
             lastFetchTime = now;
+            racesData = raceData;
             
-            // Salva in localStorage per offline
             try {
                 localStorage.setItem('racesCache', JSON.stringify({
                     data: raceData,
@@ -1079,9 +1225,6 @@
             return raceData;
         }
 
-        /**
-         * MODIFICA 3: Funzione per caricare dati da cache offline
-         */
         async function loadFromOfflineCache() {
             try {
                 const cached = localStorage.getItem('racesCache');
@@ -1090,11 +1233,10 @@
                 const { data, timestamp } = JSON.parse(cached);
                 const now = Date.now();
                 
-                // Cache valida per 30 minuti in modalità offline
                 if (now - timestamp < 30 * 60 * 1000) {
-                    console.log('Caricamento da cache offline');
                     cachedRacesData = data;
                     lastFetchTime = timestamp;
+                    racesData = data;
                     return data;
                 }
             } catch (e) {
@@ -1104,18 +1246,12 @@
             return null;
         }
 
-        /**
-         * MODIFICA 3: Funzione principale migliorata con gestione errori
-         */
         async function initDashboard() {
             showLoader(true);
             const grid = document.getElementById('race-grid');
             const counter = document.getElementById('race-counter');
             
             try {
-                console.log('Inizializzazione dashboard...');
-                
-                // Timeout per richieste lente
                 const timeoutPromise = new Promise((_, reject) => {
                     setTimeout(() => reject(new Error('Timeout caricamento (15s)')), 15000);
                 });
@@ -1124,32 +1260,28 @@
                 const raceData = await Promise.race([dataPromise, timeoutPromise]);
                 
                 if (!raceData || raceData.length === 0) {
-                    console.log('Nessun dato gara trovato');
                     showNoRacesMessage(grid, counter);
                     return;
                 }
                 
-                console.log('Dati caricati:', raceData.length, 'gare');
-                
-                // Aggiorna contatore
                 document.getElementById('counter-value').textContent = raceData.length;
                 counter.style.display = 'block';
                 
-                // Renderizza la griglia
                 renderRaceGrid(grid, raceData);
+                
+                // Aggiungi event listeners per i pulsanti
+                document.getElementById('toggle-reorder').addEventListener('click', toggleReorderMode);
+                document.getElementById('save-order').addEventListener('click', saveOrder);
+                document.getElementById('reset-order').addEventListener('click', resetOrder);
                 
             } catch (err) {
                 console.error("Errore caricamento:", err);
                 
-                // Prova a usare cache offline
                 if (!navigator.onLine) {
-                    console.log('Modalità offline, provo cache...');
                     const offlineData = await loadFromOfflineCache();
                     if (offlineData && offlineData.length > 0) {
-                        console.log('Cache offline trovata:', offlineData.length, 'gare');
                         renderRaceGrid(grid, offlineData);
                         
-                        // Mostra notifica modalità offline
                         const notif = document.getElementById('notif');
                         notif.innerHTML = `
                             <i class="fas fa-wifi-slash" style="margin-right: 10px;"></i>
@@ -1162,54 +1294,94 @@
                     }
                 }
                 
-                // Mostra errore
-                console.error('Mostro messaggio errore:', err.message);
                 showErrorMessage(grid, counter, err);
                 
             } finally {
                 showLoader(false);
-                console.log('Dashboard inizializzata');
             }
         }
 
-        /**
-         * MODIFICA 3: Funzione per renderizzare la griglia
-         */
         function renderRaceGrid(gridElement, raceData) {
-            // Icone basate sul numero della gara
+            let customOrder = [];
+            try {
+                const savedOrder = localStorage.getItem('racesCustomOrder');
+                if (savedOrder) {
+                    customOrder = JSON.parse(savedOrder);
+                }
+            } catch (e) {
+                console.warn('Errore nel caricamento ordine personalizzato:', e);
+            }
+            
+            let orderedData = [...raceData];
+            if (customOrder.length > 0) {
+                orderedData = customOrder
+                    .map(id => raceData.find(race => race.id === id))
+                    .filter(race => race !== undefined);
+                
+                const remainingRaces = raceData.filter(race => !customOrder.includes(race.id));
+                orderedData.push(...remainingRaces);
+            }
+            
             const raceIcons = ['🏆', '⚽', '🎯', '🏃', '🏊', '🚴', '🤸', '🎾'];
             
-            let gridHtml = '';
-            raceData.forEach((race, index) => {
+            const fragment = document.createDocumentFragment();
+            
+            orderedData.forEach((race, index) => {
                 const raceIcon = raceIcons[index % raceIcons.length] || '🏆';
                 const colorIndex = (index % 8) + 1;
                 
-                gridHtml += `
-                    <div class="race-card animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s">
-                        <div class="card-header color-${colorIndex}">
-                            <div class="card-number">${race.raceNumber}</div>
-                            <div class="card-logo">${raceIcon}</div>
-                            ${race.raceTitle}
-                        </div>
-                        <div class="card-body">
-                            <a href="${race.fileName}" class="btn btn-main">
-                                <i class="fas fa-users"></i> Gestisci Iscrizioni
-                            </a>
-                            
-                            <button class="btn btn-copy" id="copy-btn-${race.raceNumber}" 
-                                    onclick="copyRaceLink('${race.fileName}', ${race.raceNumber})">
-                                <i class="fas fa-link"></i> Copia Link Diretto
-                            </button>
-                        </div>
-                    </div>`;
+                const card = document.createElement('div');
+                card.className = 'race-card animate__animated animate__fadeInUp';
+                card.id = race.id;
+                card.dataset.raceId = race.id;
+                card.dataset.index = index;
+                card.style.animationDelay = `${Math.min(index * 0.05, 0.5)}s`;
+                
+                card.innerHTML = `
+                    <div class="reorder-buttons">
+                        <button class="move-btn up" onclick="moveCardUp('${race.id}')" title="Sposta su">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <button class="move-btn down" onclick="moveCardDown('${race.id}')" title="Sposta giù">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                    </div>
+                    <div class="card-header color-${colorIndex}">
+                        <div class="card-number">${race.raceNumber}</div>
+                        <div class="card-logo">${raceIcon}</div>
+                        ${escapeHtml(race.raceTitle)}
+                    </div>
+                    <div class="card-body">
+                        <a href="${encodeURI(race.fileName)}" class="btn btn-main">
+                            <i class="fas fa-users"></i> Gestisci Iscrizioni
+                        </a>
+                        
+                        <button class="btn btn-copy" data-race-number="${race.raceNumber}" 
+                                onclick="copyRaceLink('${encodeURIComponent(race.fileName)}', ${race.raceNumber})">
+                            <i class="fas fa-link"></i> Copia Link Diretto
+                        </button>
+                    </div>
+                `;
+                
+                fragment.appendChild(card);
             });
             
-            gridElement.innerHTML = gridHtml;
+            gridElement.innerHTML = '';
+            gridElement.appendChild(fragment);
+            
+            // Aggiorna stato pulsanti
+            updateMoveButtons();
+            
+            currentOrder = orderedData.map(race => race.id);
+            originalOrder = [...currentOrder];
         }
 
-        /**
-         * MODIFICA 3: Messaggio nessuna gara
-         */
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function showNoRacesMessage(grid, counter) {
             grid.innerHTML = `
                 <div class="empty-state">
@@ -1223,9 +1395,6 @@
             counter.style.display = 'none';
         }
 
-        /**
-         * MODIFICA 3: Messaggio errore
-         */
         function showErrorMessage(grid, counter, error) {
             const isOnline = navigator.onLine;
             const errorMessage = isOnline 
@@ -1244,7 +1413,6 @@
             counter.style.display = 'none';
         }
 
-        // Funzione per mostrare/nascondere il caricamento
         function showLoader(isVisible) {
             const loader = document.getElementById('loader');
             if (isVisible) {
@@ -1258,30 +1426,41 @@
             }
         }
 
-        // Funzione per copiare il link della gara (ottimizzata per mobile)
         function copyRaceLink(fileName, raceNumber) {
-            const fullUrl = getFullRaceLink(fileName);
+            const now = Date.now();
+            const cacheKey = `copy-${raceNumber}`;
             
-            // Log solo in sviluppo
-            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                console.log('Copia link:', { fileName, raceNumber, fullUrl });
+            if (copiedLinksCache.has(cacheKey)) {
+                const lastCopyTime = copiedLinksCache.get(cacheKey);
+                if (now - lastCopyTime < COPY_COOLDOWN) {
+                    return;
+                }
             }
             
-            // Usa Clipboard API con fallback
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(fullUrl).then(() => {
+            copiedLinksCache.set(cacheKey, now);
+            
+            const fullUrl = getFullRaceLink(fileName);
+            
+            setTimeout(() => {
+                copiedLinksCache.delete(cacheKey);
+            }, COPY_COOLDOWN);
+            
+            const copyPromise = navigator.clipboard.writeText(fullUrl);
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Copy timeout')), 1000);
+            });
+            
+            Promise.race([copyPromise, timeoutPromise])
+                .then(() => {
                     showCopySuccess(raceNumber, fullUrl);
-                }).catch(err => {
+                })
+                .catch(err => {
                     console.warn('Clipboard API fallback:', err);
                     fallbackCopy(fullUrl, raceNumber);
                 });
-            } else {
-                fallbackCopy(fullUrl, raceNumber);
-            }
         }
 
         function showCopySuccess(raceNumber, fullUrl) {
-            // Mostra notifica
             const notif = document.getElementById('notif');
             notif.innerHTML = `
                 <i class="fas fa-check-circle" style="margin-right: 10px;"></i>
@@ -1290,32 +1469,22 @@
             `;
             notif.style.display = 'block';
             
-            // Reset notifica dopo 4 secondi (più lungo per vedere l'URL)
             setTimeout(() => {
                 notif.style.display = 'none';
             }, 4000);
 
-            // Animazione pulsante
-            const btn = document.getElementById(`copy-btn-${raceNumber}`);
+            const btn = document.querySelector(`.btn-copy[data-race-number="${raceNumber}"]`);
             if (btn) {
                 btn.classList.add('success');
                 btn.innerHTML = '<i class="fas fa-check"></i> Copiato!';
                 
-                // Reset pulsante dopo 2 secondi
                 setTimeout(() => {
                     btn.classList.remove('success');
                     btn.innerHTML = '<i class="fas fa-link"></i> Copia Link Diretto';
                 }, 2000);
             }
-
-            // Effetto confetti per la prima copia
-            if (!copyButtonsState[raceNumber]) {
-                createConfetti(raceNumber);
-                copyButtonsState[raceNumber] = true;
-            }
         }
 
-        // Fallback per dispositivi che non supportano Clipboard API
         function fallbackCopy(text, raceNumber) {
             const textArea = document.createElement('textarea');
             textArea.value = text;
@@ -1346,139 +1515,72 @@
             document.body.removeChild(textArea);
         }
 
-        // Effetto confetti per celebrare la copia
-        function createConfetti(raceNumber) {
-            const card = document.querySelector(`#copy-btn-${raceNumber}`).closest('.race-card');
-            if (!card) return;
+        // ============ INIZIALIZZAZIONE ============
+        let isInitialized = false;
+
+        function optimizedInitDashboard() {
+            if (isInitialized) return;
             
-            const colors = ['#667eea', '#f5576c', '#43e97b', '#fa709a', '#ffb74d'];
+            isInitialized = true;
             
-            for (let i = 0; i < 8; i++) { // Ridotto per performance mobile
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.style.position = 'absolute';
-                    confetti.style.width = '6px';
-                    confetti.style.height = '6px';
-                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.borderRadius = '50%';
-                    confetti.style.top = '50%';
-                    confetti.style.left = '50%';
-                    confetti.style.zIndex = '1000';
-                    confetti.style.pointerEvents = 'none';
-                    confetti.style.willChange = 'transform, opacity';
-                    
-                    card.appendChild(confetti);
-                    
-                    // Animazione confetti ottimizzata
-                    const angle = Math.random() * Math.PI * 2;
-                    const velocity = 1.5 + Math.random() * 2;
-                    const vx = Math.cos(angle) * velocity;
-                    const vy = Math.sin(angle) * velocity;
-                    
-                    let x = 0, y = 0;
-                    const animate = () => {
-                        x += vx;
-                        y += vy;
-                        vy += 0.08; // gravità ridotta
-                        
-                        confetti.style.transform = `translate(${x}px, ${y}px) rotate(${x * 3}deg)`;
-                        confetti.style.opacity = 1 - (Math.abs(x) + Math.abs(y)) / 80;
-                        
-                        if (Math.abs(x) < 80 && Math.abs(y) < 80) {
-                            requestAnimationFrame(animate);
-                        } else {
-                            confetti.remove();
-                        }
-                    };
-                    
-                    animate();
-                }, i * 120);
-            }
-        }
-
-        // GESTIONE ORIENTAMENTO E RESIZE
-        let resizeTimeout;
-        function handleResize() {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                detectDevice();
-                optimizeForAndroid();
-            }, 250);
-        }
-
-        // PREVENZIONE SCROLL CHAOTIC SU IOS
-        function preventIOSBounce() {
-            if (document.body.classList.contains('ios-device')) {
-                document.body.addEventListener('touchmove', function(e) {
-                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-                        e.preventDefault();
-                    }
-                }, { passive: false });
-            }
-        }
-
-        // MODIFICA 3: Metriche Performance
-        const perfStart = performance.now();
-
-        // INIZIALIZZAZIONE
-        window.onload = function() {
-            console.log('Pagina caricata, inizializzazione...');
-            
-            // Setup iniziale
             detectDevice();
-            setupSafeArea();
-            optimizeForAndroid();
-            preventZoomOnInput();
-            preventIOSBounce();
             
-            // Event listeners
-            window.addEventListener('resize', handleResize);
-            window.addEventListener('orientationchange', handleResize);
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(() => {
+                    initDashboard();
+                }, { timeout: 2000 });
+            } else {
+                setTimeout(() => {
+                    initDashboard();
+                }, 500);
+            }
             
-            // Avvio dashboard
-            initDashboard();
-            
-            // MODIFICA 3: Log metriche performance
-            window.addEventListener('load', () => {
-                const loadTime = performance.now() - perfStart;
-                
-                if (loadTime > 3000) {
-                    console.warn(`Load time alto: ${Math.round(loadTime)}ms`);
-                }
-                
-                // Log solo in sviluppo
-                if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-                    console.log('Ambiente caricato:', {
-                        loadTime: Math.round(loadTime),
-                        userAgent: navigator.userAgent.substring(0, 100) + '...',
-                        platform: navigator.platform,
-                        screen: {
-                            width: window.innerWidth,
-                            height: window.innerHeight,
-                            pixelRatio: window.devicePixelRatio
-                        },
-                        touch: 'ontouchstart' in window,
-                        currentPath: window.location.pathname,
-                        fullPath: window.location.href
-                    });
-                }
-            });
-        };
+            window.addEventListener('resize', detectDevice);
+            window.addEventListener('orientationchange', detectDevice);
+        }
 
-        // GESTIONE OFFLINE
+        function detectDevice() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const body = document.body;
+            
+            body.classList.remove('device-mobile', 'device-tablet', 'device-desktop', 'ios-device', 'android-device');
+            
+            const isIOS = /iPad|iPhone|iPod/.test(userAgent) || 
+                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
+            if (isIOS) {
+                body.classList.add('ios-device');
+            } else if (/android/i.test(userAgent)) {
+                body.classList.add('android-device');
+            }
+            
+            const width = window.innerWidth;
+            if (width <= 768) {
+                body.classList.add('device-mobile');
+            } else if (width <= 1024) {
+                body.classList.add('device-tablet');
+            } else {
+                body.classList.add('device-desktop');
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', optimizedInitDashboard);
+        } else {
+            optimizedInitDashboard();
+        }
+
         window.addEventListener('online', () => {
-            console.log('Connessione ripristinata');
             const notif = document.getElementById('notif');
             notif.innerHTML = '<i class="fas fa-wifi"></i> Connessione ripristinata';
             notif.style.display = 'block';
             setTimeout(() => {
                 notif.style.display = 'none';
-                initDashboard(); // Ricarica i dati
+                initDashboard();
             }, 2000);
         });
 
         window.addEventListener('offline', () => {
-            console.log('Connessione persa');
             const notif = document.getElementById('notif');
             notif.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Connessione assente';
             notif.style.display = 'block';
@@ -1486,10 +1588,8 @@
             setTimeout(() => notif.style.display = 'none', 3000);
         });
 
-        // Auto-refresh ogni 10 minuti (ridotto per risparmio batteria mobile)
         setInterval(() => {
             if (navigator.onLine) {
-                console.log('Auto-refresh dashboard...');
                 initDashboard();
             }
         }, 10 * 60 * 1000);
