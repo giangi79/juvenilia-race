@@ -2,17 +2,15 @@
   "name": "Juvenilia Dashboard",
   "short_name": "Juvenilia",
   "description": "Dashboard di gestione gare Polisportiva Juvenilia",
-  "start_url": "/",
+  "start_url": "/juvenilia-race/",
   "display": "standalone",
   "background_color": "#1a237e",
   "theme_color": "#1a237e",
-  "orientation": "portrait-primary",
-  "scope": "/",
-  "categories": ["sports", "productivity", "utilities"],
-  "lang": "it-IT",
+  "orientation": "portrait",
+  "scope": "/juvenilia-race/",
+  "lang": "it",
   "dir": "ltr",
-  "prefer_related_applications": false,
-  
+  "categories": ["sports", "productivity"],
   "icons": [
     {
       "src": "favicon.ico",
@@ -45,91 +43,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    }
-  ],
-  
-  "screenshots": [
-    {
-      "src": "screenshot-mobile.png",
-      "sizes": "375x667",
-      "type": "image/png",
-      "platform": "narrow",
-      "label": "Dashboard su smartphone"
-    },
-    {
-      "src": "screenshot-desktop.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "platform": "wide",
-      "label": "Dashboard su desktop"
-    }
-  ],
-  
-  "shortcuts": [
-    {
-      "name": "Nuova Gara",
-      "short_name": "Nuova",
-      "description": "Crea una nuova gara",
-      "url": "/nuova-gara.html",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "Statistiche",
-      "short_name": "Stats",
-      "description": "Visualizza statistiche gare",
-      "url": "/statistiche.html",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
-    }
-  ],
-  
-  "related_applications": [],
-  
-  "protocol_handlers": [
-    {
-      "protocol": "web+juvenilia",
-      "url": "/?gara=%s"
-    }
-  ],
-  
-  "display_override": ["window-controls-overlay", "standalone"],
-  
-  "edge_side_panel": {
-    "preferred_width": 360
-  },
-  
-  "launch_handler": {
-    "client_mode": "auto"
-  },
-  
-  "handle_links": "preferred",
-  
-  "share_target": {
-    "action": "/condividi",
-    "method": "GET",
-    "params": {
-      "title": "name",
-      "text": "description",
-      "url": "link"
-    }
-  },
-  
-  "file_handlers": [
-    {
-      "action": "/importa-gara",
-      "accept": {
-        "text/csv": [".csv"],
-        "application/json": [".json"]
-      }
     }
   ]
 }
