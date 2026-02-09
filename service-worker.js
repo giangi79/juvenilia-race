@@ -1,7 +1,6 @@
-// service-worker.js - VERSIONE 3.1 CORRETTA
-const CACHE_NAME = 'juvenilia-dashboard-v3.1';
+// service-worker.js - CORREZIONE FINALE
+const CACHE_NAME = 'juvenilia-dashboard-v3.2';
 const urlsToCache = [
-  '/',
   'index.html',
   'manifest.json',
   'offline.html',
@@ -11,31 +10,43 @@ const urlsToCache = [
   'favicon-32x32.png',
   'icon-144.png',
   'icon-192.png',
-  'icon-512.png'
+  'icon-512.png',
+  'gara1.html',
+  'gara2.html',
+  'gara3.html',
+  'gara4.html',
+  'gara5.html'
 ];
 
-// INSTALL - Crea cache e precarica risorse CON GESTIONE ERRORI
+// INSTALL - Crea cache e precarica risorse CON GESTIONE ERRORI MIGLIORATA
 self.addEventListener('install', event => {
-  console.log('✅ Service Worker installato - v3.1');
+  console.log('✅ Service Worker installato - v3.2');
   
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('✅ Cache aperta:', CACHE_NAME);
         
-        // Aggiungi le risorse una alla volta con gestione errori
-        return Promise.all(
-          urlsToCache.map(url => {
-            return cache.add(url).catch(error => {
-              console.warn(`⚠️  Impossibile caricare in cache: ${url}`, error);
+        // Aggiungi le risorse una alla volta con gestione errori migliorata
+        const cachePromises = urlsToCache.map(url => {
+          return fetch(url, { mode: 'no-cors' })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`HTTP ${response.status} - ${url}`);
+              }
+              return cache.put(url, response);
+            })
+            .catch(error => {
+              console.warn(`⚠️  Impossibile caricare in cache: ${url}`, error.message);
               // Non interrompere l'installazione per errori di cache
               return Promise.resolve();
             });
-          })
-        );
+        });
+        
+        return Promise.all(cachePromises);
       })
       .then(() => {
-        console.log('✅ Installazione completata');
+        console.log('✅ Installazione cache completata');
         return self.skipWaiting();
       })
       .catch(error => {
@@ -72,11 +83,10 @@ self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET') return;
   
   const requestUrl = new URL(event.request.url);
+  const isSameOrigin = requestUrl.origin === self.location.origin;
   
-  // Salta le richieste a CDN esterni (le gestiamo in cache solo se caricate)
-  if (requestUrl.origin !== self.location.origin) {
-    // Per CDN, usa solo network
-    event.respondWith(fetch(event.request));
+  // Salta le richieste a CDN esterni
+  if (!isSameOrigin) {
     return;
   }
   
@@ -105,7 +115,7 @@ self.addEventListener('fetch', event => {
             
             // Per le pagine HTML, mostra offline.html
             if (event.request.destination === 'document' || 
-                event.request.headers.get('accept').includes('text/html')) {
+                event.request.headers.get('accept')?.includes('text/html')) {
               return caches.match('offline.html');
             }
             
@@ -141,7 +151,7 @@ self.addEventListener('message', event => {
     event.ports[0].postMessage({ 
       status: 'OK', 
       message: 'Service Worker attivo',
-      version: '3.1'
+      version: '3.2'
     });
   }
 });
