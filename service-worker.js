@@ -1,38 +1,47 @@
-// service-worker.js - VERSIONE CORRETTA
-const CACHE_NAME = 'juvenilia-dashboard-v3.0';
+// service-worker.js - VERSIONE 3.1 CORRETTA
+const CACHE_NAME = 'juvenilia-dashboard-v3.1';
 const urlsToCache = [
   '/',
-  '/index.html',
-  '/manifest.json',
-  '/offline.html',
-  '/logo.png',
-  '/favicon.ico',
-  '/favicon-16x16.png',
-  '/favicon-32x32.png',
-  '/icon-144.png',
-  '/icon-192.png',
-  '/icon-512.png',
-  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap',
-  'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css'
+  'index.html',
+  'manifest.json',
+  'offline.html',
+  'logo.png',
+  'favicon.ico',
+  'favicon-16x16.png',
+  'favicon-32x32.png',
+  'icon-144.png',
+  'icon-192.png',
+  'icon-512.png'
 ];
 
-// INSTALL - Crea cache e precarica risorse
+// INSTALL - Crea cache e precarica risorse CON GESTIONE ERRORI
 self.addEventListener('install', event => {
-  console.log('✅ Service Worker installato');
+  console.log('✅ Service Worker installato - v3.1');
+  
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
         console.log('✅ Cache aperta:', CACHE_NAME);
-        return cache.addAll(urlsToCache);
+        
+        // Aggiungi le risorse una alla volta con gestione errori
+        return Promise.all(
+          urlsToCache.map(url => {
+            return cache.add(url).catch(error => {
+              console.warn(`⚠️  Impossibile caricare in cache: ${url}`, error);
+              // Non interrompere l'installazione per errori di cache
+              return Promise.resolve();
+            });
+          })
+        );
       })
       .then(() => {
-        console.log('✅ Tutte le risorse precaricate');
+        console.log('✅ Installazione completata');
         return self.skipWaiting();
       })
       .catch(error => {
         console.error('❌ Errore durante l\'installazione:', error);
+        // Non fallire l'installazione, continua comunque
+        return self.skipWaiting();
       })
   );
 });
@@ -51,7 +60,7 @@ self.addEventListener('activate', event => {
         })
       );
     }).then(() => {
-      console.log('✅ Cache pulite, ora controllo i client');
+      console.log('✅ Cache pulite');
       return self.clients.claim();
     })
   );
@@ -59,86 +68,80 @@ self.addEventListener('activate', event => {
 
 // FETCH - Strategia Cache First con fallback Network
 self.addEventListener('fetch', event => {
-  // Solo richieste GET e dello stesso origin (no CDN)
+  // Solo richieste GET
   if (event.request.method !== 'GET') return;
   
-  // Per le pagine HTML, usa Network First
-  if (event.request.url.includes('.html') || 
-      event.request.destination === 'document') {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          // Clona la risposta per salvarla in cache
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
-          });
-          return response;
-        })
-        .catch(() => {
-          // Se offline, prova dalla cache
-          return caches.match(event.request)
-            .then(cachedResponse => {
-              if (cachedResponse) {
-                return cachedResponse;
-              }
-              // Se non in cache, mostra pagina offline
-              return caches.match('/offline.html');
-            });
-        })
-    );
-  } else {
-    // Per altre risorse (CSS, JS, immagini), usa Cache First
-    event.respondWith(
-      caches.match(event.request)
-        .then(cachedResponse => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          
-          return fetch(event.request)
-            .then(response => {
-              // Se la risposta è valida, salva in cache
-              if (!response || response.status !== 200 || response.type !== 'basic') {
-                return response;
-              }
-              
-              const responseToCache = response.clone();
-              caches.open(CACHE_NAME).then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-              
-              return response;
-            })
-            .catch(() => {
-              // Per le immagini, mostra un fallback
-              if (event.request.destination === 'image') {
-                return caches.match('/logo.png');
-              }
-            });
-        })
-    );
+  const requestUrl = new URL(event.request.url);
+  
+  // Salta le richieste a CDN esterni (le gestiamo in cache solo se caricate)
+  if (requestUrl.origin !== self.location.origin) {
+    // Per CDN, usa solo network
+    event.respondWith(fetch(event.request));
+    return;
   }
+  
+  event.respondWith(
+    caches.match(event.request)
+      .then(cachedResponse => {
+        // Se trovato in cache, restituisci
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        
+        // Altrimenti fai fetch
+        return fetch(event.request)
+          .then(response => {
+            // Se la risposta è valida, salvala in cache
+            if (response && response.status === 200) {
+              const responseClone = response.clone();
+              caches.open(CACHE_NAME).then(cache => {
+                cache.put(event.request, responseClone);
+              });
+            }
+            return response;
+          })
+          .catch(error => {
+            console.log('🌐 Offline - fallback per:', event.request.url);
+            
+            // Per le pagine HTML, mostra offline.html
+            if (event.request.destination === 'document' || 
+                event.request.headers.get('accept').includes('text/html')) {
+              return caches.match('offline.html');
+            }
+            
+            // Per le immagini, prova con il logo
+            if (event.request.destination === 'image') {
+              return caches.match('logo.png');
+            }
+            
+            // Altrimenti ritorna null
+            return new Response('Offline', {
+              status: 503,
+              statusText: 'Service Unavailable',
+              headers: new Headers({
+                'Content-Type': 'text/plain'
+              })
+            });
+          });
+      })
+  );
 });
 
 // MESSAGE - Gestisci messaggi dalla pagina
 self.addEventListener('message', event => {
+  console.log('📨 Messaggio ricevuto dal client:', event.data);
+  
   if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('⏩ Saltando fase di attesa...');
     self.skipWaiting();
   }
   
-  // SEMPRE ritorna una risposta immediata
-  event.ports[0].postMessage({ status: 'OK', message: 'Message received' });
-});
-
-// SYNC - Background sync (opzionale)
-self.addEventListener('sync', event => {
-  if (event.tag === 'sync-races') {
-    event.waitUntil(syncRacesData());
+  // Rispondi immediatamente
+  if (event.ports && event.ports[0]) {
+    event.ports[0].postMessage({ 
+      status: 'OK', 
+      message: 'Service Worker attivo',
+      version: '3.1'
+    });
   }
 });
-
-async function syncRacesData() {
-  console.log('🔄 Sync dati in background');
-  // Implementa la sincronizzazione dei dati qui
-}
