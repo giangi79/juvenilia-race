@@ -1461,20 +1461,27 @@
 
         // ============ PULIZIA CACHE VECCHIA ============
         function clearOldCaches() {
-            if ('caches' in window) {
-                caches.keys().then(cacheNames => {
-                    console.log('🗑️ Cache trovate:', cacheNames);
-                    
-                    cacheNames.forEach(cacheName => {
-                        if (cacheName.includes('juvenilia-dashboard') && 
-                            !cacheName.includes('v3.1')) {
-                            console.log('🧹 Rimuovendo vecchia cache:', cacheName);
-                            caches.delete(cacheName);
-                        }
-                    });
-                });
-            }
-        }
+    if ('caches' in window) {
+        caches.keys().then(cacheNames => {
+            console.log('🗑️ Cache trovate:', cacheNames);
+            
+            const deletePromises = cacheNames.map(cacheName => {
+                if (cacheName.includes('juvenilia-dashboard') && 
+                    !cacheName.includes('v3.2')) {
+                    console.log('🧹 Rimuovendo vecchia cache:', cacheName);
+                    return caches.delete(cacheName);
+                }
+                return Promise.resolve();
+            });
+            
+            return Promise.all(deletePromises);
+        }).then(() => {
+            console.log('✅ Pulizia cache completata');
+        }).catch(error => {
+            console.error('❌ Errore nella pulizia cache:', error);
+        });
+    }
+}
 
         // Esegui al caricamento
         setTimeout(clearOldCaches, 2000);
@@ -2397,6 +2404,68 @@
         console.log('   - debugPWA.simulateInstall()');
         console.log('   - debugPWA.forceUpdate()');
         console.log('   - forceSWUpdate() - Per forzare aggiornamento Service Worker');
-    </script>
+
+        // ============ TEST PWA COMPLETO ============
+        function testPWACompatibility() {
+            console.log('🧪 TEST PWA COMPATIBILITA:');
+            
+            // Test Service Worker
+            if ('serviceWorker' in navigator) {
+                console.log('✅ Service Worker supportato');
+                
+                navigator.serviceWorker.getRegistration().then(reg => {
+                    if (reg) {
+                        console.log('✅ Service Worker registrato:', reg.scope);
+                        console.log('✅ Service Worker stato:', reg.active ? 'Attivo' : 'Inattivo');
+                    } else {
+                        console.warn('⚠️  Service Worker non registrato');
+                    }
+                });
+            } else {
+                console.warn('⚠️  Service Worker non supportato');
+            }
+            
+            // Test Cache API
+            if ('caches' in window) {
+                console.log('✅ Cache API supportata');
+            } else {
+                console.warn('⚠️  Cache API non supportata');
+            }
+            
+            // Test Install Prompt
+            if (window.deferredInstallPrompt || deferredPrompt) {
+                console.log('✅ PWA install prompt disponibile');
+            } else {
+                console.log('ℹ️  PWA install prompt non ancora disponibile');
+            }
+            
+            // Test Manifest
+            const manifestLink = document.querySelector('link[rel="manifest"]');
+            if (manifestLink) {
+                fetch(manifestLink.href)
+                    .then(res => res.json())
+                    .then(manifest => {
+                        console.log('✅ Manifest valido:', manifest.name);
+                    })
+                    .catch(() => {
+                        console.warn('⚠️  Manifest non accessibile');
+                    });
+            }
+            
+            // Test Standalone mode
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('✅ App in modalità standalone');
+                document.body.classList.add('pwa-installed');
+            } else if (window.navigator.standalone) {
+                console.log('✅ iOS PWA installata');
+                document.body.classList.add('pwa-installed');
+            } else {
+                console.log('ℹ️  App in modalità browser');
+            }
+        }
+
+        // Esegui test dopo 3 secondi
+        setTimeout(testPWACompatibility, 3000);
+    </script>  <!-- ← QUI FINISCE LO SCRIPT -->
 </body>
 </html>
