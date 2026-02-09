@@ -25,13 +25,31 @@
     
     <title>Dashboard Polisportiva Juvenilia</title>
     
-    <!-- ICONE - CORRETTO: favicon.ico come icona principale -->
+    <!-- ============ FAVICON E ICONE COMPLETE ============ -->
+    <!-- Favicon principale .ico (per browser vecchi) -->
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    <!-- Icone aggiuntive opzionali (se esistono) -->
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    
+    <!-- Favicon PNG per browser moderni -->
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-    <link rel="apple-touch-icon" href="logo.png"> <!-- Usa logo.png per iOS -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    
+    <!-- Icone per Android/Chrome -->
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    
+    <!-- Icone Apple Touch (iOS Safari) - TUTTE LE DIMENSIONI -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="57x57" href="icon-144.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="icon-144.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="icon-144.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="icon-144.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="icon-144.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="icon-144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
     
     <!-- CDN SCRIPT & STYLE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -219,12 +237,22 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 2.5rem;
+            font-size: 3rem;
+            background: var(--primary);
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
-        /* Mostra fallback solo se l'immagine ha errore */
-        .logo-header.error:after {
-            display: block;
+        /* Mostra fallback solo se l'immagine ha errore O se non si carica */
+        .logo-header.error:after,
+        .logo-header:not([src]) + .logo-header:after {
+            display: flex;
         }
 
         .logo-header:hover {
@@ -1170,6 +1198,64 @@
     </div>
 
     <script>
+        // ============ VERIFICA ICONE ============
+        function verifyAllIcons() {
+            console.log('🔍 VERIFICA ICONE IN CORSO...');
+            
+            // Lista di tutte le icone che dovrebbero esistere
+            const iconFiles = [
+                { name: 'favicon.ico', type: 'ico', required: true },
+                { name: 'favicon-16x16.png', type: 'png', size: '16x16', required: true },
+                { name: 'favicon-32x32.png', type: 'png', size: '32x32', required: true },
+                { name: 'icon-144.png', type: 'png', size: '144x144', required: true },
+                { name: 'icon-192.png', type: 'png', size: '192x192', required: true },
+                { name: 'icon-512.png', type: 'png', size: '512x512', required: true },
+                { name: 'logo.png', type: 'png', size: 'logo', required: false }
+            ];
+            
+            // Controlla ogni icona
+            iconFiles.forEach(icon => {
+                const img = new Image();
+                img.onload = function() {
+                    console.log(`✅ ${icon.name} (${this.width}x${this.height}) - CARICATA`);
+                    
+                    // Verifica dimensioni se specificate
+                    if (icon.size && icon.size.includes('x')) {
+                        const [expectedWidth, expectedHeight] = icon.size.split('x').map(Number);
+                        if (this.width !== expectedWidth || this.height !== expectedHeight) {
+                            console.warn(`⚠️  ${icon.name}: Dimensione attesa ${icon.size}, trovata ${this.width}x${this.height}`);
+                        }
+                    }
+                };
+                img.onerror = function() {
+                    if (icon.required) {
+                        console.error(`❌ ${icon.name} - NON TROVATA!`);
+                    } else {
+                        console.warn(`⚠️  ${icon.name} - Non trovata (opzionale)`);
+                    }
+                };
+                img.src = icon.name;
+            });
+            
+            // Verifica i link nel DOM
+            console.log('\n📌 LINK ICONE NEL DOM:');
+            const iconLinks = document.querySelectorAll('link[rel*="icon"], link[rel*="apple"]');
+            iconLinks.forEach(link => {
+                console.log(`  ${link.rel}: ${link.href.split('/').pop()}`);
+            });
+            
+            // Verifica manifest
+            console.log('\n📱 MANIFEST VERIFICATION:');
+            if (document.querySelector('link[rel="manifest"]')) {
+                console.log('✅ Manifest link presente');
+            } else {
+                console.error('❌ Manifest link mancante!');
+            }
+        }
+
+        // Esegui la verifica dopo 3 secondi
+        setTimeout(verifyAllIcons, 3000);
+
         // ============ PWA INSTALLATION - VERSIONE RISOLTA ============
         let deferredPrompt = null;
         const installButton = document.getElementById('installButton');
