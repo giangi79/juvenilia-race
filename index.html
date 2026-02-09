@@ -20,6 +20,9 @@
     <meta name="apple-touch-fullscreen" content="yes">
     <meta name="apple-mobile-web-app-orientations" content="portrait">
     
+    <!-- PWA MANIFEST -->
+    <link rel="manifest" href="manifest.json">
+    
     <title>Dashboard Polisportiva Juvenilia</title>
     
     <!-- ICONE - CORRETTO: favicon.ico come icona principale -->
@@ -56,7 +59,7 @@
         }
         
         body, html {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Poppins', Oxygen, Ubuntu, Cantarell, sans-serif;
             width: 100%;
             height: 100%;
             overflow-x: hidden;
@@ -64,12 +67,13 @@
             -moz-osx-font-smoothing: grayscale;
             text-rendering: optimizeLegibility;
             touch-action: manipulation; /* Migliora performance touch */
+            overscroll-behavior: none; /* Previene lo scroll a rimbalzo */
         }
         
         :root {
             /* VARIABILI ADATTIVE */
-            --safe-area-top: env(safe-area-inset-top, 0px);
-            --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-area-top: max(env(safe-area-inset-top), 20px);
+            --safe-area-bottom: max(env(safe-area-inset-bottom), 20px);
             --safe-area-left: env(safe-area-inset-left, 0px);
             --safe-area-right: env(safe-area-inset-right, 0px);
             
@@ -150,7 +154,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding-top: calc(20px + var(--safe-area-top));
+            padding-top: calc(var(--safe-area-top) + 15px);
         }
 
         @media (min-width: 768px) {
@@ -158,6 +162,7 @@
                 min-height: var(--header-height-desktop);
                 padding: 30px 20px;
                 margin-bottom: 40px;
+                padding-top: calc(var(--safe-area-top) + 20px);
             }
         }
 
@@ -174,14 +179,14 @@
             background-position: bottom;
         }
 
-        /* LOGO ORIGINALE - COME PRIMA */
+        /* LOGO CON FALLBACK */
         .logo-header {
             height: clamp(80px, 20vw, 120px);
-            width: auto;
+            width: clamp(80px, 20vw, 120px);
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
             margin-bottom: clamp(10px, 3vw, 20px);
             border-radius: clamp(10px, 3vw, 15px);
-            background: white;
+            background: white url('logo.png') center/contain no-repeat;
             padding: clamp(8px, 2vw, 12px);
             transition: var(--transition);
             max-width: 100%;
@@ -190,6 +195,23 @@
             image-rendering: crisp-edges;
             content-visibility: auto;
             contain: layout style paint;
+            position: relative;
+        }
+
+        /* Fallback per logo mancante */
+        .logo-header:not([src]), 
+        .logo-header[src=""], 
+        .logo-header[src*="undefined"],
+        .logo-header:after {
+            content: '🏆';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            background: white;
+            border-radius: clamp(10px, 3vw, 15px);
+            width: 100%;
+            height: 100%;
         }
 
         .logo-header:hover {
@@ -229,6 +251,7 @@
             margin: 20px auto 30px;
             padding: 0 20px;
             max-width: 500px;
+            flex-wrap: wrap;
         }
 
         .reorder-btn {
@@ -247,6 +270,9 @@
             box-shadow: 0 4px 12px rgba(26, 35, 126, 0.2);
             touch-action: manipulation;
             min-height: 44px;
+            flex: 1;
+            min-width: 140px;
+            justify-content: center;
         }
 
         .reorder-btn:hover {
@@ -296,6 +322,7 @@
             width: 100%;
             -webkit-overflow-scrolling: touch;
             position: relative;
+            overscroll-behavior-y: contain; /* Contiene lo scroll nella griglia */
         }
 
         /* GRID ADATTIVA */
@@ -321,6 +348,11 @@
             .container {
                 grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             }
+        }
+
+        /* LANDSCAPE OPTIMIZATION */
+        body.landscape .container {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         }
 
         /* CARD GARA RESPONSIVE */
@@ -443,6 +475,15 @@
             transition: var(--transition);
             font-size: 1rem;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            touch-action: manipulation;
+        }
+
+        /* iOS optimization */
+        @supports (-webkit-touch-callout: none) {
+            .move-btn {
+                width: 44px;
+                height: 44px;
+            }
         }
 
         .move-btn:hover {
@@ -502,16 +543,18 @@
             user-select: none;
         }
 
+        /* iOS specific button styles */
+        @supports (-webkit-touch-callout: none) {
+            .btn {
+                min-height: 48px;
+                border-radius: 12px;
+                -webkit-appearance: none;
+            }
+        }
+
         .btn:focus-visible {
             outline: 3px solid var(--accent);
             outline-offset: 2px;
-        }
-
-        /* Dimensione minima touch target 44px (Apple Guidelines) */
-        @media (max-width: 768px) {
-            .btn {
-                min-height: 44px;
-            }
         }
 
         .btn:active {
@@ -636,7 +679,7 @@
             z-index: 2000;
             gap: clamp(15px, 4vw, 25px);
             transition: opacity 0.3s ease;
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            padding: var(--safe-area-top) var(--safe-area-right) var(--safe-area-bottom) var(--safe-area-left);
             overflow: hidden;
         }
 
@@ -664,6 +707,25 @@
             padding: 0 20px;
         }
 
+        /* PROGRESS BAR */
+        .progress-bar {
+            width: 80%;
+            max-width: 300px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: white;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
         /* NOTIFICA MOBILE-FRIENDLY */
         #notif {
             position: fixed;
@@ -682,6 +744,8 @@
             width: min(300px, 90vw);
             text-align: center;
             font-size: var(--font-size-small);
+            role: alert;
+            aria-live: polite;
         }
 
         @keyframes slideUp {
@@ -830,6 +894,23 @@
             }
         }
 
+        /* REDUCE MOTION SUPPORT */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .btn:active {
+                transform: scale(0.99);
+            }
+            
+            .race-card:hover {
+                transform: translateY(-2px);
+            }
+        }
+
         /* DARK MODE SUPPORT */
         @media (prefers-color-scheme: dark) {
             :root {
@@ -873,10 +954,13 @@
             <p>Caricamento dashboard...</p>
             <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 10px;">Rilevamento dispositivo in corso</p>
         </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
     </div>
 
     <header class="animate__animated animate__fadeInDown">
-        <img src="logo.png" alt="Logo Polisportiva Juvenilia" class="logo-header">
+        <div class="logo-header" alt="Logo Polisportiva Juvenilia"></div>
         <div class="header-content">
             <h1>Dashboard Gare</h1>
             <p>Gestione centralizzata delle manifestazioni sportive</p>
@@ -885,15 +969,15 @@
 
     <main>
         <div class="reorder-controls">
-            <button id="toggle-reorder" class="reorder-btn">
+            <button id="toggle-reorder" class="reorder-btn" aria-label="Attiva modalità riordina">
                 <i class="fas fa-sort"></i>
                 <span id="reorder-text">Modalità Riordina</span>
             </button>
-            <button id="save-order" class="reorder-btn" style="display: none;">
+            <button id="save-order" class="reorder-btn" style="display: none;" aria-label="Salva ordine corrente">
                 <i class="fas fa-save"></i>
                 Salva Ordine
             </button>
-            <button id="reset-order" class="reorder-btn" style="display: none;">
+            <button id="reset-order" class="reorder-btn" style="display: none;" aria-label="Ripristina ordine originale">
                 <i class="fas fa-undo"></i>
                 Reset
             </button>
@@ -913,7 +997,7 @@
         </div>
     </main>
 
-    <div id="notif"></div>
+    <div id="notif" role="alert" aria-live="polite"></div>
 
     <footer class="footer animate__animated animate__fadeInUp">
         <p>© 2026 Polisportiva Juvenilia - Sistema di gestione gare</p>
@@ -925,11 +1009,12 @@
     </footer>
 
     <script>
-        // ============ SISTEMA RIORDINO SEMPLICE ============
+        // ============ SISTEMA RIORDINO MIGLIORATO ============
         let isReorderMode = false;
         let originalOrder = [];
         let currentOrder = [];
         let racesData = [];
+        let deviceType = 'unknown';
 
         // TOGGLE REORDER MODE
         function toggleReorderMode() {
@@ -1055,7 +1140,7 @@
             const card = document.getElementById(cardId);
             if (card) {
                 const header = card.querySelector('.card-header');
-                return header ? header.textContent.trim() : 'Card';
+                return header ? header.textContent.trim().replace(/\s+/g, ' ') : 'Card';
             }
             return 'Card';
         }
@@ -1074,20 +1159,36 @@
                 if (upBtn) {
                     upBtn.disabled = index === 0;
                     upBtn.style.opacity = index === 0 ? '0.5' : '1';
+                    upBtn.setAttribute('aria-label', index === 0 ? 
+                        'Non puoi spostare più in alto' : 'Sposta card verso l\'alto');
                 }
                 
                 if (downBtn) {
                     downBtn.disabled = index === cards.length - 1;
                     downBtn.style.opacity = index === cards.length - 1 ? '0.5' : '1';
+                    downBtn.setAttribute('aria-label', index === cards.length - 1 ? 
+                        'Non puoi spostare più in basso' : 'Sposta card verso il basso');
                 }
             });
         }
 
-        // SALVA E RESET ORDINE
+        // SOLUZIONE PROBLEMA SINCRONIZZAZIONE CROSS-DEVICE
         function saveOrder() {
             try {
-                localStorage.setItem('racesCustomOrder', JSON.stringify(currentOrder));
+                // Salva l'ordine con un identificatore del dispositivo
+                const orderData = {
+                    order: currentOrder,
+                    deviceType: deviceType,
+                    timestamp: Date.now(),
+                    userAgent: navigator.userAgent.substring(0, 100)
+                };
+                
+                localStorage.setItem('racesCustomOrder', JSON.stringify(orderData));
                 originalOrder = [...currentOrder];
+                
+                // Forza il refresh dell'ordine visualizzato
+                renderRaceGrid(document.getElementById('race-grid'), racesData);
+                
                 showNotification('Ordine salvato con successo!', 'success');
                 
                 // Esci dalla modalità riordino
@@ -1103,11 +1204,11 @@
                 const container = document.getElementById('race-grid');
                 const cards = Array.from(container.querySelectorAll('.race-card'));
                 
-                // Ordina le card secondo l'ordine originale
+                // Ordina le card secondo l'ordine originale dei dati
                 cards.sort((a, b) => {
-                    const aIndex = originalOrder.indexOf(a.id);
-                    const bIndex = originalOrder.indexOf(b.id);
-                    return aIndex - bIndex;
+                    const aNum = parseInt(a.dataset.raceId.replace('race-', ''));
+                    const bNum = parseInt(b.dataset.raceId.replace('race-', ''));
+                    return aNum - bNum;
                 });
                 
                 // Rimuovi e riaggiungi in ordine
@@ -1128,7 +1229,7 @@
             }
         }
 
-        // ============ FUNZIONI ESISTENTI ============
+        // ============ FUNZIONI ESISTENTI MIGLIORATE ============
         function showNotification(message, type = 'success') {
             const notif = document.getElementById('notif');
             
@@ -1147,6 +1248,13 @@
             setTimeout(() => {
                 notif.style.display = 'none';
             }, 3000);
+        }
+
+        function showProgress(percent) {
+            const progressFill = document.getElementById('progress-fill');
+            if (progressFill) {
+                progressFill.style.width = percent + '%';
+            }
         }
 
         // CONFIGURAZIONE SUPABASE
@@ -1169,12 +1277,15 @@
         }
 
         async function fetchRaceData() {
+            showProgress(30);
             const now = Date.now();
             
             if (cachedRacesData && (now - lastFetchTime) < CACHE_DURATION) {
+                showProgress(100);
                 return cachedRacesData;
             }
             
+            showProgress(50);
             const { data: tables, error: tableError } = await _supabase.rpc('get_race_tables');
             
             if (tableError) {
@@ -1182,9 +1293,11 @@
             }
             
             if (!tables || tables.length === 0) {
+                showProgress(100);
                 return [];
             }
             
+            showProgress(70);
             const titleRequests = tables.map(t => 
                 _supabase
                     .from(t.table_name)
@@ -1194,6 +1307,7 @@
             );
             
             const results = await Promise.all(titleRequests);
+            showProgress(85);
             
             const raceData = results.map((res, index) => {
                 const tableName = tables[index].table_name;
@@ -1202,12 +1316,15 @@
                 
                 return {
                     tableName,
-                    raceNumber,
+                    raceNumber: parseInt(raceNumber),
                     raceTitle,
                     fileName: `gara${raceNumber}.html`,
                     id: `race-${raceNumber}`
                 };
             });
+            
+            // Ordina per numero di gara come ordine predefinito
+            raceData.sort((a, b) => a.raceNumber - b.raceNumber);
             
             cachedRacesData = raceData;
             lastFetchTime = now;
@@ -1216,12 +1333,14 @@
             try {
                 localStorage.setItem('racesCache', JSON.stringify({
                     data: raceData,
-                    timestamp: now
+                    timestamp: now,
+                    deviceType: deviceType
                 }));
             } catch (e) {
                 console.warn('Impossibile salvare in localStorage:', e);
             }
             
+            showProgress(100);
             return raceData;
         }
 
@@ -1230,7 +1349,7 @@
                 const cached = localStorage.getItem('racesCache');
                 if (!cached) return null;
                 
-                const { data, timestamp } = JSON.parse(cached);
+                const { data, timestamp, deviceType: cachedDeviceType } = JSON.parse(cached);
                 const now = Date.now();
                 
                 if (now - timestamp < 30 * 60 * 1000) {
@@ -1252,12 +1371,15 @@
             const counter = document.getElementById('race-counter');
             
             try {
-                const timeoutPromise = new Promise((_, reject) => {
-                    setTimeout(() => reject(new Error('Timeout caricamento (15s)')), 15000);
-                });
+                // Rileva velocità connessione
+                const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                const timeout = connection?.effectiveType === 'slow-2g' ? 30000 : 15000;
                 
-                const dataPromise = fetchRaceData();
-                const raceData = await Promise.race([dataPromise, timeoutPromise]);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeout);
+                
+                const raceData = await fetchRaceData();
+                clearTimeout(timeoutId);
                 
                 if (!raceData || raceData.length === 0) {
                     showNoRacesMessage(grid, counter);
@@ -1276,6 +1398,17 @@
                 
             } catch (err) {
                 console.error("Errore caricamento:", err);
+                
+                if (err.name === 'AbortError') {
+                    console.log('Fetch timeout - caricamento lento');
+                    showErrorMessage(grid, counter, { 
+                        message: 'Connessione lenta. Caricamento in corso...' 
+                    });
+                    
+                    // Riprova con timeout più lungo
+                    setTimeout(() => initDashboard(), 5000);
+                    return;
+                }
                 
                 if (!navigator.onLine) {
                     const offlineData = await loadFromOfflineCache();
@@ -1302,24 +1435,51 @@
         }
 
         function renderRaceGrid(gridElement, raceData) {
-            let customOrder = [];
+            // CARICAMENTO ORDINE PERSONALIZZATO MIGLIORATO
+            let customOrder = null;
             try {
                 const savedOrder = localStorage.getItem('racesCustomOrder');
                 if (savedOrder) {
-                    customOrder = JSON.parse(savedOrder);
+                    const orderData = JSON.parse(savedOrder);
+                    
+                    // Verifica se l'ordine è stato salvato da un dispositivo diverso
+                    const isDifferentDevice = orderData.deviceType && 
+                                             orderData.deviceType !== deviceType;
+                    
+                    // Verifica se l'ordine è recente (meno di 24 ore)
+                    const isRecent = orderData.timestamp && 
+                                    (Date.now() - orderData.timestamp) < (24 * 60 * 60 * 1000);
+                    
+                    if (isRecent && !isDifferentDevice) {
+                        // Usa l'ordine salvato solo se recente e dallo stesso tipo di dispositivo
+                        customOrder = orderData.order;
+                    } else if (isDifferentDevice) {
+                        console.log('Ordine salvato da dispositivo diverso, applico con cautela');
+                        customOrder = orderData.order;
+                        showNotification('Ordine personalizzato caricato da altro dispositivo', 'info');
+                    }
                 }
             } catch (e) {
                 console.warn('Errore nel caricamento ordine personalizzato:', e);
             }
             
             let orderedData = [...raceData];
-            if (customOrder.length > 0) {
-                orderedData = customOrder
+            if (customOrder && customOrder.length > 0) {
+                // Filtra solo le card che esistono nei dati attuali
+                const validOrder = customOrder.filter(id => 
+                    raceData.find(race => race.id === id)
+                );
+                
+                orderedData = validOrder
                     .map(id => raceData.find(race => race.id === id))
                     .filter(race => race !== undefined);
                 
-                const remainingRaces = raceData.filter(race => !customOrder.includes(race.id));
+                // Aggiungi eventuali nuove gare non presenti nell'ordine salvato
+                const remainingRaces = raceData.filter(race => !validOrder.includes(race.id));
                 orderedData.push(...remainingRaces);
+            } else {
+                // Ordine predefinito: per numero di gara
+                orderedData.sort((a, b) => a.raceNumber - b.raceNumber);
             }
             
             const raceIcons = ['🏆', '⚽', '🎯', '🏃', '🏊', '🚴', '🤸', '🎾'];
@@ -1334,16 +1494,19 @@
                 card.className = 'race-card animate__animated animate__fadeInUp';
                 card.id = race.id;
                 card.dataset.raceId = race.id;
+                card.dataset.raceNumber = race.raceNumber;
                 card.dataset.index = index;
                 card.style.animationDelay = `${Math.min(index * 0.05, 0.5)}s`;
                 
                 card.innerHTML = `
                     <div class="reorder-buttons">
-                        <button class="move-btn up" onclick="moveCardUp('${race.id}')" title="Sposta su">
-                            <i class="fas fa-arrow-up"></i>
+                        <button class="move-btn up" onclick="moveCardUp('${race.id}')" 
+                                aria-label="Sposta card verso l'alto" aria-describedby="reorder-info">
+                            <i class="fas fa-arrow-up" aria-hidden="true"></i>
                         </button>
-                        <button class="move-btn down" onclick="moveCardDown('${race.id}')" title="Sposta giù">
-                            <i class="fas fa-arrow-down"></i>
+                        <button class="move-btn down" onclick="moveCardDown('${race.id}')" 
+                                aria-label="Sposta card verso il basso" aria-describedby="reorder-info">
+                            <i class="fas fa-arrow-down" aria-hidden="true"></i>
                         </button>
                     </div>
                     <div class="card-header color-${colorIndex}">
@@ -1353,12 +1516,13 @@
                     </div>
                     <div class="card-body">
                         <a href="${encodeURI(race.fileName)}" class="btn btn-main">
-                            <i class="fas fa-users"></i> Gestisci Iscrizioni
+                            <i class="fas fa-users" aria-hidden="true"></i> Gestisci Iscrizioni
                         </a>
                         
                         <button class="btn btn-copy" data-race-number="${race.raceNumber}" 
-                                onclick="copyRaceLink('${encodeURIComponent(race.fileName)}', ${race.raceNumber})">
-                            <i class="fas fa-link"></i> Copia Link Diretto
+                                onclick="copyRaceLink('${encodeURIComponent(race.fileName)}', ${race.raceNumber})"
+                                aria-label="Copia link diretto alla gara ${race.raceNumber}">
+                            <i class="fas fa-link" aria-hidden="true"></i> Copia Link Diretto
                         </button>
                     </div>
                 `;
@@ -1385,11 +1549,11 @@
         function showNoRacesMessage(grid, counter) {
             grid.innerHTML = `
                 <div class="empty-state">
-                    <i class="fas fa-trophy"></i>
+                    <i class="fas fa-trophy" aria-hidden="true"></i>
                     <h3>Nessuna gara configurata</h3>
                     <p>Non sono presenti manifestazioni attive nel sistema.<br>Configura una nuova gara per iniziare.</p>
-                    <button onclick="initDashboard()" class="retry-btn">
-                        <i class="fas fa-sync-alt"></i> Ricarica
+                    <button onclick="initDashboard()" class="retry-btn" aria-label="Ricarica la dashboard">
+                        <i class="fas fa-sync-alt" aria-hidden="true"></i> Ricarica
                     </button>
                 </div>`;
             counter.style.display = 'none';
@@ -1403,11 +1567,11 @@
             
             grid.innerHTML = `
                 <div class="empty-state">
-                    <i class="fas fa-exclamation-triangle" style="color: #f5576c;"></i>
+                    <i class="fas fa-exclamation-triangle" style="color: #f5576c;" aria-hidden="true"></i>
                     <h3 style="color: #f5576c;">${isOnline ? 'Errore di connessione' : 'Connessione assente'}</h3>
                     <p>${errorMessage}<br>Verifica la connessione e riprova.</p>
-                    <button onclick="initDashboard()" class="retry-btn">
-                        <i class="fas fa-redo"></i> Riprova
+                    <button onclick="initDashboard()" class="retry-btn" aria-label="Riprova a caricare la dashboard">
+                        <i class="fas fa-redo" aria-hidden="true"></i> Riprova
                     </button>
                 </div>`;
             counter.style.display = 'none';
@@ -1463,7 +1627,7 @@
         function showCopySuccess(raceNumber, fullUrl) {
             const notif = document.getElementById('notif');
             notif.innerHTML = `
-                <i class="fas fa-check-circle" style="margin-right: 10px;"></i>
+                <i class="fas fa-check-circle" style="margin-right: 10px;" aria-hidden="true"></i>
                 Link gara ${raceNumber} copiato!
                 <br><small style="opacity: 0.8; font-size: 0.8em; word-break: break-all;">${fullUrl}</small>
             `;
@@ -1476,11 +1640,13 @@
             const btn = document.querySelector(`.btn-copy[data-race-number="${raceNumber}"]`);
             if (btn) {
                 btn.classList.add('success');
-                btn.innerHTML = '<i class="fas fa-check"></i> Copiato!';
+                btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copiato!';
+                btn.setAttribute('aria-label', `Link gara ${raceNumber} copiato!`);
                 
                 setTimeout(() => {
                     btn.classList.remove('success');
-                    btn.innerHTML = '<i class="fas fa-link"></i> Copia Link Diretto';
+                    btn.innerHTML = '<i class="fas fa-link" aria-hidden="true"></i> Copia Link Diretto';
+                    btn.setAttribute('aria-label', `Copia link diretto alla gara ${raceNumber}`);
                 }, 2000);
             }
         }
@@ -1515,8 +1681,47 @@
             document.body.removeChild(textArea);
         }
 
-        // ============ INIZIALIZZAZIONE ============
+        // ============ INIZIALIZZAZIONE MIGLIORATA ============
         let isInitialized = false;
+
+        function handleOrientationChange() {
+            const isPortrait = window.innerHeight > window.innerWidth;
+            
+            document.body.classList.toggle('portrait', isPortrait);
+            document.body.classList.toggle('landscape', !isPortrait);
+        }
+
+        function detectDevice() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const width = window.innerWidth;
+            
+            document.body.classList.remove('device-mobile', 'device-tablet', 'device-desktop', 'ios-device', 'android-device');
+            
+            // Rileva dispositivo
+            if (width <= 768) {
+                document.body.classList.add('device-mobile');
+                deviceType = 'mobile';
+            } else if (width <= 1024) {
+                document.body.classList.add('device-tablet');
+                deviceType = 'tablet';
+            } else {
+                document.body.classList.add('device-desktop');
+                deviceType = 'desktop';
+            }
+            
+            // Rileva OS
+            const isIOS = /iPad|iPhone|iPod/.test(userAgent) || 
+                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
+            if (isIOS) {
+                document.body.classList.add('ios-device');
+            } else if (/android/i.test(userAgent)) {
+                document.body.classList.add('android-device');
+            }
+            
+            // Gestione orientamento
+            handleOrientationChange();
+        }
 
         function optimizedInitDashboard() {
             if (isInitialized) return;
@@ -1535,33 +1740,34 @@
                 }, 500);
             }
             
-            window.addEventListener('resize', detectDevice);
-            window.addEventListener('orientationchange', detectDevice);
-        }
-
-        function detectDevice() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            const body = document.body;
+            // Event listeners migliorati
+            window.addEventListener('resize', () => {
+                setTimeout(detectDevice, 100);
+                setTimeout(handleOrientationChange, 150);
+            });
             
-            body.classList.remove('device-mobile', 'device-tablet', 'device-desktop', 'ios-device', 'android-device');
+            window.addEventListener('orientationchange', () => {
+                setTimeout(() => {
+                    detectDevice();
+                    handleOrientationChange();
+                    
+                    // Forza il refresh dell'ordine dopo cambio orientamento
+                    if (racesData.length > 0) {
+                        renderRaceGrid(document.getElementById('race-grid'), racesData);
+                    }
+                }, 300);
+            });
             
-            const isIOS = /iPad|iPhone|iPod/.test(userAgent) || 
-                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            
-            if (isIOS) {
-                body.classList.add('ios-device');
-            } else if (/android/i.test(userAgent)) {
-                body.classList.add('android-device');
-            }
-            
-            const width = window.innerWidth;
-            if (width <= 768) {
-                body.classList.add('device-mobile');
-            } else if (width <= 1024) {
-                body.classList.add('device-tablet');
-            } else {
-                body.classList.add('device-desktop');
-            }
+            // Forza refresh quando la pagina torna visibile
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden && racesData.length > 0) {
+                    // Ricarica i dati se la pagina è stata nascosta per un po'
+                    const timeSinceLastLoad = Date.now() - lastFetchTime;
+                    if (timeSinceLastLoad > 60000) { // 1 minuto
+                        initDashboard();
+                    }
+                }
+            });
         }
 
         if (document.readyState === 'loading') {
@@ -1572,7 +1778,7 @@
 
         window.addEventListener('online', () => {
             const notif = document.getElementById('notif');
-            notif.innerHTML = '<i class="fas fa-wifi"></i> Connessione ripristinata';
+            notif.innerHTML = '<i class="fas fa-wifi" aria-hidden="true"></i> Connessione ripristinata';
             notif.style.display = 'block';
             setTimeout(() => {
                 notif.style.display = 'none';
@@ -1582,17 +1788,71 @@
 
         window.addEventListener('offline', () => {
             const notif = document.getElementById('notif');
-            notif.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Connessione assente';
+            notif.innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Connessione assente';
             notif.style.display = 'block';
             notif.style.background = 'linear-gradient(135deg, #f5576c, #d32f2f)';
             setTimeout(() => notif.style.display = 'none', 3000);
         });
 
+        // Polling migliorato per aggiornamenti cross-device
         setInterval(() => {
             if (navigator.onLine) {
+                // Verifica se l'ordine è stato modificato su un altro dispositivo/tab
+                try {
+                    const savedOrder = localStorage.getItem('racesCustomOrder');
+                    if (savedOrder) {
+                        const orderData = JSON.parse(savedOrder);
+                        
+                        // Se l'ordine è stato salvato da un dispositivo diverso
+                        if (orderData.deviceType && orderData.deviceType !== deviceType) {
+                            console.log('Ordine modificato su dispositivo diverso, aggiorno...');
+                            
+                            // Forza il refresh dell'ordine
+                            if (racesData.length > 0) {
+                                renderRaceGrid(document.getElementById('race-grid'), racesData);
+                                showNotification('Ordine aggiornato da altro dispositivo', 'info');
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Errore nel controllo aggiornamenti:', e);
+                }
+                
+                // Aggiorna i dati ogni 10 minuti
                 initDashboard();
             }
-        }, 10 * 60 * 1000);
+        }, 10 * 60 * 1000); // 10 minuti
+
+        // Storage event per aggiornamenti cross-tab
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'racesCustomOrder' && e.newValue) {
+                try {
+                    const orderData = JSON.parse(e.newValue);
+                    
+                    // Se l'ordine è stato modificato su un'altra tab
+                    if (orderData.deviceType === deviceType) {
+                        console.log('Ordine modificato in un\'altra tab, aggiorno...');
+                        
+                        // Forza il refresh dell'ordine
+                        if (racesData.length > 0) {
+                            renderRaceGrid(document.getElementById('race-grid'), racesData);
+                            showNotification('Ordine aggiornato', 'info');
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Errore nel processing storage event:', e);
+                }
+            }
+        });
+
+        // PWA Support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(err => {
+                    console.log('ServiceWorker registration failed:', err);
+                });
+            });
+        }
     </script>
 </body>
 </html>
