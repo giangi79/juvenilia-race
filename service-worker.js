@@ -1,6 +1,5 @@
 // Nome della cache
 const CACHE_NAME = 'juvenilia-dashboard-v1.0';
-const OFFLINE_URL = '/offline.html';
 
 // Risorse da cache
 const urlsToCache = [
@@ -75,65 +74,11 @@ self.addEventListener('fetch', event => {
             return response;
           })
           .catch(() => {
-            // Fallback offline per HTML
+            // Fallback offline
             if (event.request.headers.get('accept').includes('text/html')) {
               return caches.match('./index.html');
             }
           });
       })
   );
-});
-
-// Gestione sync in background (per dati offline)
-self.addEventListener('sync', event => {
-  if (event.tag === 'sync-races') {
-    console.log('Sync background attivato');
-    // Qui puoi aggiungere logica per sync dati offline
-  }
-});
-
-// Gestione push notifications
-self.addEventListener('push', event => {
-  const options = {
-    body: event.data ? event.data.text() : 'Nuova notifica dalla dashboard',
-    icon: 'logo.png',
-    badge: 'logo.png',
-    vibrate: [100, 50, 100],
-    data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
-    },
-    actions: [
-      {
-        action: 'explore',
-        title: 'Apri',
-        icon: 'logo.png'
-      },
-      {
-        action: 'close',
-        title: 'Chiudi',
-        icon: 'logo.png'
-      }
-    ]
-  };
-
-  event.waitUntil(
-    self.registration.showNotification('Dashboard Juvenilia', options)
-  );
-});
-
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-
-  if (event.action === 'explore') {
-    event.waitUntil(
-      clients.openWindow('/')
-    );
-  } else if (event.action === 'close') {
-    // Notifica chiusa
-  } else {
-    event.waitUntil(
-      clients.openWindow('/')
-    );
-  }
 });
