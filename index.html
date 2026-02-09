@@ -1256,7 +1256,7 @@
         // Esegui la verifica dopo 3 secondi
         setTimeout(verifyAllIcons, 3000);
 
-        // ============ PWA INSTALLATION - VERSIONE RISOLTA ============
+        // ============ PWA INSTALLATION - VERSIONE CORRETTA ============
         let deferredPrompt = null;
         const installButton = document.getElementById('installButton');
         const pwaBanner = document.getElementById('pwaBanner');
@@ -1304,21 +1304,27 @@
             pwaBanner.style.display = 'none';
         }
 
-        // Mostra pulsante installazione quando possibile
+        // Mostra pulsante installazione quando possibile - VERSIONE CORRETTA
         window.addEventListener('beforeinstallprompt', (e) => {
             console.log('✅ beforeinstallprompt event fired - PWA can be installed');
             
-            // Previeni il banner automatico del browser
+            // Previeni il banner automatico del browser SOLO SE vogliamo mostrare il nostro banner
             e.preventDefault();
             
             // Salva l'evento per usarlo dopo
             deferredPrompt = e;
+            
+            // Salva anche globalmente per sicurezza
+            window.deferredInstallPrompt = e;
             
             // Mostra il nostro pulsante personalizzato
             showInstallButton();
             
             // Mostra anche il banner (se possibile)
             showPwaBanner();
+            
+            // IMPORTANTE: Ritorna false per indicare che gestiremo il prompt noi
+            return false;
         });
 
         function showInstallButton() {
@@ -1332,18 +1338,20 @@
         }
 
         function installApp() {
-            if (!deferredPrompt) {
+            if (!deferredPrompt && !window.deferredInstallPrompt) {
                 console.log('❌ No deferred prompt available');
                 return;
             }
             
+            const promptToUse = deferredPrompt || window.deferredInstallPrompt;
+            
             console.log('📲 Showing install prompt...');
             
             // Mostra il prompt di installazione
-            deferredPrompt.prompt();
+            promptToUse.prompt();
             
             // Attendi la scelta dell'utente
-            deferredPrompt.userChoice.then((choiceResult) => {
+            promptToUse.userChoice.then((choiceResult) => {
                 console.log('👤 User choice:', choiceResult.outcome);
                 
                 if (choiceResult.outcome === 'accepted') {
@@ -1358,6 +1366,7 @@
                 
                 // Reset del deferredPrompt
                 deferredPrompt = null;
+                window.deferredInstallPrompt = null;
                 
                 // Nascondi il pulsante e il banner
                 hideInstallButton();
@@ -1365,6 +1374,8 @@
             }).catch((error) => {
                 console.error('💥 Error during installation:', error);
                 showNotification('Errore durante l\'installazione', 'warning');
+                deferredPrompt = null;
+                window.deferredInstallPrompt = null;
             });
         }
 
@@ -2151,6 +2162,32 @@
             handleOrientationChange();
         }
 
+        // FUNZIONE PER AGGIORNARE IL SERVICE WORKER
+        function updateServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistration().then(reg => {
+                    if (reg) {
+                        console.log('🔄 Forzando aggiornamento Service Worker...');
+                        reg.update();
+                        
+                        // Invia messaggio al service worker per saltare la fase di attesa
+                        if (reg.waiting) {
+                            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                            console.log('⏩ Service Worker saltato alla nuova versione');
+                            
+                            // Ricarica la pagina dopo 1 secondo
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        }
+                    }
+                });
+            }
+        }
+
+        // Chiama dopo 10 secondi per forzare l'aggiornamento
+        setTimeout(updateServiceWorker, 10000);
+
         function optimizedInitDashboard() {
             if (isInitialized) return;
             
@@ -2320,7 +2357,8 @@
                 hidePwaBanner();
                 document.body.classList.add('pwa-installed');
                 showNotification('PWA simulation - App installed', 'success');
-            }
+            },
+            forceUpdate: updateServiceWorker
         };
 
         console.log('🚀 Dashboard Juvenilia loaded successfully!');
@@ -2328,6 +2366,7 @@
         console.log('   - debugPWA.checkInstallation()');
         console.log('   - debugPWA.resetInstall()');
         console.log('   - debugPWA.simulateInstall()');
+        console.log('   - debugPWA.forceUpdate()');
     </script>
 </body>
 </html>
