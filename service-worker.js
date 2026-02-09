@@ -1,125 +1,144 @@
-// service-worker.js - VERSIONE MIGLIORATA
-const CACHE_NAME = 'juvenilia-dashboard-v2.0';
-const OFFLINE_URL = '/offline.html';
-
-// Risorse da cache (solo quelle essenziali)
+// service-worker.js - VERSIONE CORRETTA
+const CACHE_NAME = 'juvenilia-dashboard-v3.0';
 const urlsToCache = [
-  './',
-  './index.html',
-  './logo.png',
-  './manifest.json'
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/offline.html',
+  '/logo.png',
+  '/favicon.ico',
+  '/favicon-16x16.png',
+  '/favicon-32x32.png',
+  '/icon-144.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+  'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap',
+  'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css'
 ];
 
-// Installazione - SOLO CACHE ESSENZIALI
+// INSTALL - Crea cache e precarica risorse
 self.addEventListener('install', event => {
+  console.log('✅ Service Worker installato');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Cache aperta:', CACHE_NAME);
+        console.log('✅ Cache aperta:', CACHE_NAME);
         return cache.addAll(urlsToCache);
       })
-      .then(() => self.skipWaiting())
+      .then(() => {
+        console.log('✅ Tutte le risorse precaricate');
+        return self.skipWaiting();
+      })
+      .catch(error => {
+        console.error('❌ Errore durante l\'installazione:', error);
+      })
   );
 });
 
-// Attivazione - PULIZIA CACHE VECCHIE
+// ACTIVATE - Pulisci vecchie cache
 self.addEventListener('activate', event => {
+  console.log('✅ Service Worker attivato');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          // Cancella tutte le cache tranne quella corrente
-          if (cacheName !== CACHE_NAME) {
-            console.log('Rimozione vecchia cache:', cacheName);
-            return caches.delete(cacheName);
+        cacheNames.map(cache => {
+          if (cache !== CACHE_NAME) {
+            console.log('🗑️ Rimozione vecchia cache:', cache);
+            return caches.delete(cache);
           }
         })
       );
     }).then(() => {
-      // Prendi il controllo di tutte le tab
+      console.log('✅ Cache pulite, ora controllo i client');
       return self.clients.claim();
     })
   );
 });
 
-// FETCH - STRATEGIA CACHE FIRST CON NETWORK FALLBACK
+// FETCH - Strategia Cache First con fallback Network
 self.addEventListener('fetch', event => {
-  // Salta le richieste a Supabase e altre API
-  if (event.request.url.includes('supabase.co') || 
-      event.request.url.includes('/rest/v1/')) {
-    return;
-  }
-
-  // Salta le richieste non GET
-  if (event.request.method !== 'GET') {
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => {
-        // Ritorna dalla cache se disponibile
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-
-        // Altrimenti fai richiesta di rete
-        return fetch(event.request)
-          .then(response => {
-            // Controlla se la risposta è valida
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-
-            // Clona la risposta per metterla in cache
-            const responseToCache = response.clone();
-
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                // Metti in cache solo risorse importanti
-                const shouldCache = 
-                  event.request.url.includes('.html') ||
-                  event.request.url.includes('.css') ||
-                  event.request.url.includes('.js') ||
-                  event.request.url.includes('.png') ||
-                  event.request.url.includes('.ico');
-                
-                if (shouldCache) {
-                  cache.put(event.request, responseToCache);
-                }
-              });
-
-            return response;
-          })
-          .catch(error => {
-            // Fallback per pagine offline
-            if (event.request.headers.get('accept').includes('text/html')) {
-              return caches.match('./');
-            }
-            console.error('Fetch failed:', error);
-            return new Response('Network error', { status: 408 });
+  // Solo richieste GET e dello stesso origin (no CDN)
+  if (event.request.method !== 'GET') return;
+  
+  // Per le pagine HTML, usa Network First
+  if (event.request.url.includes('.html') || 
+      event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // Clona la risposta per salvarla in cache
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
           });
-      })
-  );
-});
-
-// SYNC EVENT (per dati offline futuri)
-self.addEventListener('sync', event => {
-  if (event.tag === 'sync-data') {
-    console.log('Background sync:', event.tag);
+          return response;
+        })
+        .catch(() => {
+          // Se offline, prova dalla cache
+          return caches.match(event.request)
+            .then(cachedResponse => {
+              if (cachedResponse) {
+                return cachedResponse;
+              }
+              // Se non in cache, mostra pagina offline
+              return caches.match('/offline.html');
+            });
+        })
+    );
+  } else {
+    // Per altre risorse (CSS, JS, immagini), usa Cache First
+    event.respondWith(
+      caches.match(event.request)
+        .then(cachedResponse => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          
+          return fetch(event.request)
+            .then(response => {
+              // Se la risposta è valida, salva in cache
+              if (!response || response.status !== 200 || response.type !== 'basic') {
+                return response;
+              }
+              
+              const responseToCache = response.clone();
+              caches.open(CACHE_NAME).then(cache => {
+                cache.put(event.request, responseToCache);
+              });
+              
+              return response;
+            })
+            .catch(() => {
+              // Per le immagini, mostra un fallback
+              if (event.request.destination === 'image') {
+                return caches.match('/logo.png');
+              }
+            });
+        })
+    );
   }
 });
 
-// PUSH NOTIFICATIONS (funzionalità futura)
-self.addEventListener('push', event => {
-  const options = {
-    body: 'Nuovo aggiornamento disponibile',
-    icon: './logo.png',
-    badge: './logo.png',
-    vibrate: [100, 50, 100]
-  };
-
-  event.waitUntil(
-    self.registration.showNotification('Dashboard Juvenilia', options)
-  );
+// MESSAGE - Gestisci messaggi dalla pagina
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  
+  // SEMPRE ritorna una risposta immediata
+  event.ports[0].postMessage({ status: 'OK', message: 'Message received' });
 });
+
+// SYNC - Background sync (opzionale)
+self.addEventListener('sync', event => {
+  if (event.tag === 'sync-races') {
+    event.waitUntil(syncRacesData());
+  }
+});
+
+async function syncRacesData() {
+  console.log('🔄 Sync dati in background');
+  // Implementa la sincronizzazione dei dati qui
+}
