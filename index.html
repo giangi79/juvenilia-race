@@ -137,6 +137,18 @@
             flex-direction: column;
         }
 
+        /* PWA INSTALLED STYLES */
+        body.pwa-installed header {
+            padding-top: calc(var(--safe-area-top) + 10px);
+            min-height: calc(var(--header-height-mobile) - 20px);
+        }
+
+        @media (min-width: 768px) {
+            body.pwa-installed header {
+                min-height: calc(var(--header-height-desktop) - 20px);
+            }
+        }
+
         /* HEADER RESPONSIVE */
         header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -945,6 +957,51 @@
                 background: #4a5568;
             }
         }
+
+        /* PWA INSTALL BUTTON */
+        #installButton {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: linear-gradient(135deg, #43e97b, #38ef7d);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.3);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        #installButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 233, 123, 0.4);
+        }
+
+        #installButton:active {
+            transform: scale(0.98);
+        }
+
+        @media (max-width: 768px) {
+            #installButton {
+                bottom: 80px;
+                right: 15px;
+                padding: 10px 20px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* PWA INSTALLED STYLES */
+        body.pwa-installed #installButton {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -1010,7 +1067,57 @@
         </p>
     </footer>
 
+    <!-- PWA INSTALL BUTTON -->
+    <button id="installButton" aria-label="Installa l'applicazione">
+        <i class="fas fa-download"></i>
+        <span>Installa App</span>
+    </button>
+
     <script>
+        // ============ PWA INSTALLATION ============
+        let deferredPrompt;
+        const installButton = document.getElementById('installButton');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            installButton.style.display = 'flex';
+            
+            installButton.addEventListener('click', () => {
+                installButton.style.display = 'none';
+                deferredPrompt.prompt();
+                
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('Utente ha accettato installazione');
+                        showNotification('App installata con successo!', 'success');
+                    } else {
+                        console.log('Utente ha rifiutato installazione');
+                        showNotification('Installazione annullata', 'info');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+        });
+
+        // Controlla se l'app è già installata
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA installata');
+            installButton.style.display = 'none';
+            document.body.classList.add('pwa-installed');
+            
+            // Mostra messaggio di conferma
+            showNotification('App installata con successo!', 'success');
+        });
+
+        // Verifica se siamo in standalone mode (app installata)
+        if (window.matchMedia('(display-mode: standalone)').matches || 
+            window.navigator.standalone === true) {
+            console.log('App in esecuzione in standalone mode');
+            document.body.classList.add('pwa-installed');
+        }
+
         // ============ SISTEMA RIORDINO MIGLIORATO ============
         let isReorderMode = false;
         let originalOrder = [];
@@ -1732,6 +1839,31 @@
             
             detectDevice();
             
+            // REGISTRA SERVICE WORKER PER PWA
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('service-worker.js')
+                        .then(registration => {
+                            console.log('ServiceWorker registrato:', registration.scope);
+                            
+                            // Controlla aggiornamenti
+                            registration.addEventListener('updatefound', () => {
+                                const newWorker = registration.installing;
+                                console.log('Nuova versione ServiceWorker trovata');
+                                
+                                newWorker.addEventListener('statechange', () => {
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        showNotification('Nuova versione disponibile! Ricarica la pagina.', 'info');
+                                    }
+                                });
+                            });
+                        })
+                        .catch(err => {
+                            console.log('ServiceWorker registration failed:', err);
+                        });
+                });
+            }
+            
             if ('requestIdleCallback' in window) {
                 requestIdleCallback(() => {
                     initDashboard();
@@ -1846,15 +1978,6 @@
                 }
             }
         });
-
-        // PWA Support
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(err => {
-                    console.log('ServiceWorker registration failed:', err);
-                });
-            });
-        }
     </script>
 </body>
 </html>
