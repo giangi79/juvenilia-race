@@ -1,8 +1,8 @@
 {
   "name": "Juvenilia Dashboard",
   "short_name": "Juvenilia",
-  "description": "Dashboard di gestione gare Polisportiva Juvenilia",
-  "start_url": "/juvenilia-race/",
+  "description": "Dashboard sincronizzata gare Polisportiva Juvenilia",
+  "start_url": "/juvenilia-race/?source=pwa",
   "display": "standalone",
   "background_color": "#1a237e",
   "theme_color": "#1a237e",
@@ -12,26 +12,6 @@
   "dir": "ltr",
   "categories": ["sports", "productivity"],
   "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "favicon-16x16.png",
-      "sizes": "16x16",
-      "type": "image/png"
-    },
-    {
-      "src": "favicon-32x32.png",
-      "sizes": "32x32",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-144.png",
-      "sizes": "144x144",
-      "type": "image/png"
-    },
     {
       "src": "icon-192.png",
       "sizes": "192x192",
