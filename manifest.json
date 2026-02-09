@@ -1,0 +1,62 @@
+{
+  "name": "Dashboard Juvenilia",
+  "short_name": "Juvenilia",
+  "description": "Dashboard di gestione gare Polisportiva Juvenilia",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#1a237e",
+  "theme_color": "#1a237e",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "it",
+  "categories": ["sports", "productivity"],
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo-144.png",
+      "sizes": "144x144",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nuova Gara",
+      "short_name": "Nuova",
+      "description": "Crea una nuova gara",
+      "url": "/new-race.html",
+      "icons": [{ "src": "icon-add.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Home",
+      "description": "Torna alla dashboard",
+      "url": "/",
+      "icons": [{ "src": "icon-home.png", "sizes": "96x96" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ]
+}
