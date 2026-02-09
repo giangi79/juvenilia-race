@@ -179,39 +179,40 @@
             background-position: bottom;
         }
 
-        /* LOGO CON FALLBACK */
+        /* LOGO CON FALLBACK MIGLIORATO */
         .logo-header {
             height: clamp(80px, 20vw, 120px);
-            width: clamp(80px, 20vw, 120px);
+            width: auto;
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
             margin-bottom: clamp(10px, 3vw, 20px);
             border-radius: clamp(10px, 3vw, 15px);
-            background: white url('logo.png') center/contain no-repeat;
+            background: white;
             padding: clamp(8px, 2vw, 12px);
             transition: var(--transition);
-            max-width: 100%;
+            max-width: min(300px, 90vw);
             object-fit: contain;
             image-rendering: -webkit-optimize-contrast;
             image-rendering: crisp-edges;
             content-visibility: auto;
             contain: layout style paint;
             position: relative;
+            display: block;
         }
 
-        /* Fallback per logo mancante */
-        .logo-header:not([src]), 
-        .logo-header[src=""], 
-        .logo-header[src*="undefined"],
+        /* Fallback per logo mancante - visibile solo se l'immagine non si carica */
         .logo-header:after {
             content: '🏆';
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-size: 2.5rem;
-            background: white;
-            border-radius: clamp(10px, 3vw, 15px);
-            width: 100%;
-            height: 100%;
+        }
+
+        /* Mostra fallback solo se l'immagine ha errore */
+        .logo-header.error:after {
+            display: block;
         }
 
         .logo-header:hover {
@@ -960,7 +961,8 @@
     </div>
 
     <header class="animate__animated animate__fadeInDown">
-        <div class="logo-header" alt="Logo Polisportiva Juvenilia"></div>
+        <img src="logo.png" alt="Logo Polisportiva Juvenilia" class="logo-header" 
+             onerror="this.classList.add('error')">
         <div class="header-content">
             <h1>Dashboard Gare</h1>
             <p>Gestione centralizzata delle manifestazioni sportive</p>
