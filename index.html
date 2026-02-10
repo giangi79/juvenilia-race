@@ -1543,63 +1543,82 @@
             return currentUserId;
         }
 
-        // SALVA ORDINE CON SINCRONIZZAZIONE CLOUD
-        async function saveOrder() {
-            try {
-                const userId = getUserId();
-                
-                // Dati da salvare
-                const orderData = {
-                    order: currentOrder,
-                    deviceType: deviceType,
-                    timestamp: Date.now(),
-                    userAgent: navigator.userAgent.substring(0, 100)
-                };
-                
-                // 1. Salva in localStorage (per velocità)
-                localStorage.setItem('racesCustomOrder', JSON.stringify(orderData));
-                originalOrder = [...currentOrder];
-                
-                // 2. Salva nel cloud Supabase (se online)
-                if (navigator.onLine) {
-                    await saveOrderToCloud(userId, orderData);
-                    showNotification('Ordine salvato e sincronizzato!', 'success');
-                } else {
-                    showNotification('Ordine salvato localmente (offline)', 'info');
-                }
-                
-                // Forza il refresh dell'ordine visualizzato
-                renderRaceGrid(document.getElementById('race-grid'), racesData);
-                
-                // Esci dalla modalità riordino
-                toggleReorderMode();
-                
-            } catch (e) {
-                console.warn('Errore nel salvataggio:', e);
-                showNotification('Errore nel salvataggio', 'warning');
-            }
-        }
-
-        // SALVA ORDINE NEL CLOUD
+        // SALVA ORDINE CON SINCRONIZZAZIONE CLOUD - VERSIONE CORRETTA
         async function saveOrderToCloud(userId, orderData) {
             try {
+                console.log('💾 Preparando salvataggio cloud...', { userId, orderData });
+                
+                // Prepara i dati secondo le policy RLS
+                const dataToSave = {
+                    user_id: userId,
+                    device_type: deviceType,
+                    order_preference: {
+                        order: orderData.order || currentOrder,
+                        timestamp: orderData.timestamp || Date.now(),
+                        deviceType: deviceType, // DEVE corrispondere a device_type
+                        userAgent: orderData.userAgent || navigator.userAgent.substring(0, 100),
+                        updated_at: new Date().toISOString()
+                    },
+                    updated_at: new Date().toISOString()
+                };
+                
+                console.log('📤 Dati da salvare:', dataToSave);
+                
+                // Verifica che i dati rispettino le policy RLS
+                if (!/^user_\d+_[a-zA-Z0-9]+$/.test(userId)) {
+                    throw new Error(`Formato user_id non valido: ${userId}`);
+                }
+                
+                if (!['mobile', 'tablet', 'desktop', 'unknown'].includes(deviceType)) {
+                    throw new Error(`device_type non valido: ${deviceType}`);
+                }
+                
+                // Usa upsert con onConflict
                 const { data, error } = await _supabase
                     .from('user_preferences')
                     .upsert({
                         user_id: userId,
                         device_type: deviceType,
-                        order_preference: orderData,
-                        updated_at: new Date().toISOString()
+                        order_preference: dataToSave.order_preference,
+                        updated_at: dataToSave.updated_at
                     }, {
                         onConflict: 'user_id,device_type'
                     });
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('❌ Errore Supabase:', error);
+                    
+                    // Debug dettagliato
+                    if (error.message.includes('policy')) {
+                        console.warn('🚨 Problema con RLS policy!');
+                        console.warn('Dettagli errori:', {
+                            code: error.code,
+                            details: error.details,
+                            hint: error.hint,
+                            message: error.message
+                        });
+                    }
+                    throw error;
+                }
                 
                 console.log('✅ Ordine salvato nel cloud:', data);
                 return data;
             } catch (error) {
                 console.error('❌ Errore salvataggio cloud:', error);
+                
+                // Fallback: salva in localStorage
+                try {
+                    localStorage.setItem('racesCustomOrder', JSON.stringify({
+                        order: orderData.order || currentOrder,
+                        deviceType: deviceType,
+                        timestamp: Date.now(),
+                        userAgent: navigator.userAgent.substring(0, 100)
+                    }));
+                    console.log('📱 Ordine salvato in localStorage come fallback');
+                } catch (e) {
+                    console.warn('Impossibile salvare in localStorage:', e);
+                }
+                
                 throw error;
             }
         }
@@ -1609,18 +1628,24 @@
             try {
                 const userId = getUserId();
                 
+                console.log('📡 Caricamento ordine dal cloud per user:', userId);
+                
                 const { data, error } = await _supabase
                     .from('user_preferences')
-                    .select('*')
+                    .select('order_preference, updated_at')
                     .eq('user_id', userId)
+                    .eq('device_type', deviceType)
                     .order('updated_at', { ascending: false })
                     .limit(1);
                 
-                if (error) throw error;
+                if (error) {
+                    console.warn('⚠️ Errore caricamento cloud:', error);
+                    return null;
+                }
                 
                 if (data && data.length > 0) {
                     const cloudOrder = data[0].order_preference;
-                    console.log('📡 Ordine caricato dal cloud:', cloudOrder);
+                    console.log('✅ Ordine caricato dal cloud:', cloudOrder);
                     
                     // Controlla se l'ordine è più recente di quello locale
                     const localOrder = localStorage.getItem('racesCustomOrder');
@@ -1652,12 +1677,16 @@
 
         // SINCRONIZZA ORDINI TRA DISPOSITIVI
         async function syncOrdersAcrossDevices() {
-            if (!navigator.onLine) return;
+            if (!navigator.onLine) {
+                console.log('🌐 Offline - salto sincronizzazione');
+                return;
+            }
             
             try {
                 const userId = getUserId();
+                console.log('🔄 Sincronizzazione ordini per user:', userId);
                 
-                // 1. Carica tutti gli ordini dell'utente dal cloud
+                // Carica tutti gli ordini dell'utente
                 const { data: allOrders, error } = await _supabase
                     .from('user_preferences')
                     .select('*')
@@ -1666,12 +1695,15 @@
                 
                 if (error) throw error;
                 
-                if (!allOrders || allOrders.length === 0) return;
+                if (!allOrders || allOrders.length === 0) {
+                    console.log('📭 Nessun ordine trovato nel cloud');
+                    return;
+                }
                 
-                // 2. Trova l'ordine più recente (da qualsiasi dispositivo)
+                // Trova l'ordine più recente
                 const latestOrder = allOrders[0];
                 
-                // 3. Confronta con l'ordine locale corrente
+                // Confronta con l'ordine locale
                 const localOrder = localStorage.getItem('racesCustomOrder');
                 let localTimestamp = 0;
                 
@@ -1684,9 +1716,9 @@
                     }
                 }
                 
-                // 4. Se l'ordine cloud è più recente, aggiorna il locale
+                // Se l'ordine cloud è più recente, aggiorna il locale
                 if (latestOrder.order_preference.timestamp > localTimestamp) {
-                    console.log('🔄 Sincronizzazione: aggiorno ordine locale da cloud');
+                    console.log('🔄 Aggiorno ordine locale da cloud');
                     localStorage.setItem('racesCustomOrder', JSON.stringify(latestOrder.order_preference));
                     
                     // Ricarica la griglia se ci sono dati
@@ -1698,6 +1730,47 @@
                 
             } catch (error) {
                 console.warn('❌ Errore sincronizzazione:', error);
+            }
+        }
+
+        // SALVA ORDINE (funzione principale)
+        async function saveOrder() {
+            try {
+                const userId = getUserId();
+                
+                // Dati da salvare
+                const orderData = {
+                    order: currentOrder,
+                    deviceType: deviceType,
+                    timestamp: Date.now(),
+                    userAgent: navigator.userAgent.substring(0, 100)
+                };
+                
+                console.log('💾 Salvataggio ordine:', orderData);
+                
+                // 1. Salva in localStorage (per velocità)
+                localStorage.setItem('racesCustomOrder', JSON.stringify(orderData));
+                originalOrder = [...currentOrder];
+                
+                // 2. Salva nel cloud Supabase (se online)
+                if (navigator.onLine) {
+                    await saveOrderToCloud(userId, orderData);
+                    showNotification('Ordine salvato e sincronizzato!', 'success');
+                } else {
+                    showNotification('Ordine salvato localmente (offline)', 'info');
+                }
+                
+                // Forza il refresh dell'ordine visualizzato
+                if (racesData.length > 0) {
+                    renderRaceGrid(document.getElementById('race-grid'), racesData);
+                }
+                
+                // Esci dalla modalità riordino
+                toggleReorderMode();
+                
+            } catch (e) {
+                console.warn('Errore nel salvataggio:', e);
+                showNotification('Errore nel salvataggio: ' + (e.message || 'Sconosciuto'), 'warning');
             }
         }
 
@@ -1739,10 +1812,10 @@
             const cards = document.querySelectorAll('.race-card');
             cards.forEach(card => {
                 card.classList.add('reorder-mode');
-                
-                // Salva ordine originale all'attivazione
-                saveOriginalOrder();
             });
+            
+            // Salva ordine originale all'attivazione
+            saveOriginalOrder();
         }
 
         function deactivateReorderMode() {
@@ -1756,6 +1829,7 @@
             const cards = Array.from(document.querySelectorAll('.race-card'));
             originalOrder = cards.map(card => card.id);
             currentOrder = [...originalOrder];
+            console.log('📝 Ordine originale salvato:', originalOrder);
         }
 
         // FUNZIONI PER SPOSTARE LE CARD
@@ -1835,6 +1909,7 @@
         function updateCardOrder() {
             const cards = Array.from(document.querySelectorAll('.race-card'));
             currentOrder = cards.map(card => card.id);
+            console.log('🔄 Ordine aggiornato:', currentOrder);
         }
 
         function updateMoveButtons() {
@@ -1846,28 +1921,26 @@
                 if (upBtn) {
                     upBtn.disabled = index === 0;
                     upBtn.style.opacity = index === 0 ? '0.5' : '1';
-                    upBtn.setAttribute('aria-label', index === 0 ? 
-                        'Non puoi spostare più in alto' : 'Sposta card verso l\'alto');
+                    upBtn.title = index === 0 ? 'Non puoi spostare più in alto' : 'Sposta su';
                 }
                 
                 if (downBtn) {
                     downBtn.disabled = index === cards.length - 1;
                     downBtn.style.opacity = index === cards.length - 1 ? '0.5' : '1';
-                    downBtn.setAttribute('aria-label', index === cards.length - 1 ? 
-                        'Non puoi spostare più in basso' : 'Sposta card verso il basso');
+                    downBtn.title = index === cards.length - 1 ? 'Non puoi spostare più in basso' : 'Sposta giù';
                 }
             });
         }
 
         function resetOrder() {
-            if (confirm('Vuoi ripristinare l\'ordine originale?')) {
+            if (confirm('Vuoi ripristinare l\'ordine originale delle gare?')) {
                 const container = document.getElementById('race-grid');
                 const cards = Array.from(container.querySelectorAll('.race-card'));
                 
-                // Ordina le card secondo l'ordine originale dei dati
+                // Ordina le card secondo l'ordine originale dei dati (per numero di gara)
                 cards.sort((a, b) => {
-                    const aNum = parseInt(a.dataset.raceId.replace('race-', ''));
-                    const bNum = parseInt(b.dataset.raceId.replace('race-', ''));
+                    const aNum = parseInt(a.dataset.raceNumber) || 0;
+                    const bNum = parseInt(b.dataset.raceNumber) || 0;
                     return aNum - bNum;
                 });
                 
@@ -1879,9 +1952,10 @@
                 updateCardOrder();
                 updateMoveButtons();
                 
+                // Rimuovi ordine personalizzato
                 localStorage.removeItem('racesCustomOrder');
                 
-                showNotification('Ordine ripristinato', 'info');
+                showNotification('Ordine ripristinato al predefinito', 'info');
                 
                 if (isReorderMode) {
                     toggleReorderMode();
@@ -1934,68 +2008,86 @@
             showProgress(30);
             const now = Date.now();
             
+            // Controlla cache
             if (cachedRacesData && (now - lastFetchTime) < CACHE_DURATION) {
+                console.log('📦 Usando dati dalla cache');
                 showProgress(100);
                 return cachedRacesData;
             }
             
             showProgress(50);
-            const { data: tables, error: tableError } = await _supabase.rpc('get_race_tables');
-            
-            if (tableError) {
-                throw tableError;
-            }
-            
-            if (!tables || tables.length === 0) {
-                showProgress(100);
-                return [];
-            }
-            
-            showProgress(70);
-            const titleRequests = tables.map(t => 
-                _supabase
-                    .from(t.table_name)
-                    .select('valore')
-                    .eq('chiave', 'titolo_gara')
-                    .maybeSingle()
-            );
-            
-            const results = await Promise.all(titleRequests);
-            showProgress(85);
-            
-            const raceData = results.map((res, index) => {
-                const tableName = tables[index].table_name;
-                const raceNumber = tableName.match(/\d+/) ? tableName.match(/\d+/)[0] : (index + 1);
-                const raceTitle = (res.data && res.data.valore) ? res.data.valore : `Gara ${raceNumber}`;
-                
-                return {
-                    tableName,
-                    raceNumber: parseInt(raceNumber),
-                    raceTitle,
-                    fileName: `gara${raceNumber}.html`,
-                    id: `race-${raceNumber}`
-                };
-            });
-            
-            // Ordina per numero di gara come ordine predefinito
-            raceData.sort((a, b) => a.raceNumber - b.raceNumber);
-            
-            cachedRacesData = raceData;
-            lastFetchTime = now;
-            racesData = raceData;
+            console.log('🌐 Fetching dati gare da Supabase...');
             
             try {
-                localStorage.setItem('racesCache', JSON.stringify({
-                    data: raceData,
-                    timestamp: now,
-                    deviceType: deviceType
-                }));
-            } catch (e) {
-                console.warn('Impossibile salvare in localStorage:', e);
+                const { data: tables, error: tableError } = await _supabase.rpc('get_race_tables');
+                
+                if (tableError) {
+                    console.error('❌ Errore get_race_tables:', tableError);
+                    throw tableError;
+                }
+                
+                if (!tables || tables.length === 0) {
+                    console.log('📭 Nessuna tabella gara trovata');
+                    showProgress(100);
+                    return [];
+                }
+                
+                console.log(`🏁 Trovate ${tables.length} tabelle gara:`, tables.map(t => t.table_name));
+                
+                showProgress(70);
+                // Per ogni tabella, recupera il titolo
+                const titleRequests = tables.map(t => 
+                    _supabase
+                        .from(t.table_name)
+                        .select('valore')
+                        .eq('chiave', 'titolo_gara')
+                        .maybeSingle()
+                );
+                
+                const results = await Promise.all(titleRequests);
+                showProgress(85);
+                
+                const raceData = results.map((res, index) => {
+                    const tableName = tables[index].table_name;
+                    const raceNumber = tableName.match(/\d+/) ? parseInt(tableName.match(/\d+/)[0]) : (index + 1);
+                    const raceTitle = (res.data && res.data.valore) ? res.data.valore : `Gara ${raceNumber}`;
+                    
+                    return {
+                        tableName,
+                        raceNumber: raceNumber,
+                        raceTitle,
+                        fileName: `gara${raceNumber}.html`,
+                        id: `race-${raceNumber}`
+                    };
+                });
+                
+                // Ordina per numero di gara come ordine predefinito
+                raceData.sort((a, b) => a.raceNumber - b.raceNumber);
+                
+                console.log('✅ Dati gare elaborati:', raceData);
+                
+                cachedRacesData = raceData;
+                lastFetchTime = now;
+                racesData = raceData;
+                
+                // Salva in cache locale
+                try {
+                    localStorage.setItem('racesCache', JSON.stringify({
+                        data: raceData,
+                        timestamp: now,
+                        deviceType: deviceType
+                    }));
+                } catch (e) {
+                    console.warn('Impossibile salvare in localStorage:', e);
+                }
+                
+                showProgress(100);
+                return raceData;
+                
+            } catch (error) {
+                console.error('💥 Errore fetchRaceData:', error);
+                throw error;
             }
-            
-            showProgress(100);
-            return raceData;
         }
 
         async function loadFromOfflineCache() {
@@ -2006,7 +2098,8 @@
                 const { data, timestamp, deviceType: cachedDeviceType } = JSON.parse(cached);
                 const now = Date.now();
                 
-                if (now - timestamp < 30 * 60 * 1000) {
+                if (now - timestamp < 30 * 60 * 1000) { // 30 minuti
+                    console.log('📱 Caricamento da cache offline');
                     cachedRacesData = data;
                     lastFetchTime = timestamp;
                     racesData = data;
@@ -2025,6 +2118,9 @@
             const counter = document.getElementById('race-counter');
             
             try {
+                // Rileva dispositivo
+                detectDevice();
+                
                 // Rileva velocità connessione
                 const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
                 const timeout = connection?.effectiveType === 'slow-2g' ? 30000 : 15000;
@@ -2036,13 +2132,16 @@
                 clearTimeout(timeoutId);
                 
                 if (!raceData || raceData.length === 0) {
+                    console.log('📭 Nessuna gara trovata');
                     showNoRacesMessage(grid, counter);
                     return;
                 }
                 
+                console.log(`🏁 Caricate ${raceData.length} gare`);
                 document.getElementById('counter-value').textContent = raceData.length;
                 counter.style.display = 'block';
                 
+                // Renderizza la griglia
                 renderRaceGrid(grid, raceData);
                 
                 // Aggiungi event listeners per i pulsanti
@@ -2050,11 +2149,16 @@
                 document.getElementById('save-order').addEventListener('click', saveOrder);
                 document.getElementById('reset-order').addEventListener('click', resetOrder);
                 
+                // Sincronizza ordini se online
+                if (navigator.onLine) {
+                    setTimeout(syncOrdersAcrossDevices, 2000);
+                }
+                
             } catch (err) {
-                console.error("Errore caricamento:", err);
+                console.error("❌ Errore caricamento dashboard:", err);
                 
                 if (err.name === 'AbortError') {
-                    console.log('Fetch timeout - caricamento lento');
+                    console.log('⏱️ Fetch timeout - caricamento lento');
                     showErrorMessage(grid, counter, { 
                         message: 'Connessione lenta. Caricamento in corso...' 
                     });
@@ -2065,18 +2169,12 @@
                 }
                 
                 if (!navigator.onLine) {
+                    console.log('🌐 Modalità offline');
                     const offlineData = await loadFromOfflineCache();
                     if (offlineData && offlineData.length > 0) {
                         renderRaceGrid(grid, offlineData);
                         
-                        const notif = document.getElementById('notif');
-                        notif.innerHTML = `
-                            <i class="fas fa-wifi-slash" style="margin-right: 10px;"></i>
-                            Modalità offline - Dati in cache
-                        `;
-                        notif.style.display = 'block';
-                        setTimeout(() => notif.style.display = 'none', 3000);
-                        
+                        showNotification('Modalità offline - Dati in cache', 'info');
                         return;
                     }
                 }
@@ -2089,21 +2187,17 @@
         }
 
         function renderRaceGrid(gridElement, raceData) {
-            // CARICAMENTO ORDINE PERSONALIZZATO MIGLIORATO
-            let customOrder = null;
+            console.log('🎨 Rendering griglia con', raceData.length, 'gare');
             
-            // Prima controlla se c'è un ordine cloud da caricare
-            const loadCloudOrder = async () => {
+            // Funzione per caricare l'ordine personalizzato
+            const loadCustomOrder = async () => {
+                let customOrder = null;
+                
+                // Prima prova dal cloud (se online)
                 if (navigator.onLine) {
-                    const cloudOrder = await loadOrderFromCloud();
-                    if (cloudOrder) {
-                        customOrder = cloudOrder;
-                    }
+                    customOrder = await loadOrderFromCloud();
                 }
-            };
-            
-            // Carica sincronamente dal cloud
-            loadCloudOrder().then(() => {
+                
                 // Se non c'è ordine cloud, usa quello locale
                 if (!customOrder) {
                     try {
@@ -2111,14 +2205,23 @@
                         if (savedOrder) {
                             const orderData = JSON.parse(savedOrder);
                             customOrder = orderData.order;
+                            console.log('📁 Usando ordine locale:', customOrder);
                         }
                     } catch (e) {
                         console.warn('Errore nel caricamento ordine locale:', e);
                     }
                 }
                 
+                return customOrder;
+            };
+            
+            // Carica l'ordine e poi renderizza
+            loadCustomOrder().then(customOrder => {
                 let orderedData = [...raceData];
+                
                 if (customOrder && customOrder.length > 0) {
+                    console.log('🔄 Applicando ordine personalizzato:', customOrder);
+                    
                     // Filtra solo le card che esistono nei dati attuali
                     const validOrder = customOrder.filter(id => 
                         raceData.find(race => race.id === id)
@@ -2131,9 +2234,12 @@
                     // Aggiungi eventuali nuove gare non presenti nell'ordine salvato
                     const remainingRaces = raceData.filter(race => !validOrder.includes(race.id));
                     orderedData.push(...remainingRaces);
+                    
+                    console.log('✅ Ordine applicato. Gare ordinate:', orderedData.length);
                 } else {
                     // Ordine predefinito: per numero di gara
                     orderedData.sort((a, b) => a.raceNumber - b.raceNumber);
+                    console.log('🔢 Usando ordine predefinito (per numero)');
                 }
                 
                 const raceIcons = ['🏆', '⚽', '🎯', '🏃', '🏊', '🚴', '🤸', '🎾'];
@@ -2155,11 +2261,11 @@
                     card.innerHTML = `
                         <div class="reorder-buttons">
                             <button class="move-btn up" onclick="moveCardUp('${race.id}')" 
-                                    aria-label="Sposta card verso l'alto" aria-describedby="reorder-info">
+                                    aria-label="Sposta card verso l'alto" title="Sposta su">
                                 <i class="fas fa-arrow-up" aria-hidden="true"></i>
                             </button>
                             <button class="move-btn down" onclick="moveCardDown('${race.id}')" 
-                                    aria-label="Sposta card verso il basso" aria-describedby="reorder-info">
+                                    aria-label="Sposta card verso il basso" title="Sposta giù">
                                 <i class="fas fa-arrow-down" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -2169,7 +2275,7 @@
                             ${escapeHtml(race.raceTitle)}
                         </div>
                         <div class="card-body">
-                            <a href="${encodeURI(race.fileName)}" class="btn btn-main">
+                            <a href="${encodeURI(race.fileName)}" class="btn btn-main" target="_blank">
                                 <i class="fas fa-users" aria-hidden="true"></i> Gestisci Iscrizioni
                             </a>
                             
@@ -2190,8 +2296,11 @@
                 // Aggiorna stato pulsanti
                 updateMoveButtons();
                 
+                // Salva ordine corrente
                 currentOrder = orderedData.map(race => race.id);
                 originalOrder = [...currentOrder];
+                
+                console.log('✅ Griglia renderizzata con', orderedData.length, 'card');
             });
         }
 
@@ -2249,6 +2358,7 @@
             const now = Date.now();
             const cacheKey = `copy-${raceNumber}`;
             
+            // Controlla cooldown
             if (copiedLinksCache.has(cacheKey)) {
                 const lastCopyTime = copiedLinksCache.get(cacheKey);
                 if (now - lastCopyTime < COPY_COOLDOWN) {
@@ -2258,18 +2368,14 @@
             
             copiedLinksCache.set(cacheKey, now);
             
-            const fullUrl = getFullRaceLink(fileName);
+            const fullUrl = getFullRaceLink(decodeURIComponent(fileName));
             
             setTimeout(() => {
                 copiedLinksCache.delete(cacheKey);
             }, COPY_COOLDOWN);
             
-            const copyPromise = navigator.clipboard.writeText(fullUrl);
-            const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('Copy timeout')), 1000);
-            });
-            
-            Promise.race([copyPromise, timeoutPromise])
+            // Prova con Clipboard API
+            navigator.clipboard.writeText(fullUrl)
                 .then(() => {
                     showCopySuccess(raceNumber, fullUrl);
                 })
@@ -2296,12 +2402,12 @@
             if (btn) {
                 btn.classList.add('success');
                 btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copiato!';
-                btn.setAttribute('aria-label', `Link gara ${raceNumber} copiato!`);
+                btn.title = `Link gara ${raceNumber} copiato!`;
                 
                 setTimeout(() => {
                     btn.classList.remove('success');
                     btn.innerHTML = '<i class="fas fa-link" aria-hidden="true"></i> Copia Link Diretto';
-                    btn.setAttribute('aria-label', `Copia link diretto alla gara ${raceNumber}`);
+                    btn.title = `Copia link diretto alla gara ${raceNumber}`;
                 }, 2000);
             }
         }
@@ -2324,13 +2430,7 @@
                 }
             } catch (err) {
                 console.error('Errore nella copia:', err);
-                const notif = document.getElementById('notif');
-                notif.innerHTML = `
-                    <i class="fas fa-exclamation-triangle" style="margin-right: 10px;"></i>
-                    Errore nella copia del link
-                `;
-                notif.style.display = 'block';
-                setTimeout(() => notif.style.display = 'none', 3000);
+                showNotification('Errore nella copia del link', 'warning');
             }
             
             document.body.removeChild(textArea);
@@ -2341,7 +2441,6 @@
 
         function handleOrientationChange() {
             const isPortrait = window.innerHeight > window.innerWidth;
-            
             document.body.classList.toggle('portrait', isPortrait);
             document.body.classList.toggle('landscape', !isPortrait);
         }
@@ -2376,36 +2475,25 @@
             
             // Gestione orientamento
             handleOrientationChange();
+            
+            console.log('📱 Dispositivo rilevato:', deviceType);
         }
 
         function optimizedInitDashboard() {
             if (isInitialized) return;
             
             isInitialized = true;
+            console.log('🚀 Inizializzazione dashboard...');
             
             detectDevice();
             
-            // REGISTRA SERVICE WORKER PER PWA - VERSIONE MIGLIORATA
+            // REGISTRA SERVICE WORKER PER PWA
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
-                    // Aspetta un po' prima di registrare il service worker
                     setTimeout(() => {
                         navigator.serviceWorker.register('service-worker.js')
                             .then(registration => {
                                 console.log('✅ ServiceWorker registrato:', registration.scope);
-                                
-                                // Controlla aggiornamenti
-                                registration.addEventListener('updatefound', () => {
-                                    const newWorker = registration.installing;
-                                    console.log('🔄 Nuova versione ServiceWorker trovata');
-                                    
-                                    newWorker.addEventListener('statechange', () => {
-                                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                            console.log('🆕 Nuova versione disponibile!');
-                                            showNotification('Nuova versione disponibile! Ricarica la pagina.', 'info');
-                                        }
-                                    });
-                                });
                             })
                             .catch(err => {
                                 console.log('❌ ServiceWorker registration failed:', err);
@@ -2414,6 +2502,7 @@
                 });
             }
             
+            // Inizializza la dashboard
             if ('requestIdleCallback' in window) {
                 requestIdleCallback(() => {
                     initDashboard();
@@ -2424,7 +2513,7 @@
                 }, 500);
             }
             
-            // Event listeners migliorati
+            // Event listeners
             window.addEventListener('resize', () => {
                 setTimeout(detectDevice, 100);
                 setTimeout(handleOrientationChange, 150);
@@ -2434,20 +2523,14 @@
                 setTimeout(() => {
                     detectDevice();
                     handleOrientationChange();
-                    
-                    // Forza il refresh dell'ordine dopo cambio orientamento
-                    if (racesData.length > 0) {
-                        renderRaceGrid(document.getElementById('race-grid'), racesData);
-                    }
                 }, 300);
             });
             
-            // Forza refresh quando la pagina torna visibile
             document.addEventListener('visibilitychange', () => {
                 if (!document.hidden && racesData.length > 0) {
-                    // Ricarica i dati se la pagina è stata nascosta per un po'
                     const timeSinceLastLoad = Date.now() - lastFetchTime;
                     if (timeSinceLastLoad > 60000) { // 1 minuto
+                        console.log('🔄 Ricaricamento dati (pagina tornata visibile)');
                         initDashboard();
                     }
                 }
@@ -2460,28 +2543,25 @@
             optimizedInitDashboard();
         }
 
+        // ============ GESTIONE CONNESSIONE ============
         window.addEventListener('online', () => {
-            const notif = document.getElementById('notif');
-            notif.innerHTML = '<i class="fas fa-wifi" aria-hidden="true"></i> Connessione ripristinata';
-            notif.style.display = 'block';
+            console.log('🌐 Connessione ripristinata');
+            showNotification('Connessione ripristinata', 'success');
+            
             setTimeout(() => {
-                notif.style.display = 'none';
+                // Ricarica dati
                 initDashboard();
-                // Sincronizza ordini quando si torna online
-                setTimeout(syncOrdersAcrossDevices, 2000);
+                // Sincronizza ordini
+                syncOrdersAcrossDevices();
             }, 2000);
         });
 
         window.addEventListener('offline', () => {
-            const notif = document.getElementById('notif');
-            notif.innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Connessione assente';
-            notif.style.display = 'block';
-            notif.style.background = 'linear-gradient(135deg, #f5576c, #d32f2f)';
-            setTimeout(() => notif.style.display = 'none', 3000);
+            console.log('🌐 Connessione persa');
+            showNotification('Connessione assente - Modalità offline', 'warning');
         });
 
         // ============ SINCRONIZZAZIONE AUTOMATICA ============
-        // Sincronizza ogni minuto quando online
         setInterval(() => {
             if (navigator.onLine) {
                 syncOrdersAcrossDevices();
@@ -2493,27 +2573,15 @@
             setTimeout(syncOrdersAcrossDevices, 2000);
         });
 
-        // Sincronizza al cambio tab/focus
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && navigator.onLine) {
-                setTimeout(syncOrdersAcrossDevices, 1000);
-            }
-        });
-
-        // Storage event per aggiornamenti cross-tab (sullo stesso dispositivo)
+        // Storage event per aggiornamenti cross-tab
         window.addEventListener('storage', (e) => {
             if (e.key === 'racesCustomOrder' && e.newValue) {
                 try {
                     const orderData = JSON.parse(e.newValue);
-                    
-                    // Se l'ordine è stato modificato su un'altra tab
                     if (orderData.deviceType === deviceType) {
-                        console.log('Ordine modificato in un\'altra tab, aggiorno...');
-                        
-                        // Forza il refresh dell'ordine
+                        console.log('🔄 Ordine modificato in un\'altra tab');
                         if (racesData.length > 0) {
                             renderRaceGrid(document.getElementById('race-grid'), racesData);
-                            showNotification('Ordine aggiornato', 'info');
                         }
                     }
                 } catch (e) {
@@ -2522,7 +2590,7 @@
             }
         });
 
-        // Funzioni di debug per PWA
+        // ============ FUNZIONI DI DEBUG ============
         window.debugPWA = {
             checkInstallation: checkIfPWAInstalled,
             resetInstall: () => {
@@ -2543,7 +2611,43 @@
             },
             forceUpdate: forceServiceWorkerUpdate,
             
-            // Nuove funzioni per sync
+            // Test RLS policies
+            testRLSPolicies: async function() {
+                console.log('🧪 Testing RLS Policies...');
+                
+                const userId = getUserId();
+                const testData = {
+                    user_id: userId,
+                    device_type: deviceType,
+                    order_preference: {
+                        order: ["race-1", "race-2", "race-3"],
+                        timestamp: Date.now(),
+                        deviceType: deviceType,
+                        userAgent: 'Test User Agent'
+                    }
+                };
+                
+                console.log('Test data:', testData);
+                
+                try {
+                    const { data, error } = await _supabase
+                        .from('user_preferences')
+                        .upsert(testData, { onConflict: 'user_id,device_type' });
+                    
+                    if (error) {
+                        console.error('❌ RLS Test FAILED:', error);
+                        return { success: false, error };
+                    } else {
+                        console.log('✅ RLS Test PASSED:', data);
+                        return { success: true, data };
+                    }
+                } catch (error) {
+                    console.error('💥 RLS Test ERROR:', error);
+                    return { success: false, error };
+                }
+            },
+            
+            // Test sync functions
             forceSync: () => {
                 console.log('🔄 Forzando sincronizzazione...');
                 syncOrdersAcrossDevices();
@@ -2570,34 +2674,32 @@
             },
             
             clearAllData: () => {
-                localStorage.removeItem('racesCustomOrder');
-                localStorage.removeItem('juvenilia_user_id');
-                console.log('🧹 Tutti i dati locali cancellati');
-                
-                // Opzionale: cancellare anche dal cloud
-                if (confirm('Cancellare anche dal cloud?')) {
-                    const userId = getUserId();
-                    _supabase
-                        .from('user_preferences')
-                        .delete()
-                        .eq('user_id', userId)
-                        .then(() => {
-                            console.log('☁️ Dati cloud cancellati');
-                        });
+                if (confirm('Sicuro di voler cancellare TUTTI i dati?')) {
+                    localStorage.removeItem('racesCustomOrder');
+                    localStorage.removeItem('juvenilia_user_id');
+                    localStorage.removeItem('racesCache');
+                    console.log('🧹 Tutti i dati locali cancellati');
+                    showNotification('Dati locali cancellati', 'info');
+                    
+                    // Ricarica la pagina
+                    setTimeout(() => location.reload(), 1000);
                 }
+            },
+            
+            // Test salvataggio ordine
+            testSaveOrder: () => {
+                console.log('🧪 Test salvataggio ordine...');
+                saveOrder();
             }
         };
 
-        console.log('🚀 Dashboard Juvenilia loaded successfully!');
-        console.log('🔧 PWA Debug commands available:');
-        console.log('   - debugPWA.checkInstallation()');
-        console.log('   - debugPWA.resetInstall()');
-        console.log('   - debugPWA.simulateInstall()');
-        console.log('   - debugPWA.forceUpdate()');
-        console.log('   - debugPWA.forceSync()');
-        console.log('   - debugPWA.checkSyncStatus()');
-        console.log('   - debugPWA.clearAllData()');
-        console.log('   - forceSWUpdate() - Per forzare aggiornamento Service Worker');
+        console.log('🚀 Dashboard Juvenilia v3.2 loaded successfully!');
+        console.log('🔧 Debug commands available:');
+        console.log('   - debugPWA.testRLSPolicies() - Testa le policy RLS');
+        console.log('   - debugPWA.testSaveOrder() - Testa il salvataggio ordine');
+        console.log('   - debugPWA.forceSync() - Forza sincronizzazione');
+        console.log('   - debugPWA.checkSyncStatus() - Controlla stato sync');
+        console.log('   - debugPWA.clearAllData() - Cancella tutti i dati locali');
     </script>
 </body>
 </html>
