@@ -20,7 +20,6 @@
             --gradient-danger: linear-gradient(135deg, #E63946 0%, #FF6B6B 100%);
             --gradient-warning: linear-gradient(135deg, #F4A261 0%, #FFB347 100%);
             --gradient-racing: linear-gradient(90deg, #1D3557, #E63946, #FFD166);
-            --gradient-info: linear-gradient(135deg, #457B9D 0%, #6A4C93 100%);
             --text-main: #1D3557; --bg-body: #f8f9fa; --bg-card: #ffffff;
             --shadow-light: 0 8px 25px rgba(29, 53, 87, 0.08);
             --shadow-medium: 0 12px 35px rgba(29, 53, 87, 0.12);
@@ -119,7 +118,6 @@
         .dark-mode #addAtletaBox,
         .dark-mode #costiBox,
         .dark-mode #docsBox,
-        .dark-mode #infoBox,
         .dark-mode .timer-admin-section {
             background: rgba(42, 59, 78, 0.5);
             border-color: #3a4b5e;
@@ -129,8 +127,7 @@
         .dark-mode .admin-row input,
         .dark-mode .admin-row select,
         .dark-mode .timer-admin-row input,
-        .dark-mode .timer-admin-row select,
-        .dark-mode #infoTextInput {
+        .dark-mode .timer-admin-row select {
             background: #2a3b4e;
             color: var(--dark-text-main);
             border-color: #3a4b5e;
@@ -139,8 +136,7 @@
         .dark-mode .admin-row input:focus,
         .dark-mode .admin-row select:focus,
         .dark-mode .timer-admin-row input:focus,
-        .dark-mode .timer-admin-row select:focus,
-        .dark-mode #infoTextInput:focus {
+        .dark-mode .timer-admin-row select:focus {
             border-color: var(--racing-blue);
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3), 0 5px 15px rgba(0,0,0,0.2);
         }
@@ -220,8 +216,7 @@
         }
 
         .dark-mode #confirmedList,
-        .dark-mode #riepilogoAccompagnatori,
-        .dark-mode #infoBoxDisplay {
+        .dark-mode #riepilogoAccompagnatori {
             background: #2a3b4e;
             color: var(--dark-text-main);
             border-color: #3a4b5e;
@@ -278,7 +273,7 @@
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3) !important;
         }
 
-        /* STILI PER IL BOX INFO - VISIBILE DI DEFAULT */
+        /* STILI PER IL BOX INFO - AGGIUNTA NUOVA */
         #infoBox {
             background: rgba(69, 123, 157, 0.1);
             border: 2px solid var(--racing-blue);
@@ -294,7 +289,8 @@
         }
 
         #infoBoxDisplay {
-            background: var(--gradient-info);
+            background: var(--gradient-primary);
+            background: linear-gradient(135deg, #457B9D 0%, #6A4C93 100%);
             border-radius: 15px;
             padding: 18px 25px;
             margin: 15px 0 25px 0;
@@ -305,7 +301,6 @@
             border-left: 8px solid var(--racing-yellow);
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
         }
 
         #infoBoxDisplay.hidden {
@@ -570,7 +565,7 @@
             border-radius: 2px;
         }
 
-        /* STILI TIMER */
+        /* STILI TIMER - DUPLICATI */
         .countdown-container { 
             text-align: center; 
             margin: 15px 0; 
@@ -1753,7 +1748,7 @@
                 font-size: 0.9rem;
             }
             
-            #toggleAccompagnatoriBtn, #toggleInfoBtn {
+            #toggleAccompagnatoriBtn {
                 width: 100%;
                 min-width: auto;
                 padding: 12px;
@@ -2100,7 +2095,7 @@
 
     <h2 id="mainTitle">Juvenilia Racing Team - Iscrizioni Gara 5</h2>
     
-    <!-- BOX INFORMAZIONI - SEMPRE VISIBILE DI DEFAULT -->
+    <!-- BOX INFORMAZIONI - AGGIUNTO QUI -->
     <div id="infoBoxDisplay">
         <div class="info-icon">
             <i class="fas fa-info-circle"></i>
@@ -2155,7 +2150,7 @@
         </div>
     </div>
 
-    <!-- Sezione admin per gestione box informazioni -->
+    <!-- NUOVO: Sezione admin per gestione box informazioni -->
     <div id="infoBox">
         <div style="font-size: 14px; font-weight: bold; color: var(--racing-blue); margin-left: 5px; display: flex; align-items: center; gap: 10px;">
             <i class="fas fa-info-circle"></i> GESTIONE BOX INFORMAZIONI:
@@ -2304,8 +2299,8 @@
     const TELEGRAM_TOKEN = '8441085660:AAEui_yfGnT_quKPHVx_wsslcuJtm3KbTOI';
     const TELEGRAM_CHAT_ID = '691756250';
     
-    // Numero WhatsApp per invio quote
-    const WHATSAPP_NUMBER = '393333061247';
+    // AGGIUNTA: Numero WhatsApp per invio quote
+    const WHATSAPP_NUMBER = '393333061247'; // Sostituisci con il numero reale (es: 393331234567)
     
     const O_P = "anV2ZW5pbGlhMTE3OQ==";
     
@@ -2320,13 +2315,13 @@
     let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false, isEditingInfo = false;
     let selectedIds = new Set();
     let mostraAccompagnatori = true;
-    let mostraInfoBox = true; // Variabile per gestire la visibilità del box info
     let tempAccompagnatoriValues = {};
     let isTypingInAccompagnatore = false;
     let refreshInterval = null;
     let categoryTimers = [];
     let categoryTimerIntervals = {};
     let isEditingCategoria = false;
+    let mostraInfoBox = true; // AGGIUNTO
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
@@ -2361,49 +2356,32 @@
         // Avvia il controllo della dark mode
         startTimeCheck();
         
-        // Inizializza il box info
-        await initInfoBox();
-        
         await fullLoad(); 
         refreshInterval = setInterval(checkAndRefresh, 15000);
     }
 
-    // Inizializza il box informazioni
+    // FUNZIONI PER BOX INFO - AGGIUNTE
     async function initInfoBox() {
-        try {
-            const { data } = await _supabase.from(T_CONF).select('*');
-            if (data) {
-                const infoText = data.find(c => c.chiave === 'info_text')?.valore || "";
-                const infoVisibility = data.find(c => c.chiave === 'mostra_info_box')?.valore;
-                
-                if (infoVisibility !== null && infoVisibility !== undefined) {
-                    mostraInfoBox = infoVisibility === 'true';
-                }
-                
-                // Se c'è testo salvato, usalo, altrimenti mantieni il testo di default
-                if (infoText && infoText.trim() !== "") {
-                    document.getElementById('infoTextDisplay').innerText = infoText;
-                    document.getElementById('infoTextInput').value = infoText;
-                }
-                
-                const infoBoxDisplay = document.getElementById('infoBoxDisplay');
-                if (!mostraInfoBox) {
-                    infoBoxDisplay.classList.add('hidden');
-                } else {
-                    infoBoxDisplay.classList.remove('hidden');
-                    infoBoxDisplay.style.display = 'flex'; // Forza visibilità
-                }
+        const { data } = await _supabase.from(T_CONF).select('*');
+        if (data) {
+            const infoText = data.find(c => c.chiave === 'info_text')?.valore || "";
+            const infoVisibility = data.find(c => c.chiave === 'mostra_info_box')?.valore;
+            
+            if (infoVisibility !== null && infoVisibility !== undefined) {
+                mostraInfoBox = infoVisibility === 'true';
             }
-        } catch (e) {
-            console.error('Errore in initInfoBox:', e);
-            // In caso di errore, il box rimane visibile con testo di default
-            const infoBoxDisplay = document.getElementById('infoBoxDisplay');
-            infoBoxDisplay.classList.remove('hidden');
-            infoBoxDisplay.style.display = 'flex';
+            
+            if (infoText) {
+                document.getElementById('infoTextDisplay').innerText = infoText;
+                document.getElementById('infoTextInput').value = infoText;
+            }
+            
+            if (!mostraInfoBox) {
+                document.getElementById('infoBoxDisplay').classList.add('hidden');
+            }
         }
     }
 
-    // Salva le informazioni
     async function salvaInfo() {
         const testo = document.getElementById('infoTextInput').value.trim().toUpperCase();
         
@@ -2413,20 +2391,10 @@
         }, { onConflict: 'chiave' });
         
         document.getElementById('infoTextDisplay').innerText = testo || "BENVENUTI AL SISTEMA DI ISCRIZIONE JUVENILIA RACING TEAM! UTILIZZA IL PANNELLO ADMIN PER PERSONALIZZARE QUESTO MESSAGGIO.";
-        
-        const infoBoxDisplay = document.getElementById('infoBoxDisplay');
-        if ((!testo || testo === "") || !mostraInfoBox) {
-            infoBoxDisplay.classList.add('hidden');
-        } else {
-            infoBoxDisplay.classList.remove('hidden');
-            infoBoxDisplay.style.display = 'flex';
-        }
-        
         showToast("Informazioni salvate!");
         isEditingInfo = false;
     }
 
-    // Azzera le informazioni
     async function azzeraInfo() {
         if (confirm("Cancellare tutte le informazioni dal box?")) {
             await _supabase.from(T_CONF).upsert({ 
@@ -2436,27 +2404,15 @@
             
             document.getElementById('infoTextInput').value = "";
             document.getElementById('infoTextDisplay').innerText = "BENVENUTI AL SISTEMA DI ISCRIZIONE JUVENILIA RACING TEAM! UTILIZZA IL PANNELLO ADMIN PER PERSONALIZZARE QUESTO MESSAGGIO.";
-            
-            const infoBoxDisplay = document.getElementById('infoBoxDisplay');
-            if (!mostraInfoBox) {
-                infoBoxDisplay.classList.add('hidden');
-            } else {
-                infoBoxDisplay.classList.remove('hidden');
-                infoBoxDisplay.style.display = 'flex';
-            }
-            
             showToast("Informazioni azzerate!");
         }
     }
 
-    // Nascondi il box info (per utenti)
     function nascondiInfoBox() {
-        const infoBoxDisplay = document.getElementById('infoBoxDisplay');
-        infoBoxDisplay.classList.add('hidden');
+        document.getElementById('infoBoxDisplay').classList.add('hidden');
         showToast("Box informazioni nascosto");
     }
 
-    // Toggle visibilità box info (per admin)
     async function toggleInfoVisibility() {
         mostraInfoBox = !mostraInfoBox;
         
@@ -2465,14 +2421,11 @@
             valore: mostraInfoBox.toString() 
         }, { onConflict: 'chiave' });
         
-        const infoText = document.getElementById('infoTextInput').value.trim();
         const infoBoxDisplay = document.getElementById('infoBoxDisplay');
-        
         if (!mostraInfoBox) {
             infoBoxDisplay.classList.add('hidden');
         } else {
             infoBoxDisplay.classList.remove('hidden');
-            infoBoxDisplay.style.display = 'flex';
         }
         
         showToast(`Box informazioni ${mostraInfoBox ? 'mostrato' : 'nascosto'} per gli utenti`);
@@ -2497,7 +2450,7 @@
         await caricaConfig(); 
         await caricaTimers();
         await caricaTabella();
-        await initInfoBox(); // Ricarica info box
+        await initInfoBox(); // AGGIUNTO
         
         restoreTempAccompagnatoriValues();
     }
@@ -2520,11 +2473,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Forza la visibilità del box info all'avvio
-        const infoBoxDisplay = document.getElementById('infoBoxDisplay');
-        infoBoxDisplay.style.display = 'flex';
-        infoBoxDisplay.classList.remove('hidden');
-        
         document.addEventListener('input', function(e) {
             if (e.target.classList.contains('accompagnatore-input') || 
                 e.target.classList.contains('search-box') ||
@@ -2538,7 +2486,7 @@
                 e.target.id === 'docLink2_URL' ||
                 e.target.id === 'docLink2_Text' ||
                 e.target.id === 'newTimerLabel' ||
-                e.target.id === 'infoTextInput' || // NUOVO
+                e.target.id === 'infoTextInput' || // AGGIUNTO
                 e.target.classList.contains('categoria-select')) {
                 e.target.value = e.target.value.toUpperCase();
             }
@@ -2562,7 +2510,7 @@
             if (e.target.classList.contains('categoria-select')) {
                 isEditingCategoria = true;
             }
-            if (e.target.id === 'infoTextInput') { // NUOVO
+            if (e.target.id === 'infoTextInput') { // AGGIUNTO
                 isEditingInfo = true;
             }
         });
@@ -2595,7 +2543,7 @@
                     isEditingCategoria = false;
                 }, 500);
             }
-            if (e.target.id === 'infoTextInput') { // NUOVO
+            if (e.target.id === 'infoTextInput') { // AGGIUNTO
                 setTimeout(() => {
                     isEditingInfo = false;
                 }, 500);
@@ -3126,7 +3074,7 @@
 
     function setSort(type) { sortBy = type; renderData(); }
 
-    // Modifica categoria atleta
+    // NUOVA FUNZIONE: Modifica categoria atleta
     async function modificaCategoria(id, nuovaCategoria) {
         const atleta = currentData.find(a => a.id == id);
         
@@ -3342,7 +3290,7 @@
         });
     }
 
-    // Funzione per inviare quote via WhatsApp
+    // AGGIUNTA: Funzione per inviare quote via WhatsApp
     async function inviaWhatsAppQuote() {
         // Calcola il totale per atleta
         let quoteAtleti = [];
@@ -3499,7 +3447,6 @@
             
             caricaConfig(); 
             caricaTimers();
-            initInfoBox(); // NUOVO
             renderData(); 
             showToast("Modalità Admin Attiva");
         } else { 
@@ -3927,7 +3874,7 @@
             const genderHtml = gender ? `<span class="badge-gender bg-${gender.toLowerCase()}">${gender}</span>` : "";
             const isChecked = selectedIds.has(p.id.toString()) ? 'checked' : '';
             
-            // Selezione categoria per admin
+            // NUOVO: Selezione categoria per admin
             const categoriaSelect = isAdmin ? `
                 <select class="categoria-select" style="font-size:0.7rem; padding:4px 8px; border-radius:6px; border:1px solid var(--racing-light); background:white; color:var(--racing-blue); font-weight:bold; margin-top:5px;" 
                         onchange="modificaCategoria('${p.id}', this.value)"
