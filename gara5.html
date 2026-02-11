@@ -20,6 +20,7 @@
             --gradient-danger: linear-gradient(135deg, #E63946 0%, #FF6B6B 100%);
             --gradient-warning: linear-gradient(135deg, #F4A261 0%, #FFB347 100%);
             --gradient-racing: linear-gradient(90deg, #1D3557, #E63946, #FFD166);
+            --gradient-info: linear-gradient(135deg, #457B9D 0%, #6A4C93 100%);
             --text-main: #1D3557; --bg-body: #f8f9fa; --bg-card: #ffffff;
             --shadow-light: 0 8px 25px rgba(29, 53, 87, 0.08);
             --shadow-medium: 0 12px 35px rgba(29, 53, 87, 0.12);
@@ -118,6 +119,7 @@
         .dark-mode #addAtletaBox,
         .dark-mode #costiBox,
         .dark-mode #docsBox,
+        .dark-mode #infoBox,
         .dark-mode .timer-admin-section {
             background: rgba(42, 59, 78, 0.5);
             border-color: #3a4b5e;
@@ -127,7 +129,8 @@
         .dark-mode .admin-row input,
         .dark-mode .admin-row select,
         .dark-mode .timer-admin-row input,
-        .dark-mode .timer-admin-row select {
+        .dark-mode .timer-admin-row select,
+        .dark-mode #infoTextInput {
             background: #2a3b4e;
             color: var(--dark-text-main);
             border-color: #3a4b5e;
@@ -136,7 +139,8 @@
         .dark-mode .admin-row input:focus,
         .dark-mode .admin-row select:focus,
         .dark-mode .timer-admin-row input:focus,
-        .dark-mode .timer-admin-row select:focus {
+        .dark-mode .timer-admin-row select:focus,
+        .dark-mode #infoTextInput:focus {
             border-color: var(--racing-blue);
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3), 0 5px 15px rgba(0,0,0,0.2);
         }
@@ -216,7 +220,8 @@
         }
 
         .dark-mode #confirmedList,
-        .dark-mode #riepilogoAccompagnatori {
+        .dark-mode #riepilogoAccompagnatori,
+        .dark-mode #infoBoxDisplay {
             background: #2a3b4e;
             color: var(--dark-text-main);
             border-color: #3a4b5e;
@@ -271,6 +276,147 @@
         .dark-mode .costo-in:focus {
             border-color: var(--racing-blue) !important;
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3) !important;
+        }
+
+        /* STILI PER IL BOX INFO */
+        #infoBox {
+            background: rgba(69, 123, 157, 0.1);
+            border: 2px solid var(--racing-blue);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: var(--shadow-light);
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+        }
+
+        #infoBoxDisplay {
+            background: var(--gradient-info);
+            border-radius: 15px;
+            padding: 18px 25px;
+            margin: 15px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            box-shadow: var(--shadow-medium);
+            border-left: 8px solid var(--racing-yellow);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        #infoBoxDisplay.hidden {
+            display: none !important;
+        }
+
+        #infoBoxDisplay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" width="200" height="100" opacity="0.05"><path d="M30,50 Q50,30 70,50 T110,50" stroke="white" stroke-width="3" fill="none"/><circle cx="40" cy="40" r="5" fill="white"/><circle cx="160" cy="60" r="5" fill="white"/></svg>');
+            background-size: 300px;
+            z-index: 0;
+        }
+
+        .info-icon {
+            font-size: 2rem;
+            color: var(--racing-yellow);
+            text-shadow: 0 2px 10px rgba(255, 209, 102, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            animation: pulse 2s infinite;
+        }
+
+        .info-content {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-content h3 {
+            margin: 0 0 8px 0;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-content p {
+            margin: 0;
+            color: white;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            font-weight: 500;
+            white-space: pre-wrap;
+        }
+
+        .btn-close-info {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+
+        .btn-close-info:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: rotate(90deg);
+        }
+
+        #toggleInfoBtn {
+            background: var(--gradient-info);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+            min-width: 180px;
+            flex-shrink: 0;
+        }
+
+        #toggleInfoBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .dark-mode #infoBoxDisplay {
+            background: linear-gradient(135deg, #2a3b4e 0%, #1a2b3e 100%);
+            border-left: 8px solid var(--racing-yellow);
+        }
+
+        .dark-mode .btn-close-info {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         * {
@@ -808,7 +954,7 @@
             box-shadow: var(--shadow-light);
         }
         
-        #addAtletaBox, #costiBox, #docsBox { 
+        #addAtletaBox, #costiBox, #docsBox, #infoBox { 
             background: rgba(168, 218, 220, 0.1); 
             border: 2px solid var(--racing-light); 
             border-radius: 20px; 
@@ -828,6 +974,10 @@
         #docsBox { 
             background: rgba(255, 209, 102, 0.05); 
             border-color: var(--racing-yellow); 
+        }
+        #infoBox {
+            background: rgba(69, 123, 157, 0.1);
+            border-color: var(--racing-blue);
         }
 
         .admin-row { 
@@ -1624,7 +1774,7 @@
                 font-size: 0.9rem;
             }
             
-            #toggleAccompagnatoriBtn {
+            #toggleAccompagnatoriBtn, #toggleInfoBtn {
                 width: 100%;
                 min-width: auto;
                 padding: 12px;
@@ -1778,6 +1928,22 @@
             #riepilogoAccompagnatori {
                 padding: 15px;
                 margin: 15px 0;
+            }
+            
+            /* Responsive per box info */
+            #infoBoxDisplay {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 18px;
+            }
+            
+            .info-icon {
+                margin-bottom: 5px;
+            }
+            
+            .btn-close-info {
+                align-self: flex-end;
+                margin-top: 10px;
             }
             
             /* Animazioni responsive */
@@ -1955,6 +2121,20 @@
 
     <h2 id="mainTitle">Juvenilia Racing Team - Iscrizioni Gara 5</h2>
     
+    <!-- NUOVO: Box informazioni dinamico sotto il titolo -->
+    <div id="infoBoxDisplay">
+        <div class="info-icon">
+            <i class="fas fa-info-circle"></i>
+        </div>
+        <div class="info-content">
+            <h3><i class="fas fa-bullhorn"></i> INFORMAZIONI IMPORTANTI</h3>
+            <p id="infoTextDisplay">Nessuna informazione disponibile al momento.</p>
+        </div>
+        <button class="btn-close-info" onclick="nascondiInfoBox()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
     <!-- Timer principale -->
     <div id="countdownBox" class="countdown-container">
         <div id="timerDisplay" class="timer"><i class="fas fa-clock"></i> Inizializzazione...</div>
@@ -1993,6 +2173,23 @@
             <input type="text" id="docLink2_Text" placeholder="Testo Pulsante 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
             <button onclick="salvaDoc(2)" style="background:var(--racing-green);"><i class="fas fa-save"></i> Salva 2</button>
             <button onclick="azzeraDoc(2)" style="background:var(--racing-red);"><i class="fas fa-trash"></i> Azzera 2</button>
+        </div>
+    </div>
+
+    <!-- NUOVO: Sezione admin per gestione box informazioni -->
+    <div id="infoBox">
+        <div style="font-size: 14px; font-weight: bold; color: var(--racing-blue); margin-left: 5px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-info-circle"></i> GESTIONE BOX INFORMAZIONI:
+        </div>
+        <div class="admin-row">
+            <textarea id="infoTextInput" rows="4" placeholder="Inserisci qui le informazioni da mostrare agli utenti..." 
+                      style="flex: 1; padding: 15px; border: 2px solid var(--racing-light); border-radius: 12px; font-family: inherit; font-size: 0.9rem; resize: vertical; text-transform: uppercase;" 
+                      onfocus="isEditingInfo=true" onblur="isEditingInfo=false"></textarea>
+        </div>
+        <div class="admin-row" style="justify-content: flex-end;">
+            <button onclick="salvaInfo()" style="background:var(--racing-green);"><i class="fas fa-save"></i> Salva Informazioni</button>
+            <button onclick="azzeraInfo()" style="background:var(--racing-red);"><i class="fas fa-trash-alt"></i> Azzera</button>
+            <button onclick="toggleInfoVisibility()" style="background:var(--racing-blue);"><i class="fas fa-eye-slash"></i> Nascondi/Mostra Box</button>
         </div>
     </div>
 
@@ -2141,9 +2338,10 @@
     let isAdmin = false, isExpired = false, currentData = [], timerInterval;
     let labelA = "", labelB = "", labelC = "", sortBy = 'nome'; 
     let costiCategorie = {};
-    let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false;
+    let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false, isEditingInfo = false;
     let selectedIds = new Set();
     let mostraAccompagnatori = true;
+    let mostraInfoBox = true; // NUOVO: variabile per gestire la visibilità del box info
     let tempAccompagnatoriValues = {};
     let isTypingInAccompagnatore = false;
     let refreshInterval = null;
@@ -2184,12 +2382,110 @@
         // Avvia il controllo della dark mode
         startTimeCheck();
         
+        // NUOVO: Inizializza il box info
+        await initInfoBox();
+        
         await fullLoad(); 
         refreshInterval = setInterval(checkAndRefresh, 15000);
     }
 
+    // NUOVO: Inizializza il box informazioni
+    async function initInfoBox() {
+        const { data } = await _supabase.from(T_CONF).select('*');
+        if (data) {
+            const infoText = data.find(c => c.chiave === 'info_text')?.valore || "";
+            const infoVisibility = data.find(c => c.chiave === 'mostra_info_box')?.valore;
+            
+            if (infoVisibility !== null && infoVisibility !== undefined) {
+                mostraInfoBox = infoVisibility === 'true';
+            }
+            
+            document.getElementById('infoTextDisplay').innerText = infoText || "Nessuna informazione disponibile al momento.";
+            document.getElementById('infoTextInput').value = infoText || "";
+            
+            const infoBoxDisplay = document.getElementById('infoBoxDisplay');
+            if (!infoText || infoText.trim() === "" || !mostraInfoBox) {
+                infoBoxDisplay.classList.add('hidden');
+            } else {
+                infoBoxDisplay.classList.remove('hidden');
+            }
+        }
+    }
+
+    // NUOVO: Salva le informazioni
+    async function salvaInfo() {
+        const testo = document.getElementById('infoTextInput').value.trim().toUpperCase();
+        
+        await _supabase.from(T_CONF).upsert({ 
+            chiave: 'info_text', 
+            valore: testo 
+        }, { onConflict: 'chiave' });
+        
+        document.getElementById('infoTextDisplay').innerText = testo || "Nessuna informazione disponibile al momento.";
+        
+        const infoBoxDisplay = document.getElementById('infoBoxDisplay');
+        if (!testo || testo === "" || !mostraInfoBox) {
+            infoBoxDisplay.classList.add('hidden');
+        } else {
+            infoBoxDisplay.classList.remove('hidden');
+        }
+        
+        showToast("Informazioni salvate!");
+        isEditingInfo = false;
+    }
+
+    // NUOVO: Azzera le informazioni
+    async function azzeraInfo() {
+        if (confirm("Cancellare tutte le informazioni dal box?")) {
+            await _supabase.from(T_CONF).upsert({ 
+                chiave: 'info_text', 
+                valore: "" 
+            }, { onConflict: 'chiave' });
+            
+            document.getElementById('infoTextInput').value = "";
+            document.getElementById('infoTextDisplay').innerText = "Nessuna informazione disponibile al momento.";
+            
+            const infoBoxDisplay = document.getElementById('infoBoxDisplay');
+            if (!mostraInfoBox) {
+                infoBoxDisplay.classList.add('hidden');
+            } else {
+                infoBoxDisplay.classList.add('hidden');
+            }
+            
+            showToast("Informazioni azzerate!");
+        }
+    }
+
+    // NUOVO: Nascondi il box info (per utenti)
+    function nascondiInfoBox() {
+        const infoBoxDisplay = document.getElementById('infoBoxDisplay');
+        infoBoxDisplay.classList.add('hidden');
+        showToast("Box informazioni nascosto");
+    }
+
+    // NUOVO: Toggle visibilità box info (per admin)
+    async function toggleInfoVisibility() {
+        mostraInfoBox = !mostraInfoBox;
+        
+        await _supabase.from(T_CONF).upsert({ 
+            chiave: 'mostra_info_box', 
+            valore: mostraInfoBox.toString() 
+        }, { onConflict: 'chiave' });
+        
+        const infoText = document.getElementById('infoTextInput').value.trim();
+        const infoBoxDisplay = document.getElementById('infoBoxDisplay');
+        
+        if (!mostraInfoBox || !infoText || infoText === "") {
+            infoBoxDisplay.classList.add('hidden');
+        } else {
+            infoBoxDisplay.classList.remove('hidden');
+        }
+        
+        showToast(`Box informazioni ${mostraInfoBox ? 'mostrato' : 'nascosto'} per gli utenti`);
+    }
+
     async function checkAndRefresh() {
-        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingTitolo && !isEditingDateLabels && !isEditingTimers && !isEditingCategoria) {
+        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingTitolo && !isEditingDateLabels && !isEditingTimers && !isEditingCategoria && !isEditingInfo) {
             await fullLoad();
         }
     }
@@ -2207,6 +2503,7 @@
         await caricaConfig(); 
         await caricaTimers();
         await caricaTabella();
+        await initInfoBox(); // NUOVO: Ricarica info box
         
         restoreTempAccompagnatoriValues();
     }
@@ -2242,6 +2539,7 @@
                 e.target.id === 'docLink2_URL' ||
                 e.target.id === 'docLink2_Text' ||
                 e.target.id === 'newTimerLabel' ||
+                e.target.id === 'infoTextInput' || // NUOVO
                 e.target.classList.contains('categoria-select')) {
                 e.target.value = e.target.value.toUpperCase();
             }
@@ -2264,6 +2562,9 @@
             }
             if (e.target.classList.contains('categoria-select')) {
                 isEditingCategoria = true;
+            }
+            if (e.target.id === 'infoTextInput') { // NUOVO
+                isEditingInfo = true;
             }
         });
         
@@ -2293,6 +2594,11 @@
             if (e.target.classList.contains('categoria-select')) {
                 setTimeout(() => {
                     isEditingCategoria = false;
+                }, 500);
+            }
+            if (e.target.id === 'infoTextInput') { // NUOVO
+                setTimeout(() => {
+                    isEditingInfo = false;
                 }, 500);
             }
         });
@@ -3184,6 +3490,7 @@
             document.getElementById('addAtletaBox').style.display = 'flex';
             document.getElementById('costiBox').style.display = 'flex';
             document.getElementById('docsBox').style.display = 'flex';
+            document.getElementById('infoBox').style.display = 'flex'; // NUOVO
             document.getElementById('timerAdminBox').style.display = 'flex';
             document.getElementById('adminTotalBox').style.display = 'block';
             document.getElementById('adminButtons').style.display = 'grid';
@@ -3193,6 +3500,7 @@
             
             caricaConfig(); 
             caricaTimers();
+            initInfoBox(); // NUOVO
             renderData(); 
             showToast("Modalità Admin Attiva");
         } else { 
@@ -3270,7 +3578,7 @@
         let g = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : '');
         let d = note.includes('B') ? 'B' : (note.includes('C') ? 'C' : '');
         if(tipo === 'gender') g = valore;
-        if(tipo === 'data') d = (valore === 'A' ? '' : valeur);
+        if(tipo === 'data') d = (valore === 'A' ? '' : valore);
         await _supabase.from(T_DATA).update({ note: g + d }).eq('id', id);
         showToast("Dettaglio aggiornato!");
         caricaTabella(); 
