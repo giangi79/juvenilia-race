@@ -12,23 +12,36 @@
     <style>
         :root { 
             /* TEMA CHIARO */
-            --racing-red: #E63946; --racing-blue: #1D3557; --racing-light: #A8DADC; 
-            --racing-white: #F1FAEE; --racing-yellow: #FFD166; --racing-orange: #F4A261;
-            --racing-green: #2A9D8F; --racing-purple: #6A4C93; --racing-silver: #C0C0C0;
+            --racing-red: #E63946; 
+            --racing-blue: #1D3557; 
+            --racing-light: #A8DADC; 
+            --racing-white: #F1FAEE; 
+            --racing-yellow: #FFD166; 
+            --racing-orange: #F4A261;
+            --racing-green: #2A9D8F; 
+            --racing-purple: #6A4C93; 
+            --racing-silver: #C0C0C0;
             --gradient-primary: linear-gradient(135deg, #1D3557 0%, #457B9D 100%);
             --gradient-success: linear-gradient(135deg, #2A9D8F 0%, #4ECDC4 100%);
             --gradient-danger: linear-gradient(135deg, #E63946 0%, #FF6B6B 100%);
             --gradient-warning: linear-gradient(135deg, #F4A261 0%, #FFB347 100%);
             --gradient-racing: linear-gradient(90deg, #1D3557, #E63946, #FFD166);
-            --text-main: #1D3557; --bg-body: #f8f9fa; --bg-card: #ffffff;
+            --text-main: #1D3557; 
+            --bg-body: #f8f9fa; 
+            --bg-card: #ffffff;
             --shadow-light: 0 8px 25px rgba(29, 53, 87, 0.08);
             --shadow-medium: 0 12px 35px rgba(29, 53, 87, 0.12);
             --shadow-heavy: 0 15px 40px rgba(29, 53, 87, 0.15);
             
             /* Colori Categorie aggiornati */
-            --cat-senior: #1D3557; --cat-junior: #E63946; --cat-allievi: #2A9D8F;
-            --cat-ragazzi: #457B9D; --cat-r12: #6A4C93; --cat-esordienti: #F4A261;
-            --cat-giovanissimi: #4ECDC4; --cat-default: #8A8D93;
+            --cat-senior: #1D3557; 
+            --cat-junior: #E63946; 
+            --cat-allievi: #2A9D8F;
+            --cat-ragazzi: #457B9D; 
+            --cat-r12: #6A4C93; 
+            --cat-esordienti: #F4A261;
+            --cat-giovanissimi: #4ECDC4; 
+            --cat-default: #8A8D93;
             
             /* Variabili per Dark Mode */
             --dark-bg-body: #0a1929;
@@ -256,7 +269,6 @@
                 radial-gradient(circle at 40% 40%, rgba(233, 196, 106, 0.02) 0%, transparent 50%);
         }
 
-        /* AGGIUNTE PER DARK MODE COSTI */
         .dark-mode .costo-label {
             color: var(--racing-light) !important;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
@@ -273,7 +285,6 @@
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3) !important;
         }
 
-        /* STILI PER INFO BOX */
         .dark-mode #infoBox {
             background: rgba(42, 59, 78, 0.5);
             border-color: #3a4b5e;
@@ -405,6 +416,7 @@
             gap: 8px; 
             z-index: 10; 
         }
+        
         .icon-btn { 
             background: var(--racing-white); 
             border: none; 
@@ -419,11 +431,13 @@
             color: var(--racing-blue);
             transition: all 0.3s ease;
         }
+        
         .icon-btn:hover { 
             transform: translateY(-3px) rotate(10deg); 
             box-shadow: var(--shadow-medium);
             background: var(--racing-yellow);
         }
+        
         .logout-btn { 
             display: none; 
             color: var(--racing-white); 
@@ -437,6 +451,7 @@
             transition: 0.3s; 
             box-shadow: var(--shadow-light);
         }
+        
         .logout-btn:hover { 
             background: var(--racing-red); 
             transform: translateY(-2px);
@@ -595,7 +610,7 @@
             margin-top: 5px;
         }
 
-        /* STILI TIMER - DUPLICATI */
+        /* STILI TIMER */
         .countdown-container { 
             text-align: center; 
             margin: 15px 0; 
@@ -812,6 +827,7 @@
             align-items: center;
             flex-shrink: 0;
         }
+        
         .search-box { 
             flex: 1;
             padding: 16px 16px 16px 50px; 
@@ -825,11 +841,13 @@
             box-shadow: var(--shadow-light); 
             font-weight: 500;
         }
+        
         .search-box:focus { 
             outline: none; 
             border-color: var(--racing-blue); 
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.2), var(--shadow-medium); 
         }
+        
         .search-icon { 
             position: absolute; 
             left: 18px; 
@@ -850,6 +868,7 @@
             margin: 15px 0 20px 0; 
             flex-shrink: 0;
         }
+        
         .btn-doc-link { 
             background: var(--gradient-primary); 
             color: white; 
@@ -865,12 +884,16 @@
             align-items: center;
             gap: 8px;
         }
+        
         .btn-doc-link:hover { 
             transform: translateY(-5px) scale(1.05); 
             box-shadow: var(--shadow-medium);
         }
 
-        input[type="radio"] { display: none; }
+        input[type="radio"] { 
+            display: none; 
+        }
+        
         .badge-btn { 
             display: inline-block; 
             padding: 12px 10px; 
@@ -889,6 +912,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+        
         .badge-btn:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-light);
@@ -901,6 +925,7 @@
             transform: scale(1.05); 
             box-shadow: 0 6px 15px rgba(42, 157, 143, 0.4); 
         }
+        
         input[value="no"]:checked + .badge-no { 
             background: var(--gradient-danger); 
             color: white; 
@@ -919,18 +944,21 @@
             font-weight: bold; 
             transition: all 0.2s ease; 
         }
+        
         .btn-date-small.active { 
             background-color: var(--racing-orange); 
             color: white; 
             border-color: #e68a00; 
             box-shadow: 0 3px 8px rgba(244, 162, 97, 0.4);
         }
+        
         .btn-gender-small.active-m { 
             background-color: var(--racing-blue); 
             color: white; 
             border-color: #0056b3; 
             box-shadow: 0 3px 8px rgba(29, 53, 87, 0.4);
         }
+        
         .btn-gender-small.active-f { 
             background-color: var(--racing-red); 
             color: white; 
@@ -952,6 +980,7 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
+        
         .btn-reset:hover {
             background-color: #5a6268;
             transform: translateY(-2px);
@@ -971,10 +1000,12 @@
             backdrop-filter: blur(10px);
             flex-shrink: 0;
         }
+        
         #costiBox { 
             background: rgba(106, 76, 147, 0.05); 
             border-color: var(--racing-purple); 
         }
+        
         #docsBox { 
             background: rgba(255, 209, 102, 0.05); 
             border-color: var(--racing-yellow); 
@@ -987,6 +1018,7 @@
             align-items: center; 
             padding: 8px 0; 
         }
+        
         .admin-row input, .admin-row select { 
             flex: 1; 
             padding: 12px; 
@@ -998,11 +1030,13 @@
             transition: all 0.3s ease;
             box-shadow: 0 3px 8px rgba(0,0,0,0.05);
         }
+        
         .admin-row input:focus, .admin-row select:focus {
             outline: none;
             border-color: var(--racing-blue);
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.1), 0 5px 15px rgba(0,0,0,0.08);
         }
+        
         .admin-row button { 
             padding: 12px 20px; 
             border: none; 
@@ -1013,10 +1047,12 @@
             transition: all 0.3s ease; 
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
+        
         .admin-row button:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
+        
         .btn-clear-input { 
             background: #6c757d !important; 
             color: white !important; 
@@ -1032,6 +1068,7 @@
             margin-bottom: 20px; 
             flex-shrink: 0;
         }
+        
         .stat-card { 
             padding: 20px; 
             border-radius: 18px; 
@@ -1043,10 +1080,12 @@
             position: relative;
             overflow: hidden;
         }
+        
         .stat-card:hover {
             transform: translateY(-5px);
             box-shadow: var(--shadow-heavy);
         }
+        
         .stat-card::before {
             content: '';
             position: absolute;
@@ -1058,12 +1097,15 @@
             background-size: 150px;
             z-index: 0;
         }
+        
         .stat-presenti { 
             background: var(--gradient-success); 
         }
+        
         .stat-assenti { 
             background: var(--gradient-danger); 
         }
+        
         #adminTotalBox { 
             background: var(--gradient-primary); 
             grid-column: span 2; 
@@ -1117,6 +1159,7 @@
             border-spacing: 0; 
             background: transparent; 
         }
+        
         thead { 
             position: sticky; 
             top: 0; 
@@ -1136,9 +1179,11 @@
             position: sticky;
             top: 0;
         }
+        
         thead th:first-child {
             border-radius: 15px 0 0 0;
         }
+        
         thead th:last-child {
             border-radius: 0 15px 0 0;
         }
@@ -1149,6 +1194,7 @@
             box-shadow: 0 3px 10px rgba(0,0,0,0.03);
             border-bottom: 1px solid #f0f0f0;
         }
+        
         tbody tr:hover { 
             transform: translateY(-3px); 
             box-shadow: var(--shadow-medium); 
@@ -1212,10 +1258,16 @@
             font-weight: bold;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
+        
         .bg-m { background-color: var(--racing-blue); }
         .bg-f { background-color: var(--racing-red); }
 
-        .gender-section { margin-top: 8px; padding-left: 15px; border-left: 3px solid var(--racing-light); }
+        .gender-section { 
+            margin-top: 8px; 
+            padding-left: 15px; 
+            border-left: 3px solid var(--racing-light); 
+        }
+        
         .gender-title { 
             font-size: 0.7rem; 
             font-weight: bold; 
@@ -1225,6 +1277,7 @@
             opacity: 0.9; 
             letter-spacing: 0.5px;
         }
+        
         .title-m { color: var(--racing-blue); }
         .title-f { color: var(--racing-red); }
 
@@ -1236,6 +1289,7 @@
             padding-bottom: 30px; 
             flex-shrink: 0;
         }
+        
         #adminButtons button { 
             padding: 15px; 
             border: none; 
@@ -1251,6 +1305,7 @@
             gap: 8px;
             box-shadow: var(--shadow-light);
         }
+        
         #adminButtons button:hover {
             transform: translateY(-5px);
             box-shadow: var(--shadow-medium);
@@ -1284,6 +1339,7 @@
             font-weight: bold;
             font-size: 0.9rem;
         }
+        
         #toast.show { 
             visibility: visible; 
             animation: slideIn 0.5s, fadeout 0.5s 2.5s; 
@@ -2078,36 +2134,42 @@
                 font-size: 0.8rem;
             }
         }
-    
-    /* Stile Pulsante Torna in Cima */
-    #backToTopBtn {
-        display: none;
-        position: fixed;
-        bottom: 25px;
-        right: 25px;
-        z-index: 999;
-        border: none;
-        outline: none;
-        background: var(--gradient-danger);
-        color: white;
-        cursor: pointer;
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        font-size: 1.5rem;
-        box-shadow: var(--shadow-heavy);
-        transition: all 0.3s ease;
-        align-items: center;
-        justify-content: center;
-    }
-    #backToTopBtn:hover {
-        transform: translateY(-5px) scale(1.1);
-        background: var(--gradient-primary);
-    }
-    @media (max-width: 768px) {
-        #backToTopBtn { bottom: 85px; right: 15px; width: 45px; height: 45px; }
-    }
 
+        /* Stile Pulsante Torna in Cima */
+        #backToTopBtn {
+            display: none;
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 999;
+            border: none;
+            outline: none;
+            background: var(--gradient-danger);
+            color: white;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-heavy);
+            transition: all 0.3s ease;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #backToTopBtn:hover {
+            transform: translateY(-5px) scale(1.1);
+            background: var(--gradient-primary);
+        }
+        
+        @media (max-width: 768px) {
+            #backToTopBtn { 
+                bottom: 85px; 
+                right: 15px; 
+                width: 45px; 
+                height: 45px; 
+            }
+        }
     </style>
 </head>
 <body>
@@ -2332,6 +2394,10 @@
         <p style="margin-top: 15px; font-size: 0.7rem; opacity: 0.7;">Pronti, partenza... via!</p>
     </div>
 </div>
+
+<button onclick="scrollToTop()" id="backToTopBtn" title="Torna in cima">
+    <i class="fas fa-chevron-up"></i>
+</button>
 
 <script>
     // SUPABASE CONFIGURATION
@@ -4115,11 +4181,7 @@
     init();
 </script>
 
-    <button onclick="scrollToTop()" id="backToTopBtn" title="Torna in cima">
-        <i class="fas fa-chevron-up"></i>
-    </button>
-
-    <script>
+<script>
     // Logica Torna in Cima
     window.onscroll = function() {
         const btn = document.getElementById("backToTopBtn");
@@ -4129,9 +4191,11 @@
             btn.style.display = "none";
         }
     };
+    
     function scrollToTop() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 </script>
+
 </body>
 </html>
