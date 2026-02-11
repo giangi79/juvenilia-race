@@ -11,7 +11,6 @@
     
     <style>
         :root { 
-            /* TEMA CHIARO */
             --racing-red: #E63946; --racing-blue: #1D3557; --racing-light: #A8DADC; 
             --racing-white: #F1FAEE; --racing-yellow: #FFD166; --racing-orange: #F4A261;
             --racing-green: #2A9D8F; --racing-purple: #6A4C93; --racing-silver: #C0C0C0;
@@ -20,17 +19,16 @@
             --gradient-danger: linear-gradient(135deg, #E63946 0%, #FF6B6B 100%);
             --gradient-warning: linear-gradient(135deg, #F4A261 0%, #FFB347 100%);
             --gradient-racing: linear-gradient(90deg, #1D3557, #E63946, #FFD166);
+            --gradient-info: linear-gradient(135deg, #457B9D 0%, #6A4C93 100%);
             --text-main: #1D3557; --bg-body: #f8f9fa; --bg-card: #ffffff;
             --shadow-light: 0 8px 25px rgba(29, 53, 87, 0.08);
             --shadow-medium: 0 12px 35px rgba(29, 53, 87, 0.12);
             --shadow-heavy: 0 15px 40px rgba(29, 53, 87, 0.15);
             
-            /* Colori Categorie aggiornati */
             --cat-senior: #1D3557; --cat-junior: #E63946; --cat-allievi: #2A9D8F;
             --cat-ragazzi: #457B9D; --cat-r12: #6A4C93; --cat-esordienti: #F4A261;
             --cat-giovanissimi: #4ECDC4; --cat-default: #8A8D93;
             
-            /* Variabili per Dark Mode */
             --dark-bg-body: #0a1929;
             --dark-bg-card: #1a2b3e;
             --dark-text-main: #e9ecef;
@@ -39,7 +37,6 @@
             --dark-shadow-heavy: 0 15px 40px rgba(0, 0, 0, 0.5);
         }
 
-        /* Dark Mode Class */
         .dark-mode {
             --text-main: var(--dark-text-main);
             --bg-body: var(--dark-bg-body);
@@ -118,6 +115,7 @@
         .dark-mode #addAtletaBox,
         .dark-mode #costiBox,
         .dark-mode #docsBox,
+        .dark-mode #infoBox,
         .dark-mode .timer-admin-section {
             background: rgba(42, 59, 78, 0.5);
             border-color: #3a4b5e;
@@ -127,7 +125,8 @@
         .dark-mode .admin-row input,
         .dark-mode .admin-row select,
         .dark-mode .timer-admin-row input,
-        .dark-mode .timer-admin-row select {
+        .dark-mode .timer-admin-row select,
+        .dark-mode #infoTextInput {
             background: #2a3b4e;
             color: var(--dark-text-main);
             border-color: #3a4b5e;
@@ -136,7 +135,8 @@
         .dark-mode .admin-row input:focus,
         .dark-mode .admin-row select:focus,
         .dark-mode .timer-admin-row input:focus,
-        .dark-mode .timer-admin-row select:focus {
+        .dark-mode .timer-admin-row select:focus,
+        .dark-mode #infoTextInput:focus {
             border-color: var(--racing-blue);
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3), 0 5px 15px rgba(0,0,0,0.2);
         }
@@ -216,7 +216,8 @@
         }
 
         .dark-mode #confirmedList,
-        .dark-mode #riepilogoAccompagnatori {
+        .dark-mode #riepilogoAccompagnatori,
+        .dark-mode #infoBoxDisplay {
             background: #2a3b4e;
             color: var(--dark-text-main);
             border-color: #3a4b5e;
@@ -256,7 +257,6 @@
                 radial-gradient(circle at 40% 40%, rgba(233, 196, 106, 0.02) 0%, transparent 50%);
         }
 
-        /* AGGIUNTE PER DARK MODE COSTI */
         .dark-mode .costo-label {
             color: var(--racing-light) !important;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
@@ -271,6 +271,126 @@
         .dark-mode .costo-in:focus {
             border-color: var(--racing-blue) !important;
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3) !important;
+        }
+
+        /* STILI PER IL BOX INFO - VISIBILE DI DEFAULT */
+        #infoBox {
+            background: rgba(69, 123, 157, 0.1);
+            border: 2px solid var(--racing-blue);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: var(--shadow-light);
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+        }
+
+        #infoBoxDisplay {
+            background: var(--gradient-info);
+            border-radius: 15px;
+            padding: 18px 25px;
+            margin: 15px 0 25px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            box-shadow: var(--shadow-medium);
+            border-left: 8px solid var(--racing-yellow);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        #infoBoxDisplay.hidden {
+            display: none !important;
+        }
+
+        #infoBoxDisplay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" width="200" height="100" opacity="0.05"><path d="M30,50 Q50,30 70,50 T110,50" stroke="white" stroke-width="3" fill="none"/><circle cx="40" cy="40" r="5" fill="white"/><circle cx="160" cy="60" r="5" fill="white"/></svg>');
+            background-size: 300px;
+            z-index: 0;
+        }
+
+        .info-icon {
+            font-size: 2rem;
+            color: var(--racing-yellow);
+            text-shadow: 0 2px 10px rgba(255, 209, 102, 0.5);
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            animation: pulse 2s infinite;
+        }
+
+        .info-content {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+        }
+
+        .info-content h3 {
+            margin: 0 0 8px 0;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-content p {
+            margin: 0;
+            color: white;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            font-weight: 500;
+            white-space: pre-wrap;
+        }
+
+        .btn-close-info {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+            flex-shrink: 0;
+        }
+
+        .btn-close-info:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: rotate(90deg);
+        }
+
+        .dark-mode #infoBoxDisplay {
+            background: linear-gradient(135deg, #2a3b4e 0%, #1a2b3e 100%);
+            border-left: 8px solid var(--racing-yellow);
+        }
+
+        .dark-mode .btn-close-info {
+            background: rgba(255, 255, 255, 0.1);
         }
 
         * {
@@ -445,7 +565,6 @@
             border-radius: 2px;
         }
 
-        /* STILI TIMER - DUPLICATI */
         .countdown-container { 
             text-align: center; 
             margin: 15px 0; 
@@ -494,7 +613,6 @@
             color: var(--racing-yellow);
         }
 
-        /* TIMER PER CATEGORIE */
         .timer-category-container {
             display: flex;
             flex-direction: column;
@@ -544,7 +662,6 @@
             min-width: 70px;
         }
 
-        /* NUOVI STILI PER TIMER ADMIN */
         .timer-admin-section {
             background: rgba(106, 76, 147, 0.05);
             border: 2px solid var(--racing-purple);
@@ -808,7 +925,7 @@
             box-shadow: var(--shadow-light);
         }
         
-        #addAtletaBox, #costiBox, #docsBox { 
+        #addAtletaBox, #costiBox, #docsBox, #infoBox { 
             background: rgba(168, 218, 220, 0.1); 
             border: 2px solid var(--racing-light); 
             border-radius: 20px; 
@@ -828,6 +945,10 @@
         #docsBox { 
             background: rgba(255, 209, 102, 0.05); 
             border-color: var(--racing-yellow); 
+        }
+        #infoBox {
+            background: rgba(69, 123, 157, 0.1);
+            border-color: var(--racing-blue);
         }
 
         .admin-row { 
@@ -949,7 +1070,6 @@
             margin-bottom: 20px;
         }
         
-        /* Fix per l'header fisso senza riga bianca */
         .table-wrapper::before {
             content: '';
             position: absolute;
@@ -1015,7 +1135,6 @@
             vertical-align: middle;
         }
         
-        /* Stili categorie aggiornati */
         .tr-senior { border-left: 6px solid var(--cat-senior); }
         .tr-junior { border-left: 6px solid var(--cat-junior); }
         .tr-allievi { border-left: 6px solid var(--cat-allievi); }
@@ -1024,7 +1143,6 @@
         .tr-esordienti { border-left: 6px solid var(--cat-esordienti); }
         .tr-giovanissimi { border-left: 6px solid var(--cat-giovanissimi); }
         
-        /* Badge categoria */
         .categoria-badge {
             display: inline-block;
             padding: 5px 10px;
@@ -1106,7 +1224,6 @@
             box-shadow: var(--shadow-medium);
         }
         
-        /* Stile specifico per pulsante WhatsApp */
         #adminButtons button[onclick*="WhatsApp"] {
             background: linear-gradient(135deg, #25D366 0%, #128C7E 100%) !important;
         }
@@ -1144,7 +1261,6 @@
             to { bottom: 40px; opacity: 1; }
         }
 
-        /* ANIMAZIONI PARTECIPA E NON PARTECIPA */
         #celebrationEffect {
             display: none;
             position: fixed;
@@ -1207,7 +1323,6 @@
             filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
         }
         
-        /* Particelle per PARTECIPA */
         .skate-particle {
             position: absolute;
             width: 30px;
@@ -1225,7 +1340,6 @@
             opacity: 0;
         }
         
-        /* Particelle per NON PARTECIPA */
         .sad-particle {
             position: absolute;
             width: 40px;
@@ -1273,7 +1387,6 @@
             opacity: 0;
         }
         
-        /* Animazioni pattinaggio */
         @keyframes skateMove {
             0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
             70% { transform: translate(var(--skate-x), var(--skate-y)) rotate(var(--skate-rotate)) scale(0.8); opacity: 0.8; }
@@ -1314,7 +1427,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* NUOVI STILI PER ACCOMPAGNATORI - COMPATTI */
         .accompagnatore-box {
             margin-top: 5px;
             display: none;
@@ -1475,7 +1587,6 @@
             background: rgba(168, 218, 220, 0.05);
         }
 
-        /* Pulsante toggle accompagnatori */
         #toggleAccompagnatoriBtn {
             display: none;
             background: var(--gradient-primary);
@@ -1498,7 +1609,6 @@
             box-shadow: var(--shadow-medium);
         }
         
-        /* Footer tematico */
         .racing-footer {
             margin-top: 20px;
             padding: 15px;
@@ -1529,7 +1639,6 @@
             transform: translateY(-5px) rotate(10deg);
         }
         
-        /* Riepilogo partecipanti */
         #confirmedList {
             display:none; 
             background: var(--racing-white); 
@@ -1541,7 +1650,6 @@
             flex-shrink: 0;
         }
         
-        /* Responsive design - MOBILE */
         @media screen and (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -1599,7 +1707,6 @@
                 font-size: 1rem;
             }
             
-            /* Timer per categorie in mobile */
             .category-timer {
                 padding: 12px;
                 gap: 8px;
@@ -1624,7 +1731,7 @@
                 font-size: 0.9rem;
             }
             
-            #toggleAccompagnatoriBtn {
+            #toggleAccompagnatoriBtn, #toggleInfoBtn {
                 width: 100%;
                 min-width: auto;
                 padding: 12px;
@@ -1677,7 +1784,6 @@
                 border-left-width: 0px;
             }
             
-            /* Bordi superiori per le categorie in mobile */
             .tr-senior { border-top: 8px solid var(--cat-senior); }
             .tr-junior { border-top: 8px solid var(--cat-junior); }
             .tr-allievi { border-top: 8px solid var(--cat-allievi); }
@@ -1737,12 +1843,10 @@
                 justify-content: center !important;
             }
             
-            /* Forza testo NON PARTECIPA su una riga sola */
             .badge-no {
                 white-space: nowrap !important;
             }
             
-            /* Responsive per accompagnatori */
             .accompagnatore-box {
                 max-width: 100%;
                 width: 100%;
@@ -1768,7 +1872,6 @@
                 align-items: center !important;
             }
             
-            /* Responsive per riepilogo accompagnatori */
             .riepilogo-row {
                 flex-direction: column;
                 gap: 5px;
@@ -1780,7 +1883,21 @@
                 margin: 15px 0;
             }
             
-            /* Animazioni responsive */
+            #infoBoxDisplay {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 18px;
+            }
+            
+            .info-icon {
+                margin-bottom: 5px;
+            }
+            
+            .btn-close-info {
+                align-self: flex-end;
+                margin-top: 10px;
+            }
+            
             .celebration-title {
                 font-size: 2.5rem;
             }
@@ -1793,7 +1910,6 @@
                 font-size: 6rem;
             }
             
-            /* Admin buttons responsive */
             #adminButtons {
                 grid-template-columns: 1fr;
                 gap: 10px;
@@ -1810,7 +1926,6 @@
                 margin-bottom: 5px;
             }
             
-            /* Timer admin responsive */
             .timer-admin-row {
                 flex-direction: column;
                 align-items: stretch;
@@ -1845,7 +1960,6 @@
                 font-size: 1.1rem;
             }
             
-            /* Fix per admin row in mobile */
             .admin-row button {
                 padding: 10px 15px;
                 font-size: 0.8rem;
@@ -1857,7 +1971,6 @@
             }
         }
         
-        /* Desktop - ottimizzazione schermi grandi */
         @media screen and (min-width: 1400px) {
             .container {
                 max-width: 1600px;
@@ -1872,7 +1985,6 @@
             }
         }
         
-        /* Schermi molto piccoli */
         @media screen and (max-width: 480px) {
             .logo-container img {
                 max-width: 100%;
@@ -1900,7 +2012,6 @@
             }
         }
     
-    /* Stile Pulsante Torna in Cima */
     #backToTopBtn {
         display: none;
         position: fixed;
@@ -1955,6 +2066,20 @@
 
     <h2 id="mainTitle">Juvenilia Racing Team - Iscrizioni Gara 5</h2>
     
+    <!-- BOX INFORMAZIONI - SEMPRE VISIBILE DI DEFAULT -->
+    <div id="infoBoxDisplay">
+        <div class="info-icon">
+            <i class="fas fa-info-circle"></i>
+        </div>
+        <div class="info-content">
+            <h3><i class="fas fa-bullhorn"></i> INFORMAZIONI IMPORTANTI</h3>
+            <p id="infoTextDisplay">Benvenuti al sistema di iscrizione Juvenilia Racing Team! Utilizza il pannello admin per personalizzare questo messaggio.</p>
+        </div>
+        <button class="btn-close-info" onclick="nascondiInfoBox()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
     <!-- Timer principale -->
     <div id="countdownBox" class="countdown-container">
         <div id="timerDisplay" class="timer"><i class="fas fa-clock"></i> Inizializzazione...</div>
@@ -1969,7 +2094,6 @@
     <div id="timerAdminBox" class="timer-admin-section">
         <div style="font-size: 14px; font-weight: bold; color: var(--racing-purple); margin-left: 5px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-stopwatch"></i> GESTIONE TIMER PER CATEGORIE:</div>
         
-        <!-- Form per aggiungere nuovo timer -->
         <div class="timer-admin-row">
             <input type="datetime-local" id="newTimerDeadline">
             <input type="text" id="newTimerLabel" placeholder="Nome timer (es: Scadenza Senior)" style="text-transform: uppercase;">
@@ -1993,6 +2117,23 @@
             <input type="text" id="docLink2_Text" placeholder="Testo Pulsante 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
             <button onclick="salvaDoc(2)" style="background:var(--racing-green);"><i class="fas fa-save"></i> Salva 2</button>
             <button onclick="azzeraDoc(2)" style="background:var(--racing-red);"><i class="fas fa-trash"></i> Azzera 2</button>
+        </div>
+    </div>
+
+    <!-- Sezione admin per gestione box informazioni -->
+    <div id="infoBox">
+        <div style="font-size: 14px; font-weight: bold; color: var(--racing-blue); margin-left: 5px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-info-circle"></i> GESTIONE BOX INFORMAZIONI:
+        </div>
+        <div class="admin-row">
+            <textarea id="infoTextInput" rows="4" placeholder="Inserisci qui le informazioni da mostrare agli utenti..." 
+                      style="flex: 1; padding: 15px; border: 2px solid var(--racing-light); border-radius: 12px; font-family: inherit; font-size: 0.9rem; resize: vertical; text-transform: uppercase;" 
+                      onfocus="isEditingInfo=true" onblur="isEditingInfo=false"></textarea>
+        </div>
+        <div class="admin-row" style="justify-content: flex-end;">
+            <button onclick="salvaInfo()" style="background:var(--racing-green);"><i class="fas fa-save"></i> Salva Informazioni</button>
+            <button onclick="azzeraInfo()" style="background:var(--racing-red);"><i class="fas fa-trash-alt"></i> Azzera</button>
+            <button onclick="toggleInfoVisibility()" style="background:var(--racing-blue);"><i class="fas fa-eye-slash"></i> Nascondi/Mostra Box</button>
         </div>
     </div>
 
@@ -2128,8 +2269,7 @@
     const TELEGRAM_TOKEN = '8441085660:AAEui_yfGnT_quKPHVx_wsslcuJtm3KbTOI';
     const TELEGRAM_CHAT_ID = '691756250';
     
-    // AGGIUNTA: Numero WhatsApp per invio quote
-    const WHATSAPP_NUMBER = '393333061247'; // Sostituisci con il numero reale (es: 393331234567)
+    const WHATSAPP_NUMBER = '393333061247';
     
     const O_P = "anV2ZW5pbGlhMTE3OQ==";
     
@@ -2141,9 +2281,10 @@
     let isAdmin = false, isExpired = false, currentData = [], timerInterval;
     let labelA = "", labelB = "", labelC = "", sortBy = 'nome'; 
     let costiCategorie = {};
-    let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false;
+    let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false, isEditingInfo = false;
     let selectedIds = new Set();
     let mostraAccompagnatori = true;
+    let mostraInfoBox = true;
     let tempAccompagnatoriValues = {};
     let isTypingInAccompagnatore = false;
     let refreshInterval = null;
@@ -2157,8 +2298,6 @@
     function checkTimeForDarkMode() {
         const now = new Date();
         const hour = now.getHours();
-        
-        // Attiva dark mode dalle 18:00 alle 8:00 (6 PM - 8 AM)
         const isNightTime = hour >= 18 || hour < 8;
         const body = document.body;
         
@@ -2171,25 +2310,117 @@
         }
     }
 
-    // Funzione per avviare il controllo periodico dell'orario
     function startTimeCheck() {
-        // Controlla immediatamente
         checkTimeForDarkMode();
-        
-        // Controlla ogni minuto
         setInterval(checkTimeForDarkMode, 60000);
     }
 
     async function init() { 
-        // Avvia il controllo della dark mode
         startTimeCheck();
-        
+        await initInfoBox();
         await fullLoad(); 
         refreshInterval = setInterval(checkAndRefresh, 15000);
     }
 
+    async function initInfoBox() {
+        const { data } = await _supabase.from(T_CONF).select('*');
+        if (data) {
+            const infoText = data.find(c => c.chiave === 'info_text')?.valore || "";
+            const infoVisibility = data.find(c => c.chiave === 'mostra_info_box')?.valore;
+            
+            if (infoVisibility !== null && infoVisibility !== undefined) {
+                mostraInfoBox = infoVisibility === 'true';
+            }
+            
+            // Se c'è testo salvato, usalo, altrimenti mantieni il testo di default
+            if (infoText && infoText.trim() !== "") {
+                document.getElementById('infoTextDisplay').innerText = infoText;
+                document.getElementById('infoTextInput').value = infoText;
+            } else {
+                // Testo di default
+                document.getElementById('infoTextDisplay').innerText = "Benvenuti al sistema di iscrizione Juvenilia Racing Team! Utilizza il pannello admin per personalizzare questo messaggio.";
+            }
+            
+            const infoBoxDisplay = document.getElementById('infoBoxDisplay');
+            if (!mostraInfoBox) {
+                infoBoxDisplay.classList.add('hidden');
+            } else {
+                infoBoxDisplay.classList.remove('hidden');
+            }
+        }
+    }
+
+    async function salvaInfo() {
+        const testo = document.getElementById('infoTextInput').value.trim().toUpperCase();
+        
+        await _supabase.from(T_CONF).upsert({ 
+            chiave: 'info_text', 
+            valore: testo 
+        }, { onConflict: 'chiave' });
+        
+        document.getElementById('infoTextDisplay').innerText = testo || "Benvenuti al sistema di iscrizione Juvenilia Racing Team! Utilizza il pannello admin per personalizzare questo messaggio.";
+        
+        const infoBoxDisplay = document.getElementById('infoBoxDisplay');
+        if ((!testo || testo === "") || !mostraInfoBox) {
+            infoBoxDisplay.classList.add('hidden');
+        } else {
+            infoBoxDisplay.classList.remove('hidden');
+        }
+        
+        showToast("Informazioni salvate!");
+        isEditingInfo = false;
+    }
+
+    async function azzeraInfo() {
+        if (confirm("Cancellare tutte le informazioni dal box?")) {
+            await _supabase.from(T_CONF).upsert({ 
+                chiave: 'info_text', 
+                valore: "" 
+            }, { onConflict: 'chiave' });
+            
+            document.getElementById('infoTextInput').value = "";
+            document.getElementById('infoTextDisplay').innerText = "Benvenuti al sistema di iscrizione Juvenilia Racing Team! Utilizza il pannello admin per personalizzare questo messaggio.";
+            
+            const infoBoxDisplay = document.getElementById('infoBoxDisplay');
+            if (!mostraInfoBox) {
+                infoBoxDisplay.classList.add('hidden');
+            } else {
+                // Se è visibile, mostra il testo di default
+                infoBoxDisplay.classList.remove('hidden');
+            }
+            
+            showToast("Informazioni azzerate!");
+        }
+    }
+
+    function nascondiInfoBox() {
+        const infoBoxDisplay = document.getElementById('infoBoxDisplay');
+        infoBoxDisplay.classList.add('hidden');
+        showToast("Box informazioni nascosto");
+    }
+
+    async function toggleInfoVisibility() {
+        mostraInfoBox = !mostraInfoBox;
+        
+        await _supabase.from(T_CONF).upsert({ 
+            chiave: 'mostra_info_box', 
+            valore: mostraInfoBox.toString() 
+        }, { onConflict: 'chiave' });
+        
+        const infoText = document.getElementById('infoTextInput').value.trim();
+        const infoBoxDisplay = document.getElementById('infoBoxDisplay');
+        
+        if (!mostraInfoBox) {
+            infoBoxDisplay.classList.add('hidden');
+        } else {
+            infoBoxDisplay.classList.remove('hidden');
+        }
+        
+        showToast(`Box informazioni ${mostraInfoBox ? 'mostrato' : 'nascosto'} per gli utenti`);
+    }
+
     async function checkAndRefresh() {
-        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingTitolo && !isEditingDateLabels && !isEditingTimers && !isEditingCategoria) {
+        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingTitolo && !isEditingDateLabels && !isEditingTimers && !isEditingCategoria && !isEditingInfo) {
             await fullLoad();
         }
     }
@@ -2207,6 +2438,7 @@
         await caricaConfig(); 
         await caricaTimers();
         await caricaTabella();
+        await initInfoBox();
         
         restoreTempAccompagnatoriValues();
     }
@@ -2242,6 +2474,7 @@
                 e.target.id === 'docLink2_URL' ||
                 e.target.id === 'docLink2_Text' ||
                 e.target.id === 'newTimerLabel' ||
+                e.target.id === 'infoTextInput' ||
                 e.target.classList.contains('categoria-select')) {
                 e.target.value = e.target.value.toUpperCase();
             }
@@ -2264,6 +2497,9 @@
             }
             if (e.target.classList.contains('categoria-select')) {
                 isEditingCategoria = true;
+            }
+            if (e.target.id === 'infoTextInput') {
+                isEditingInfo = true;
             }
         });
         
@@ -2293,6 +2529,11 @@
             if (e.target.classList.contains('categoria-select')) {
                 setTimeout(() => {
                     isEditingCategoria = false;
+                }, 500);
+            }
+            if (e.target.id === 'infoTextInput') {
+                setTimeout(() => {
+                    isEditingInfo = false;
                 }, 500);
             }
         });
@@ -2331,7 +2572,6 @@
         }
         
         if(isAdmin) {
-            // Salva i valori attuali prima di aggiornarli
             const currentTitoloValue = document.getElementById('editTitleInput')?.value || "";
             const currentDateAValue = document.getElementById('dateA_Label')?.value || "";
             const currentDateBValue = document.getElementById('dateB_Label')?.value || "";
@@ -2341,7 +2581,6 @@
             const currentDoc2URLValue = document.getElementById('docLink2_URL')?.value || "";
             const currentDoc2TextValue = document.getElementById('docLink2_Text')?.value || "";
             
-            // Aggiorna solo se non siamo in modalità editing
             if(!isEditingTitolo && currentTitoloValue === "") {
                 document.getElementById('editTitleInput').value = tit?.valore || "";
             }
@@ -2776,7 +3015,6 @@
         if (!container) return;
         const cats = [...new Set(currentData.map(a => a.categoria.toUpperCase()))].sort((a, b) => (customCatOrder[a] || 999) - (customCatOrder[b] || 999));
         
-        // Salva i valori attuali prima di aggiornare
         const currentValues = {};
         container.querySelectorAll('.costo-in').forEach(input => {
             const cat = input.dataset.cat;
@@ -2821,7 +3059,6 @@
 
     function setSort(type) { sortBy = type; renderData(); }
 
-    // NUOVA FUNZIONE: Modifica categoria atleta
     async function modificaCategoria(id, nuovaCategoria) {
         const atleta = currentData.find(a => a.id == id);
         
@@ -3037,9 +3274,7 @@
         });
     }
 
-    // AGGIUNTA: Funzione per inviare quote via WhatsApp
     async function inviaWhatsAppQuote() {
-        // Calcola il totale per atleta
         let quoteAtleti = [];
         let totaleGenerale = 0;
         
@@ -3065,7 +3300,6 @@
             return;
         }
         
-        // Ordina per categoria e nome
         quoteAtleti.sort((a, b) => {
             const catOrderA = customCatOrder[a.categoria] || 999;
             const catOrderB = customCatOrder[b.categoria] || 999;
@@ -3073,7 +3307,6 @@
             return a.nome.localeCompare(b.nome);
         });
         
-        // Crea il messaggio
         let messaggio = `*JUVENILIA RACING TEAM - RIEPILOGO QUOTE GARA 5*\n\n`;
         messaggio += `🏆 *Evento:* ${document.getElementById('mainTitle').innerText}\n`;
         messaggio += `📅 *Data generazione:* ${new Date().toLocaleDateString('it-IT')}\n\n`;
@@ -3095,21 +3328,13 @@
         
         messaggio += `\n*💰 TOTALE GENERALE:* ${totaleGenerale.toFixed(2)}€\n\n`;
         
-        // Codifica il messaggio per URL
         const messaggioCodificato = encodeURIComponent(messaggio);
-        
-        // Crea il link WhatsApp
         const linkWhatsApp = `https://wa.me/${WHATSAPP_NUMBER}?text=${messaggioCodificato}`;
         
-        // Mostra anteprima e chiedi conferma
         if (confirm(`Vuoi inviare il riepilogo quote a WhatsApp?\n\nTotale atleti: ${quoteAtleti.length}\nImporto totale: ${totaleGenerale.toFixed(2)}€\n\nIl messaggio verrà aperto in WhatsApp per l'invio.`)) {
-            // Apre WhatsApp in una nuova finestra
             window.open(linkWhatsApp, '_blank');
-            
-            // Mostra anche una copia nel sistema
             showToast(`Riepilogo quote pronto per WhatsApp! Totale: ${totaleGenerale.toFixed(2)}€`);
             
-            // Opzionale: invia anche una copia via Telegram
             const telegramMsg = `📊 *RIEPILOGO QUOTE GENERATO*\nAtleti: ${quoteAtleti.length}\nTotale: ${totaleGenerale.toFixed(2)}€\nGenerato da admin`;
             fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
                 method: 'POST',
@@ -3184,6 +3409,7 @@
             document.getElementById('addAtletaBox').style.display = 'flex';
             document.getElementById('costiBox').style.display = 'flex';
             document.getElementById('docsBox').style.display = 'flex';
+            document.getElementById('infoBox').style.display = 'flex';
             document.getElementById('timerAdminBox').style.display = 'flex';
             document.getElementById('adminTotalBox').style.display = 'block';
             document.getElementById('adminButtons').style.display = 'grid';
@@ -3193,6 +3419,7 @@
             
             caricaConfig(); 
             caricaTimers();
+            initInfoBox();
             renderData(); 
             showToast("Modalità Admin Attiva");
         } else { 
@@ -3270,7 +3497,7 @@
         let g = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : '');
         let d = note.includes('B') ? 'B' : (note.includes('C') ? 'C' : '');
         if(tipo === 'gender') g = valore;
-        if(tipo === 'data') d = (valore === 'A' ? '' : valeur);
+        if(tipo === 'data') d = (valore === 'A' ? '' : valore);
         await _supabase.from(T_DATA).update({ note: g + d }).eq('id', id);
         showToast("Dettaglio aggiornato!");
         caricaTabella(); 
@@ -3620,7 +3847,6 @@
             const genderHtml = gender ? `<span class="badge-gender bg-${gender.toLowerCase()}">${gender}</span>` : "";
             const isChecked = selectedIds.has(p.id.toString()) ? 'checked' : '';
             
-            // NUOVO: Selezione categoria per admin
             const categoriaSelect = isAdmin ? `
                 <select class="categoria-select" style="font-size:0.7rem; padding:4px 8px; border-radius:6px; border:1px solid var(--racing-light); background:white; color:var(--racing-blue); font-weight:bold; margin-top:5px;" 
                         onchange="modificaCategoria('${p.id}', this.value)"
@@ -3789,7 +4015,6 @@
     </button>
 
     <script>
-    // Logica Torna in Cima
     window.onscroll = function() {
         const btn = document.getElementById("backToTopBtn");
         if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
