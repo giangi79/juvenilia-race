@@ -12,36 +12,23 @@
     <style>
         :root { 
             /* TEMA CHIARO */
-            --racing-red: #E63946; 
-            --racing-blue: #1D3557; 
-            --racing-light: #A8DADC; 
-            --racing-white: #F1FAEE; 
-            --racing-yellow: #FFD166; 
-            --racing-orange: #F4A261;
-            --racing-green: #2A9D8F; 
-            --racing-purple: #6A4C93; 
-            --racing-silver: #C0C0C0;
+            --racing-red: #E63946; --racing-blue: #1D3557; --racing-light: #A8DADC; 
+            --racing-white: #F1FAEE; --racing-yellow: #FFD166; --racing-orange: #F4A261;
+            --racing-green: #2A9D8F; --racing-purple: #6A4C93; --racing-silver: #C0C0C0;
             --gradient-primary: linear-gradient(135deg, #1D3557 0%, #457B9D 100%);
             --gradient-success: linear-gradient(135deg, #2A9D8F 0%, #4ECDC4 100%);
             --gradient-danger: linear-gradient(135deg, #E63946 0%, #FF6B6B 100%);
             --gradient-warning: linear-gradient(135deg, #F4A261 0%, #FFB347 100%);
             --gradient-racing: linear-gradient(90deg, #1D3557, #E63946, #FFD166);
-            --text-main: #1D3557; 
-            --bg-body: #f8f9fa; 
-            --bg-card: #ffffff;
+            --text-main: #1D3557; --bg-body: #f8f9fa; --bg-card: #ffffff;
             --shadow-light: 0 8px 25px rgba(29, 53, 87, 0.08);
             --shadow-medium: 0 12px 35px rgba(29, 53, 87, 0.12);
             --shadow-heavy: 0 15px 40px rgba(29, 53, 87, 0.15);
             
             /* Colori Categorie aggiornati */
-            --cat-senior: #1D3557; 
-            --cat-junior: #E63946; 
-            --cat-allievi: #2A9D8F;
-            --cat-ragazzi: #457B9D; 
-            --cat-r12: #6A4C93; 
-            --cat-esordienti: #F4A261;
-            --cat-giovanissimi: #4ECDC4; 
-            --cat-default: #8A8D93;
+            --cat-senior: #1D3557; --cat-junior: #E63946; --cat-allievi: #2A9D8F;
+            --cat-ragazzi: #457B9D; --cat-r12: #6A4C93; --cat-esordienti: #F4A261;
+            --cat-giovanissimi: #4ECDC4; --cat-default: #8A8D93;
             
             /* Variabili per Dark Mode */
             --dark-bg-body: #0a1929;
@@ -269,6 +256,7 @@
                 radial-gradient(circle at 40% 40%, rgba(233, 196, 106, 0.02) 0%, transparent 50%);
         }
 
+        /* AGGIUNTE PER DARK MODE COSTI */
         .dark-mode .costo-label {
             color: var(--racing-light) !important;
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
@@ -283,29 +271,6 @@
         .dark-mode .costo-in:focus {
             border-color: var(--racing-blue) !important;
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3) !important;
-        }
-
-        .dark-mode #infoBox {
-            background: rgba(42, 59, 78, 0.5);
-            border-color: #3a4b5e;
-        }
-
-        .dark-mode .info-box-content {
-            background: #2a3b4e;
-            color: var(--dark-text-main);
-            border-left: 6px solid var(--racing-blue);
-        }
-
-        .dark-mode .info-box-icon {
-            background: var(--gradient-primary);
-            color: var(--racing-light);
-        }
-
-        .dark-mode .info-box-admin .admin-row input,
-        .dark-mode .info-box-admin .admin-row textarea {
-            background: #2a3b4e;
-            color: var(--dark-text-main);
-            border-color: #3a4b5e;
         }
 
         * {
@@ -416,7 +381,6 @@
             gap: 8px; 
             z-index: 10; 
         }
-        
         .icon-btn { 
             background: var(--racing-white); 
             border: none; 
@@ -431,13 +395,11 @@
             color: var(--racing-blue);
             transition: all 0.3s ease;
         }
-        
         .icon-btn:hover { 
             transform: translateY(-3px) rotate(10deg); 
             box-shadow: var(--shadow-medium);
             background: var(--racing-yellow);
         }
-        
         .logout-btn { 
             display: none; 
             color: var(--racing-white); 
@@ -451,7 +413,6 @@
             transition: 0.3s; 
             box-shadow: var(--shadow-light);
         }
-        
         .logout-btn:hover { 
             background: var(--racing-red); 
             transform: translateY(-2px);
@@ -484,133 +445,7 @@
             border-radius: 2px;
         }
 
-        /* INFO BOX STYLES */
-        #infoBox {
-            background: rgba(168, 218, 220, 0.1);
-            border: 2px solid var(--racing-light);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            box-shadow: var(--shadow-light);
-            backdrop-filter: blur(10px);
-            flex-shrink: 0;
-            transition: all 0.3s ease;
-        }
-
-        #infoBox.hidden {
-            display: none;
-        }
-
-        .info-box-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .info-box-title {
-            font-weight: 800;
-            font-size: 1.2rem;
-            color: var(--racing-blue);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .info-box-icon {
-            background: var(--gradient-primary);
-            color: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-        }
-
-        .info-box-toggle {
-            background: var(--racing-yellow);
-            color: var(--racing-blue);
-            border: none;
-            padding: 8px 15px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.3s ease;
-        }
-
-        .info-box-toggle:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-light);
-        }
-
-        .info-box-content {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            border-left: 6px solid var(--racing-blue);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            line-height: 1.6;
-            font-size: 0.95rem;
-        }
-
-        .info-box-content ul {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-
-        .info-box-content li {
-            margin-bottom: 8px;
-        }
-
-        .info-box-content strong {
-            color: var(--racing-blue);
-        }
-
-        .info-box-admin {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
-            padding: 15px;
-            border: 2px dashed var(--racing-purple);
-            margin-top: 15px;
-        }
-
-        .info-box-admin .admin-row {
-            margin-bottom: 10px;
-        }
-
-        .info-box-admin textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 12px;
-            border: 2px solid var(--racing-light);
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 0.9rem;
-            resize: vertical;
-            transition: all 0.3s ease;
-        }
-
-        .info-box-admin textarea:focus {
-            outline: none;
-            border-color: var(--racing-blue);
-            box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.1);
-        }
-
-        .info-box-admin .admin-row button {
-            padding: 10px 20px;
-            margin-top: 5px;
-        }
-
-        /* STILI TIMER */
+        /* STILI TIMER - DUPLICATI */
         .countdown-container { 
             text-align: center; 
             margin: 15px 0; 
@@ -827,7 +662,6 @@
             align-items: center;
             flex-shrink: 0;
         }
-        
         .search-box { 
             flex: 1;
             padding: 16px 16px 16px 50px; 
@@ -841,13 +675,11 @@
             box-shadow: var(--shadow-light); 
             font-weight: 500;
         }
-        
         .search-box:focus { 
             outline: none; 
             border-color: var(--racing-blue); 
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.2), var(--shadow-medium); 
         }
-        
         .search-icon { 
             position: absolute; 
             left: 18px; 
@@ -868,7 +700,6 @@
             margin: 15px 0 20px 0; 
             flex-shrink: 0;
         }
-        
         .btn-doc-link { 
             background: var(--gradient-primary); 
             color: white; 
@@ -884,16 +715,12 @@
             align-items: center;
             gap: 8px;
         }
-        
         .btn-doc-link:hover { 
             transform: translateY(-5px) scale(1.05); 
             box-shadow: var(--shadow-medium);
         }
 
-        input[type="radio"] { 
-            display: none; 
-        }
-        
+        input[type="radio"] { display: none; }
         .badge-btn { 
             display: inline-block; 
             padding: 12px 10px; 
@@ -912,7 +739,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
         .badge-btn:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-light);
@@ -925,7 +751,6 @@
             transform: scale(1.05); 
             box-shadow: 0 6px 15px rgba(42, 157, 143, 0.4); 
         }
-        
         input[value="no"]:checked + .badge-no { 
             background: var(--gradient-danger); 
             color: white; 
@@ -944,21 +769,18 @@
             font-weight: bold; 
             transition: all 0.2s ease; 
         }
-        
         .btn-date-small.active { 
             background-color: var(--racing-orange); 
             color: white; 
             border-color: #e68a00; 
             box-shadow: 0 3px 8px rgba(244, 162, 97, 0.4);
         }
-        
         .btn-gender-small.active-m { 
             background-color: var(--racing-blue); 
             color: white; 
             border-color: #0056b3; 
             box-shadow: 0 3px 8px rgba(29, 53, 87, 0.4);
         }
-        
         .btn-gender-small.active-f { 
             background-color: var(--racing-red); 
             color: white; 
@@ -980,7 +802,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
         .btn-reset:hover {
             background-color: #5a6268;
             transform: translateY(-2px);
@@ -1000,12 +821,10 @@
             backdrop-filter: blur(10px);
             flex-shrink: 0;
         }
-        
         #costiBox { 
             background: rgba(106, 76, 147, 0.05); 
             border-color: var(--racing-purple); 
         }
-        
         #docsBox { 
             background: rgba(255, 209, 102, 0.05); 
             border-color: var(--racing-yellow); 
@@ -1018,7 +837,6 @@
             align-items: center; 
             padding: 8px 0; 
         }
-        
         .admin-row input, .admin-row select { 
             flex: 1; 
             padding: 12px; 
@@ -1030,13 +848,11 @@
             transition: all 0.3s ease;
             box-shadow: 0 3px 8px rgba(0,0,0,0.05);
         }
-        
         .admin-row input:focus, .admin-row select:focus {
             outline: none;
             border-color: var(--racing-blue);
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.1), 0 5px 15px rgba(0,0,0,0.08);
         }
-        
         .admin-row button { 
             padding: 12px 20px; 
             border: none; 
@@ -1047,12 +863,10 @@
             transition: all 0.3s ease; 
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        
         .admin-row button:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
-        
         .btn-clear-input { 
             background: #6c757d !important; 
             color: white !important; 
@@ -1068,7 +882,6 @@
             margin-bottom: 20px; 
             flex-shrink: 0;
         }
-        
         .stat-card { 
             padding: 20px; 
             border-radius: 18px; 
@@ -1080,12 +893,10 @@
             position: relative;
             overflow: hidden;
         }
-        
         .stat-card:hover {
             transform: translateY(-5px);
             box-shadow: var(--shadow-heavy);
         }
-        
         .stat-card::before {
             content: '';
             position: absolute;
@@ -1097,15 +908,12 @@
             background-size: 150px;
             z-index: 0;
         }
-        
         .stat-presenti { 
             background: var(--gradient-success); 
         }
-        
         .stat-assenti { 
             background: var(--gradient-danger); 
         }
-        
         #adminTotalBox { 
             background: var(--gradient-primary); 
             grid-column: span 2; 
@@ -1159,7 +967,6 @@
             border-spacing: 0; 
             background: transparent; 
         }
-        
         thead { 
             position: sticky; 
             top: 0; 
@@ -1179,11 +986,9 @@
             position: sticky;
             top: 0;
         }
-        
         thead th:first-child {
             border-radius: 15px 0 0 0;
         }
-        
         thead th:last-child {
             border-radius: 0 15px 0 0;
         }
@@ -1194,7 +999,6 @@
             box-shadow: 0 3px 10px rgba(0,0,0,0.03);
             border-bottom: 1px solid #f0f0f0;
         }
-        
         tbody tr:hover { 
             transform: translateY(-3px); 
             box-shadow: var(--shadow-medium); 
@@ -1258,16 +1062,10 @@
             font-weight: bold;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
-        
         .bg-m { background-color: var(--racing-blue); }
         .bg-f { background-color: var(--racing-red); }
 
-        .gender-section { 
-            margin-top: 8px; 
-            padding-left: 15px; 
-            border-left: 3px solid var(--racing-light); 
-        }
-        
+        .gender-section { margin-top: 8px; padding-left: 15px; border-left: 3px solid var(--racing-light); }
         .gender-title { 
             font-size: 0.7rem; 
             font-weight: bold; 
@@ -1277,7 +1075,6 @@
             opacity: 0.9; 
             letter-spacing: 0.5px;
         }
-        
         .title-m { color: var(--racing-blue); }
         .title-f { color: var(--racing-red); }
 
@@ -1289,7 +1086,6 @@
             padding-bottom: 30px; 
             flex-shrink: 0;
         }
-        
         #adminButtons button { 
             padding: 15px; 
             border: none; 
@@ -1305,7 +1101,6 @@
             gap: 8px;
             box-shadow: var(--shadow-light);
         }
-        
         #adminButtons button:hover {
             transform: translateY(-5px);
             box-shadow: var(--shadow-medium);
@@ -1339,7 +1134,6 @@
             font-weight: bold;
             font-size: 0.9rem;
         }
-        
         #toast.show { 
             visibility: visible; 
             animation: slideIn 0.5s, fadeout 0.5s 2.5s; 
@@ -1818,35 +1612,6 @@
                 text-align: center;
             }
             
-            /* Info box responsive */
-            #infoBox {
-                padding: 15px;
-                margin-bottom: 15px;
-            }
-            
-            .info-box-header {
-                flex-direction: column;
-                gap: 10px;
-                align-items: stretch;
-            }
-            
-            .info-box-toggle {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .info-box-content {
-                padding: 15px;
-            }
-            
-            .info-box-admin {
-                padding: 12px;
-            }
-            
-            .info-box-admin textarea {
-                min-height: 100px;
-            }
-            
             .search-container {
                 flex-direction: column;
                 align-items: stretch;
@@ -2134,42 +1899,36 @@
                 font-size: 0.8rem;
             }
         }
+    
+    /* Stile Pulsante Torna in Cima */
+    #backToTopBtn {
+        display: none;
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        z-index: 999;
+        border: none;
+        outline: none;
+        background: var(--gradient-danger);
+        color: white;
+        cursor: pointer;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        box-shadow: var(--shadow-heavy);
+        transition: all 0.3s ease;
+        align-items: center;
+        justify-content: center;
+    }
+    #backToTopBtn:hover {
+        transform: translateY(-5px) scale(1.1);
+        background: var(--gradient-primary);
+    }
+    @media (max-width: 768px) {
+        #backToTopBtn { bottom: 85px; right: 15px; width: 45px; height: 45px; }
+    }
 
-        /* Stile Pulsante Torna in Cima */
-        #backToTopBtn {
-            display: none;
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            z-index: 999;
-            border: none;
-            outline: none;
-            background: var(--gradient-danger);
-            color: white;
-            cursor: pointer;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            box-shadow: var(--shadow-heavy);
-            transition: all 0.3s ease;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        #backToTopBtn:hover {
-            transform: translateY(-5px) scale(1.1);
-            background: var(--gradient-primary);
-        }
-        
-        @media (max-width: 768px) {
-            #backToTopBtn { 
-                bottom: 85px; 
-                right: 15px; 
-                width: 45px; 
-                height: 45px; 
-            }
-        }
     </style>
 </head>
 <body>
@@ -2195,39 +1954,6 @@
     </div>
 
     <h2 id="mainTitle">Juvenilia Racing Team - Iscrizioni Gara 1</h2>
-    
-    <!-- INFO BOX -->
-    <div id="infoBox">
-        <div class="info-box-header">
-            <div class="info-box-title">
-                <div class="info-box-icon">
-                    <i class="fas fa-info-circle"></i>
-                </div>
-                INFORMAZIONI IMPORTANTI
-            </div>
-            <button id="toggleInfoBoxBtn" class="info-box-toggle" onclick="toggleInfoBoxVisibility()">
-                <i class="fas fa-eye-slash"></i> Nascondi agli utenti
-            </button>
-        </div>
-        
-        <div id="infoBoxContent" class="info-box-content">
-            <!-- Il contenuto sarà popolato dinamicamente -->
-        </div>
-        
-        <!-- Sezione admin per modificare il contenuto -->
-        <div id="infoBoxAdmin" class="info-box-admin" style="display: none;">
-            <div style="font-size: 14px; font-weight: bold; color: var(--racing-purple); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-edit"></i> MODIFICA CONTENUTO (ADMIN):
-            </div>
-            <div class="admin-row">
-                <textarea id="infoBoxText" placeholder="Inserisci qui le informazioni importanti per gli atleti..." onfocus="isEditingInfo=true" onblur="isEditingInfo=false"></textarea>
-            </div>
-            <div class="admin-row" style="justify-content: center; gap: 15px; margin-top: 10px;">
-                <button onclick="salvaInfoBox()" style="background:var(--racing-green);"><i class="fas fa-save"></i> Salva</button>
-                <button onclick="azzeraInfoBox()" style="background:var(--racing-red);"><i class="fas fa-trash"></i> Azzera</button>
-            </div>
-        </div>
-    </div>
     
     <!-- Timer principale -->
     <div id="countdownBox" class="countdown-container">
@@ -2395,10 +2121,6 @@
     </div>
 </div>
 
-<button onclick="scrollToTop()" id="backToTopBtn" title="Torna in cima">
-    <i class="fas fa-chevron-up"></i>
-</button>
-
 <script>
     // SUPABASE CONFIGURATION
     const SUPABASE_URL = 'https://jnfnfszekfstuoiemkgf.supabase.co';
@@ -2419,7 +2141,7 @@
     let isAdmin = false, isExpired = false, currentData = [], timerInterval;
     let labelA = "", labelB = "", labelC = "", sortBy = 'nome'; 
     let costiCategorie = {};
-    let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false, isEditingInfo = false;
+    let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false;
     let selectedIds = new Set();
     let mostraAccompagnatori = true;
     let tempAccompagnatoriValues = {};
@@ -2428,7 +2150,6 @@
     let categoryTimers = [];
     let categoryTimerIntervals = {};
     let isEditingCategoria = false;
-    let mostraInfoBox = true;
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
@@ -2468,7 +2189,7 @@
     }
 
     async function checkAndRefresh() {
-        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingTitolo && !isEditingDateLabels && !isEditingTimers && !isEditingCategoria && !isEditingInfo) {
+        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingTitolo && !isEditingDateLabels && !isEditingTimers && !isEditingCategoria) {
             await fullLoad();
         }
     }
@@ -2521,7 +2242,6 @@
                 e.target.id === 'docLink2_URL' ||
                 e.target.id === 'docLink2_Text' ||
                 e.target.id === 'newTimerLabel' ||
-                e.target.id === 'infoBoxText' ||
                 e.target.classList.contains('categoria-select')) {
                 e.target.value = e.target.value.toUpperCase();
             }
@@ -2544,9 +2264,6 @@
             }
             if (e.target.classList.contains('categoria-select')) {
                 isEditingCategoria = true;
-            }
-            if (e.target.id === 'infoBoxText') {
-                isEditingInfo = true;
             }
         });
         
@@ -2576,11 +2293,6 @@
             if (e.target.classList.contains('categoria-select')) {
                 setTimeout(() => {
                     isEditingCategoria = false;
-                }, 500);
-            }
-            if (e.target.id === 'infoBoxText') {
-                setTimeout(() => {
-                    isEditingInfo = false;
                 }, 500);
             }
         });
@@ -2618,14 +2330,6 @@
             mostraAccompagnatori = visibilitaAccompagnatori.valore === 'true';
         }
         
-        const infoBoxContent = data.find(c => c.chiave === 'infobox_content')?.valore || "";
-        const infoBoxVisible = data.find(c => c.chiave === 'infobox_visible');
-        if (infoBoxVisible) {
-            mostraInfoBox = infoBoxVisible.valore === 'true';
-        } else {
-            mostraInfoBox = true; // default: visibile
-        }
-        
         if(isAdmin) {
             // Salva i valori attuali prima di aggiornarli
             const currentTitoloValue = document.getElementById('editTitleInput')?.value || "";
@@ -2636,7 +2340,6 @@
             const currentDoc1TextValue = document.getElementById('docLink1_Text')?.value || "";
             const currentDoc2URLValue = document.getElementById('docLink2_URL')?.value || "";
             const currentDoc2TextValue = document.getElementById('docLink2_Text')?.value || "";
-            const currentInfoBoxValue = document.getElementById('infoBoxText')?.value || "";
             
             // Aggiorna solo se non siamo in modalità editing
             if(!isEditingTitolo && currentTitoloValue === "") {
@@ -2656,10 +2359,6 @@
                 if (currentDoc2TextValue === "") document.getElementById('docLink2_Text').value = txt2;
             }
             
-            if(!isEditingInfo && currentInfoBoxValue === "") {
-                document.getElementById('infoBoxText').value = infoBoxContent;
-            }
-            
             document.getElementById('deadlineInput').value = sca?.valore || "";
         }
         
@@ -2674,32 +2373,6 @@
         });
         
         document.getElementById('mainTitle').innerText = tit?.valore || "Juvenilia Racing Team - Iscrizioni Gara 1";
-        
-        // Aggiorna Info Box
-        const infoBox = document.getElementById('infoBox');
-        const infoBoxContentDiv = document.getElementById('infoBoxContent');
-        const toggleBtn = document.getElementById('toggleInfoBoxBtn');
-        
-        if (mostraInfoBox && infoBoxContent) {
-            infoBox.style.display = 'flex';
-            infoBoxContentDiv.innerHTML = formatInfoBoxContent(infoBoxContent);
-            
-            if (isAdmin) {
-                toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Nascondi agli utenti';
-            }
-        } else {
-            if (!isAdmin) {
-                infoBox.style.display = 'none';
-            } else {
-                infoBox.style.display = 'flex';
-                toggleBtn.innerHTML = '<i class="fas fa-eye"></i> Mostra agli utenti';
-                if (!infoBoxContent) {
-                    infoBoxContentDiv.innerHTML = '<p style="color: #666; font-style: italic; text-align: center;">Nessun contenuto configurato. Usa la sezione admin per aggiungere informazioni.</p>';
-                } else {
-                    infoBoxContentDiv.innerHTML = formatInfoBoxContent(infoBoxContent);
-                }
-            }
-        }
         
         const cBox = document.getElementById('countdownBox');
         if(sca?.valore && sca.valore !== "") {
@@ -2718,75 +2391,6 @@
         }
         
         if(isAdmin && !isEditingCosti) renderCostiInputs();
-    }
-
-    function formatInfoBoxContent(content) {
-        // Sostituisce le nuove righe con <br> e gestisce i bullet points
-        let formatted = content.replace(/\n/g, '<br>');
-        
-        // Gestione delle liste semplici
-        formatted = formatted.replace(/\*\s*(.*?)(?=<br>|$)/g, '<li>$1</li>');
-        
-        // Se ci sono <li> aggiunge <ul>
-        if (formatted.includes('<li>')) {
-            formatted = formatted.replace(/<li>/g, '</p><ul><li>').replace(/<\/li>/g, '</li></ul><p>');
-            // Rimuove i tag <p> vuoti
-            formatted = formatted.replace(/<p><\/p>/g, '');
-        }
-        
-        // Aggiunge stile ai link
-        formatted = formatted.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color: var(--racing-blue); font-weight: bold; text-decoration: underline;">$1</a>');
-        
-        // Aggiunge stile ai testi importanti
-        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
-        
-        return `<p>${formatted}</p>`;
-    }
-
-    async function salvaInfoBox() {
-        const content = document.getElementById('infoBoxText').value.trim();
-        
-        await _supabase.from(T_CONF).upsert([
-            { chiave: 'infobox_content', valore: content }
-        ], { onConflict: 'chiave' });
-        
-        showToast("Informazioni salvate!");
-        isEditingInfo = false;
-        await caricaConfig();
-    }
-
-    async function azzeraInfoBox() {
-        if(confirm("Cancellare il contenuto del box informazioni?")) {
-            await _supabase.from(T_CONF).upsert([
-                { chiave: 'infobox_content', valore: "" }
-            ], { onConflict: 'chiave' });
-            document.getElementById('infoBoxText').value = "";
-            showToast("Contenuto azzerato!");
-            await caricaConfig();
-        }
-    }
-
-    async function toggleInfoBoxVisibility() {
-        if (!isAdmin) return;
-        
-        mostraInfoBox = !mostraInfoBox;
-        
-        await _supabase.from(T_CONF).upsert({
-            chiave: 'infobox_visible',
-            valore: mostraInfoBox.toString()
-        }, { onConflict: 'chiave' });
-        
-        const toggleBtn = document.getElementById('toggleInfoBoxBtn');
-        if (mostraInfoBox) {
-            toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Nascondi agli utenti';
-            showToast("Info Box ora visibile agli utenti");
-        } else {
-            toggleBtn.innerHTML = '<i class="fas fa-eye"></i> Mostra agli utenti';
-            showToast("Info Box nascosto agli utenti");
-        }
-        
-        await caricaConfig();
     }
 
     async function caricaTimers() {
@@ -3585,7 +3189,6 @@
             document.getElementById('adminButtons').style.display = 'grid';
             document.getElementById('riepilogoAccompagnatori').style.display = 'block';
             document.getElementById('toggleAccompagnatoriBtn').style.display = 'inline-block';
-            document.getElementById('infoBoxAdmin').style.display = 'block';
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
             
             caricaConfig(); 
@@ -4181,7 +3784,11 @@
     init();
 </script>
 
-<script>
+    <button onclick="scrollToTop()" id="backToTopBtn" title="Torna in cima">
+        <i class="fas fa-chevron-up"></i>
+    </button>
+
+    <script>
     // Logica Torna in Cima
     window.onscroll = function() {
         const btn = document.getElementById("backToTopBtn");
@@ -4191,11 +3798,9 @@
             btn.style.display = "none";
         }
     };
-    
     function scrollToTop() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 </script>
-
 </body>
 </html>
