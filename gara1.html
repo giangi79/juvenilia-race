@@ -273,6 +273,39 @@
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3) !important;
         }
 
+        /* BOX INFORMAZIONI - NUOVO STILE */
+        .dark-mode .info-box {
+            background: linear-gradient(135deg, rgba(255, 209, 102, 0.05) 0%, rgba(106, 76, 147, 0.03) 100%);
+            border-color: #3a4b5e;
+            color: var(--dark-text-main);
+        }
+        
+        .dark-mode .info-box-header {
+            color: var(--racing-yellow);
+        }
+        
+        .dark-mode .info-box-content {
+            color: var(--racing-light);
+        }
+        
+        .dark-mode .info-box-content strong {
+            color: var(--racing-yellow);
+        }
+        
+        .dark-mode .info-box-content ul {
+            color: var(--dark-text-main);
+        }
+        
+        .dark-mode .info-box .btn-toggle-info {
+            background: rgba(42, 59, 78, 0.7);
+            color: var(--dark-text-main);
+            border-color: #3a4b5e;
+        }
+        
+        .dark-mode .info-box .btn-toggle-info:hover {
+            background: rgba(29, 53, 87, 0.8);
+        }
+
         * {
             box-sizing: border-box;
         }
@@ -651,6 +684,146 @@
         
         .timer-category-checkbox input[type="checkbox"]:checked {
             accent-color: var(--racing-green);
+        }
+
+        /* BOX INFORMAZIONI - NUOVO STILE */
+        .info-box-container {
+            margin: 20px 0;
+            width: 100%;
+            flex-shrink: 0;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, rgba(255, 209, 102, 0.1) 0%, rgba(106, 76, 147, 0.05) 100%);
+            border: 2px solid var(--racing-yellow);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow-light);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: all 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .info-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" opacity="0.03"><path d="M30,30 L70,30 L70,70 L30,70 Z" fill="none" stroke="%23F4A261" stroke-width="1"/><circle cx="50" cy="50" r="10" fill="none" stroke="%23F4A261" stroke-width="1"/><path d="M30,50 L40,40 M70,50 L60,40 M30,50 L40,60 M70,50 L60,60" stroke="%23F4A261" stroke-width="1"/></svg>');
+            background-size: 150px;
+            z-index: 0;
+        }
+        
+        .info-box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .info-box-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--racing-orange);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-box-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-toggle-info {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--racing-yellow);
+            border-radius: 10px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: var(--racing-blue);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-toggle-info:hover {
+            background: var(--racing-yellow);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+        
+        .info-box-content {
+            position: relative;
+            z-index: 1;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--racing-blue);
+        }
+        
+        .info-box-content strong {
+            color: var(--racing-orange);
+        }
+        
+        .info-box-content ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .info-box-content li {
+            margin-bottom: 8px;
+        }
+        
+        .info-box.hidden {
+            display: none;
+        }
+        
+        .info-box-admin {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px dashed var(--racing-light);
+        }
+        
+        .info-box-admin-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid var(--racing-light);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            resize: vertical;
+            transition: all 0.3s ease;
+            background: white;
+            color: var(--text-main);
+        }
+        
+        .info-box-admin-input:focus {
+            outline: none;
+            border-color: var(--racing-blue);
+            box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.1);
+        }
+        
+        .info-box-admin-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: flex-end;
         }
 
         .search-container { 
@@ -1793,6 +1966,37 @@
                 font-size: 6rem;
             }
             
+            /* Info box responsive */
+            .info-box {
+                padding: 15px;
+                margin-bottom: 10px;
+            }
+            
+            .info-box-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .info-box-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .info-box-admin-input {
+                min-height: 100px;
+            }
+            
+            .info-box-admin-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .btn-toggle-info {
+                width: 100%;
+                justify-content: center;
+            }
+            
             /* Admin buttons responsive */
             #adminButtons {
                 grid-template-columns: 1fr;
@@ -1897,6 +2101,10 @@
             
             .category-timer-header {
                 font-size: 0.8rem;
+            }
+            
+            .info-box-title {
+                font-size: 1rem;
             }
         }
     
@@ -2045,6 +2253,9 @@
         </div>
     </div>
 
+    <!-- BOX INFORMAZIONI - NUOVO -->
+    <div id="infoBoxContainer" class="info-box-container"></div>
+
     <!-- Statistiche -->
     <div class="stats-grid">
         <div class="stat-card stat-presenti"><span><i class="fas fa-check-circle"></i> PARTECIPA</span><div id="count-si" style="font-size: 2.5rem;">0</div></div>
@@ -2150,6 +2361,11 @@
     let categoryTimers = [];
     let categoryTimerIntervals = {};
     let isEditingCategoria = false;
+    
+    // NUOVE VARIABILI PER INFO BOX
+    let infoBoxVisible = true;
+    let isEditingInfoBox = false;
+    let infoBoxContent = "";
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
@@ -2189,7 +2405,7 @@
     }
 
     async function checkAndRefresh() {
-        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingTitolo && !isEditingDateLabels && !isEditingTimers && !isEditingCategoria) {
+        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingTitolo && !isEditingDateLabels && !isEditingTimers && !isEditingCategoria && !isEditingInfoBox) {
             await fullLoad();
         }
     }
@@ -2242,7 +2458,8 @@
                 e.target.id === 'docLink2_URL' ||
                 e.target.id === 'docLink2_Text' ||
                 e.target.id === 'newTimerLabel' ||
-                e.target.classList.contains('categoria-select')) {
+                e.target.classList.contains('categoria-select') ||
+                e.target.classList.contains('info-box-admin-input')) {
                 e.target.value = e.target.value.toUpperCase();
             }
         });
@@ -2264,6 +2481,9 @@
             }
             if (e.target.classList.contains('categoria-select')) {
                 isEditingCategoria = true;
+            }
+            if (e.target.classList.contains('info-box-admin-input')) {
+                isEditingInfoBox = true;
             }
         });
         
@@ -2293,6 +2513,11 @@
             if (e.target.classList.contains('categoria-select')) {
                 setTimeout(() => {
                     isEditingCategoria = false;
+                }, 500);
+            }
+            if (e.target.classList.contains('info-box-admin-input')) {
+                setTimeout(() => {
+                    isEditingInfoBox = false;
                 }, 500);
             }
         });
@@ -2328,6 +2553,17 @@
         const visibilitaAccompagnatori = data.find(c => c.chiave === 'mostra_accompagnatori');
         if (visibilitaAccompagnatori) {
             mostraAccompagnatori = visibilitaAccompagnatori.valore === 'true';
+        }
+        
+        // Carica info box content
+        const infoBoxConfig = data.find(c => c.chiave === 'info_box_content');
+        if (infoBoxConfig) {
+            infoBoxContent = infoBoxConfig.valore || "";
+        }
+        
+        const infoBoxVisibleConfig = data.find(c => c.chiave === 'info_box_visible');
+        if (infoBoxVisibleConfig) {
+            infoBoxVisible = infoBoxVisibleConfig.valore === 'true';
         }
         
         if(isAdmin) {
@@ -2391,6 +2627,112 @@
         }
         
         if(isAdmin && !isEditingCosti) renderCostiInputs();
+        
+        // Render info box
+        renderInfoBox();
+    }
+
+    // FUNZIONI PER INFO BOX
+    function renderInfoBox() {
+        const container = document.getElementById('infoBoxContainer');
+        if (!container) return;
+        
+        if (!infoBoxVisible || (!infoBoxContent && !isAdmin)) {
+            container.innerHTML = '';
+            return;
+        }
+        
+        container.innerHTML = `
+            <div class="info-box">
+                <div class="info-box-header">
+                    <div class="info-box-title">
+                        <i class="fas fa-info-circle"></i> INFORMAZIONI IMPORTANTI
+                    </div>
+                    <div class="info-box-actions">
+                        <button class="btn-toggle-info" onclick="toggleInfoBox()">
+                            <i class="fas fa-eye-slash"></i> Nascondi
+                        </button>
+                        ${isAdmin ? `
+                            <button class="btn-toggle-info" onclick="mostraEditorInfoBox()" style="background:var(--racing-yellow); color:var(--racing-blue);">
+                                <i class="fas fa-edit"></i> Modifica
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="info-box-content">
+                    ${infoBoxContent || '<p><strong>Nessuna informazione disponibile al momento.</strong></p>'}
+                </div>
+                ${isAdmin ? `
+                    <div class="info-box-admin" style="display:none;" id="infoBoxAdminEditor">
+                        <textarea class="info-box-admin-input" id="infoBoxAdminInput" placeholder="Inserisci qui le informazioni importanti... Utilizza HTML di base (es: &lt;strong&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;br&gt;)"></textarea>
+                        <div class="info-box-admin-buttons">
+                            <button class="btn-toggle-info" onclick="salvaInfoBox()" style="background:var(--racing-green); color:white;">
+                                <i class="fas fa-save"></i> Salva
+                            </button>
+                            <button class="btn-toggle-info" onclick="nascondiEditorInfoBox()" style="background:var(--racing-red); color:white;">
+                                <i class="fas fa-times"></i> Annulla
+                            </button>
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        
+        if (isAdmin) {
+            const textarea = document.getElementById('infoBoxAdminInput');
+            if (textarea && !isEditingInfoBox) {
+                textarea.value = infoBoxContent || "";
+            }
+        }
+    }
+
+    async function toggleInfoBox() {
+        infoBoxVisible = !infoBoxVisible;
+        await _supabase.from(T_CONF).upsert({ 
+            chiave: 'info_box_visible', 
+            valore: infoBoxVisible.toString() 
+        }, { onConflict: 'chiave' });
+        
+        renderInfoBox();
+        showToast(`Box informazioni ${infoBoxVisible ? 'mostrato' : 'nascosto'}`);
+    }
+
+    function mostraEditorInfoBox() {
+        const editor = document.getElementById('infoBoxAdminEditor');
+        const content = document.querySelector('.info-box-content');
+        if (editor && content) {
+            editor.style.display = 'block';
+            content.style.display = 'none';
+            document.getElementById('infoBoxAdminInput').focus();
+        }
+    }
+
+    function nascondiEditorInfoBox() {
+        const editor = document.getElementById('infoBoxAdminEditor');
+        const content = document.querySelector('.info-box-content');
+        if (editor && content) {
+            editor.style.display = 'none';
+            content.style.display = 'block';
+            isEditingInfoBox = false;
+        }
+    }
+
+    async function salvaInfoBox() {
+        const textarea = document.getElementById('infoBoxAdminInput');
+        if (!textarea) return;
+        
+        const nuovoContenuto = textarea.value.trim();
+        
+        await _supabase.from(T_CONF).upsert({ 
+            chiave: 'info_box_content', 
+            valore: nuovoContenuto 
+        }, { onConflict: 'chiave' });
+        
+        infoBoxContent = nuovoContenuto;
+        isEditingInfoBox = false;
+        nascondiEditorInfoBox();
+        renderInfoBox();
+        showToast("Informazioni salvate!");
     }
 
     async function caricaTimers() {
@@ -3621,89 +3963,78 @@
             const isChecked = selectedIds.has(p.id.toString()) ? 'checked' : '';
             
             // NUOVO: Selezione categoria per admin
-            const categoriaSelect = isAdmin ? `
-                <select class="categoria-select" style="font-size:0.7rem; padding:4px 8px; border-radius:6px; border:1px solid var(--racing-light); background:white; color:var(--racing-blue); font-weight:bold; margin-top:5px;" 
-                        onchange="modificaCategoria('${p.id}', this.value)"
-                        onfocus="isEditingCategoria=true" 
-                        onblur="isEditingCategoria=false">
-                    <option value="SENIOR" ${p.categoria === 'SENIOR' ? 'selected' : ''}>SENIOR</option>
-                    <option value="JUNIOR" ${p.categoria === 'JUNIOR' ? 'selected' : ''}>JUNIOR</option>
-                    <option value="ALLIEVI" ${p.categoria === 'ALLIEVI' ? 'selected' : ''}>ALLIEVI</option>
-                    <option value="RAGAZZI" ${p.categoria === 'RAGAZZI' ? 'selected' : ''}>RAGAZZI</option>
-                    <option value="R12" ${p.categoria === 'R12' ? 'selected' : ''}>R12</option>
-                    <option value="ESORDIENTI" ${p.categoria === 'ESORDIENTI' ? 'selected' : ''}>ESORDIENTI</option>
-                    <option value="GIOVANISSIMI" ${p.categoria === 'GIOVANISSIMI' ? 'selected' : ''}>GIOVANISSIMI</option>
+            const categoriaSelectHtml = isAdmin ? `
+                <select class="categoria-select" onchange="modificaCategoria('${p.id}', this.value)" style="font-size:0.7rem; padding:5px; border-radius:6px; border:1px solid var(--racing-light); margin-top:5px; width:100%;">
+                    <option value="${p.categoria}" selected>${p.categoria}</option>
+                    <option value="SENIOR">SENIOR</option>
+                    <option value="JUNIOR">JUNIOR</option>
+                    <option value="ALLIEVI">ALLIEVI</option>
+                    <option value="RAGAZZI">RAGAZZI</option>
+                    <option value="R12">R12</option>
+                    <option value="ESORDIENTI">ESORDIENTI</option>
+                    <option value="GIOVANISSIMI">GIOVANISSIMI</option>
                 </select>
-            ` : `<span class="categoria-badge cat-${p.categoria.toLowerCase()}">${p.categoria}</span>`;
+            ` : '';
             
-            const hasAccompagnatore = p.accompagnatore && p.accompagnatore.trim() !== "";
-            const showInput = !hasAccompagnatore || isAdmin;
-            
-            const accompagnatoreBox = `
-                <div class="accompagnatore-box ${mostraAccompagnatori ? 'show' : ''}">
-                    ${showInput ? 
-                        `<div class="accompagnatore-content">
-                            <input type="text" class="accompagnatore-input" id="acc_input_${p.id}" 
-                                   placeholder="${hasAccompagnatore ? 'Modifica accompagnatore...' : 'Nome accompagnatore...'}" 
-                                   ${disabled ? 'disabled' : ''}
-                                   value="${hasAccompagnatore ? p.accompagnatore : ''}"
-                                   style="text-transform: uppercase;">
-                            <button class="btn-accompagnatore" id="acc_btn_${p.id}" 
-                                    onclick="salvaAccompagnatore('${p.id}')" 
-                                    ${disabled ? 'disabled' : ''}>
-                                <i class="fas fa-${hasAccompagnatore ? 'edit' : 'check'}"></i> ${hasAccompagnatore ? 'Aggiorna' : 'Conferma'}
-                            </button>
-                            ${hasAccompagnatore && isAdmin ? 
-                                `<div class="accompagnatore-actions">
+            let accompagnatoreHtml = '';
+            if (mostraAccompagnatori) {
+                if (p.accompagnatore && p.accompagnatore.trim() !== "") {
+                    if (isAdmin) {
+                        accompagnatoreHtml = `
+                            <div class="accompagnatore-confirmed">
+                                <strong>Accompagnatore:</strong> ${p.accompagnatore}
+                                <div class="accompagnatore-actions">
                                     <button class="btn-modify" onclick="modificaAccompagnatore('${p.id}')"><i class="fas fa-edit"></i> Modifica</button>
                                     <button class="btn-remove" onclick="rimuoviAccompagnatore('${p.id}')"><i class="fas fa-trash"></i> Rimuovi</button>
-                                </div>` 
-                                : ''}
-                        </div>` 
-                        : 
-                        `<div class="accompagnatore-confirmed">
-                            <i class="fas fa-check-circle"></i> Accompagnatore registrato
-                        </div>`
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        accompagnatoreHtml = `
+                            <div class="accompagnatore-confirmed">
+                                <strong>Accompagnatore:</strong> ${p.accompagnatore}
+                            </div>
+                        `;
                     }
-                </div>
-            `;
-            
-            const scadutoIndicator = isCategoriaScaduta && !isAdmin ? 
-                `<div style="margin-top:5px; font-size:0.7rem; color:var(--racing-red); font-weight:bold;">
-                    <i class="fas fa-clock"></i> Scaduto per questa categoria
-                </div>` : '';
+                } else {
+                    accompagnatoreHtml = `
+                        <div class="accompagnatore-box ${p.stato === 'si' && !isCategoriaScaduta ? 'show' : ''}">
+                            <div class="accompagnatore-content">
+                                <input type="text" class="accompagnatore-input" id="acc_input_${p.id}" placeholder="Nome accompagnatore" maxlength="30" ${disabled}>
+                                <button class="btn-accompagnatore" onclick="salvaAccompagnatore('${p.id}')" ${disabled}><i class="fas fa-user-plus"></i> Salva</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
             
             tr.innerHTML = `
-                <td class="col-admin" style="display:${displayAdmin}"><input type="checkbox" class="bulk-cb" value="${p.id}" ${isChecked}></td>
+                <td class="col-admin" style="display:${displayAdmin};"><input type="checkbox" class="bulk-cb" value="${p.id}" ${isChecked} onclick="selectedIds.${isChecked?'delete':'add'}('${p.id}')"></td>
                 <td class="nome-cell">
-                    <div style="display:flex; flex-direction:column; gap:6px;">
-                        <div style="display:flex; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <div>
+                        <div style="display:flex; justify-content:flex-start; align-items:center; flex-wrap:wrap; gap:8px;">
                             <span>${p.nome}</span>
                             ${genderHtml}
-                            ${p.bloccato ? ' <i class="fas fa-lock" style="color:var(--racing-red); font-size:0.9rem;"></i>' : ''}
+                            ${labelHtml}
                         </div>
-                        ${labelHtml}
-                        ${accompagnatoreBox}
-                        ${scadutoIndicator}
-                        <div class="col-admin" style="display:${displayAdmin}; gap:5px; margin-top:10px;">
-                            <div style="display:inline-flex; gap:3px; margin-right:12px;">
-                                <button class="btn-date-small ${!note || (!note.includes('B') && !note.includes('C')) ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'A')">A</button>
-                                <button class="btn-date-small ${note.includes('B') ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'B')">B</button>
-                                <button class="btn-date-small ${note.includes('C') ? 'active' : ''}" onclick="assegnaDettaglio('${p.id}', 'data', 'C')">C</button>
-                            </div>
-                            <div style="display:inline-flex; gap:3px;">
-                                <button class="btn-gender-small ${gender==='M'?'active-m':''}" onclick="assegnaDettaglio('${p.id}', 'gender', 'M')">M</button>
-                                <button class="btn-gender-small ${gender==='F'?'active-f':''}" onclick="assegnaDettaglio('${p.id}', 'gender', 'F')">F</button>
-                            </div>
-                        </div>
+                        ${accompagnatoreHtml}
+                        ${categoriaSelectHtml}
                     </div>
                 </td>
-                <td data-label="Categoria" style="font-weight:bold;">
-                    ${categoriaSelect}
+                <td><span class="categoria-badge cat-${p.categoria.toLowerCase()}">${p.categoria}</span></td>
+                <td>
+                    <label>
+                        <input type="radio" name="scelta_${p.id}" value="si" ${p.stato === 'si' ? 'checked' : ''} ${disabled} onchange="salva('${p.id}', 'si')">
+                        <div class="badge-btn badge-si">PARTECIPA</div>
+                    </label>
                 </td>
-                <td data-label="Partecipa"><label><input type="radio" name="r_${p.id}" value="si" ${p.stato==='si'?'checked':''} ${disabled} onclick="salva('${p.id}','si')"><span class="badge-btn badge-si"><i class="fas fa-check"></i> PARTECIPA</span></label></td>
-                <td data-label="Non Partecipa"><label><input type="radio" name="r_${p.id}" value="no" ${p.stato==='no'?'checked':''} ${disabled} onclick="salva('${p.id}','no')"><span class="badge-btn badge-no"><i class="fas fa-times"></i> NON PARTECIPA</span></label></td>
-                <td data-label="Reset"><button class="btn-reset" onclick="salva('${p.id}','vuoto')" ${disabled}><i class="fas fa-redo"></i> Reset</button></td>
+                <td>
+                    <label>
+                        <input type="radio" name="scelta_${p.id}" value="no" ${p.stato === 'no' ? 'checked' : ''} ${disabled} onchange="salva('${p.id}', 'no')">
+                        <div class="badge-btn badge-no">NON PARTECIPA</div>
+                    </label>
+                </td>
+                <td><button class="btn-reset" ${disabled} onclick="salva('${p.id}', 'vuoto')"><i class="fas fa-redo"></i> Reset</button></td>
                 <td class="col-admin" style="display:${displayAdmin}">
                     <button onclick="toggleLock('${p.id}', ${p.bloccato})" style="background:none; border:none; cursor:pointer; font-size:1.1rem; color:${p.bloccato?'var(--racing-red)':'var(--racing-blue)'};"><i class="fas fa-${p.bloccato?'lock':'lock-open'}"></i></button>
                     <button onclick="eliminaAtleta('${p.id}','${p.nome}')" style="background:none; border:none; cursor:pointer; font-size:1.1rem; color:var(--racing-red);"><i class="fas fa-trash-alt"></i></button>
