@@ -273,6 +273,30 @@
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3) !important;
         }
 
+        /* STILI PER INFO BOX */
+        .dark-mode #infoBox {
+            background: rgba(42, 59, 78, 0.5);
+            border-color: #3a4b5e;
+        }
+
+        .dark-mode .info-box-content {
+            background: #2a3b4e;
+            color: var(--dark-text-main);
+            border-left: 6px solid var(--racing-blue);
+        }
+
+        .dark-mode .info-box-icon {
+            background: var(--gradient-primary);
+            color: var(--racing-light);
+        }
+
+        .dark-mode .info-box-admin .admin-row input,
+        .dark-mode .info-box-admin .admin-row textarea {
+            background: #2a3b4e;
+            color: var(--dark-text-main);
+            border-color: #3a4b5e;
+        }
+
         * {
             box-sizing: border-box;
         }
@@ -443,6 +467,132 @@
             height: 4px;
             background: var(--gradient-racing);
             border-radius: 2px;
+        }
+
+        /* INFO BOX STYLES */
+        #infoBox {
+            background: rgba(168, 218, 220, 0.1);
+            border: 2px solid var(--racing-light);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: var(--shadow-light);
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        #infoBox.hidden {
+            display: none;
+        }
+
+        .info-box-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .info-box-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--racing-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-box-icon {
+            background: var(--gradient-primary);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .info-box-toggle {
+            background: var(--racing-yellow);
+            color: var(--racing-blue);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .info-box-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .info-box-content {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 6px solid var(--racing-blue);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .info-box-content ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .info-box-content li {
+            margin-bottom: 8px;
+        }
+
+        .info-box-content strong {
+            color: var(--racing-blue);
+        }
+
+        .info-box-admin {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            border: 2px dashed var(--racing-purple);
+            margin-top: 15px;
+        }
+
+        .info-box-admin .admin-row {
+            margin-bottom: 10px;
+        }
+
+        .info-box-admin textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 2px solid var(--racing-light);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .info-box-admin textarea:focus {
+            outline: none;
+            border-color: var(--racing-blue);
+            box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.1);
+        }
+
+        .info-box-admin .admin-row button {
+            padding: 10px 20px;
+            margin-top: 5px;
         }
 
         /* STILI TIMER - DUPLICATI */
@@ -1612,6 +1762,35 @@
                 text-align: center;
             }
             
+            /* Info box responsive */
+            #infoBox {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+            
+            .info-box-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: stretch;
+            }
+            
+            .info-box-toggle {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .info-box-content {
+                padding: 15px;
+            }
+            
+            .info-box-admin {
+                padding: 12px;
+            }
+            
+            .info-box-admin textarea {
+                min-height: 100px;
+            }
+            
             .search-container {
                 flex-direction: column;
                 align-items: stretch;
@@ -1955,6 +2134,39 @@
 
     <h2 id="mainTitle">Juvenilia Racing Team - Iscrizioni Gara 1</h2>
     
+    <!-- INFO BOX -->
+    <div id="infoBox">
+        <div class="info-box-header">
+            <div class="info-box-title">
+                <div class="info-box-icon">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                INFORMAZIONI IMPORTANTI
+            </div>
+            <button id="toggleInfoBoxBtn" class="info-box-toggle" onclick="toggleInfoBoxVisibility()">
+                <i class="fas fa-eye-slash"></i> Nascondi agli utenti
+            </button>
+        </div>
+        
+        <div id="infoBoxContent" class="info-box-content">
+            <!-- Il contenuto sarà popolato dinamicamente -->
+        </div>
+        
+        <!-- Sezione admin per modificare il contenuto -->
+        <div id="infoBoxAdmin" class="info-box-admin" style="display: none;">
+            <div style="font-size: 14px; font-weight: bold; color: var(--racing-purple); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-edit"></i> MODIFICA CONTENUTO (ADMIN):
+            </div>
+            <div class="admin-row">
+                <textarea id="infoBoxText" placeholder="Inserisci qui le informazioni importanti per gli atleti..." onfocus="isEditingInfo=true" onblur="isEditingInfo=false"></textarea>
+            </div>
+            <div class="admin-row" style="justify-content: center; gap: 15px; margin-top: 10px;">
+                <button onclick="salvaInfoBox()" style="background:var(--racing-green);"><i class="fas fa-save"></i> Salva</button>
+                <button onclick="azzeraInfoBox()" style="background:var(--racing-red);"><i class="fas fa-trash"></i> Azzera</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Timer principale -->
     <div id="countdownBox" class="countdown-container">
         <div id="timerDisplay" class="timer"><i class="fas fa-clock"></i> Inizializzazione...</div>
@@ -2141,7 +2353,7 @@
     let isAdmin = false, isExpired = false, currentData = [], timerInterval;
     let labelA = "", labelB = "", labelC = "", sortBy = 'nome'; 
     let costiCategorie = {};
-    let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false;
+    let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false, isEditingInfo = false;
     let selectedIds = new Set();
     let mostraAccompagnatori = true;
     let tempAccompagnatoriValues = {};
@@ -2150,6 +2362,7 @@
     let categoryTimers = [];
     let categoryTimerIntervals = {};
     let isEditingCategoria = false;
+    let mostraInfoBox = true;
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
@@ -2189,7 +2402,7 @@
     }
 
     async function checkAndRefresh() {
-        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingTitolo && !isEditingDateLabels && !isEditingTimers && !isEditingCategoria) {
+        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingTitolo && !isEditingDateLabels && !isEditingTimers && !isEditingCategoria && !isEditingInfo) {
             await fullLoad();
         }
     }
@@ -2242,6 +2455,7 @@
                 e.target.id === 'docLink2_URL' ||
                 e.target.id === 'docLink2_Text' ||
                 e.target.id === 'newTimerLabel' ||
+                e.target.id === 'infoBoxText' ||
                 e.target.classList.contains('categoria-select')) {
                 e.target.value = e.target.value.toUpperCase();
             }
@@ -2264,6 +2478,9 @@
             }
             if (e.target.classList.contains('categoria-select')) {
                 isEditingCategoria = true;
+            }
+            if (e.target.id === 'infoBoxText') {
+                isEditingInfo = true;
             }
         });
         
@@ -2293,6 +2510,11 @@
             if (e.target.classList.contains('categoria-select')) {
                 setTimeout(() => {
                     isEditingCategoria = false;
+                }, 500);
+            }
+            if (e.target.id === 'infoBoxText') {
+                setTimeout(() => {
+                    isEditingInfo = false;
                 }, 500);
             }
         });
@@ -2330,6 +2552,14 @@
             mostraAccompagnatori = visibilitaAccompagnatori.valore === 'true';
         }
         
+        const infoBoxContent = data.find(c => c.chiave === 'infobox_content')?.valore || "";
+        const infoBoxVisible = data.find(c => c.chiave === 'infobox_visible');
+        if (infoBoxVisible) {
+            mostraInfoBox = infoBoxVisible.valore === 'true';
+        } else {
+            mostraInfoBox = true; // default: visibile
+        }
+        
         if(isAdmin) {
             // Salva i valori attuali prima di aggiornarli
             const currentTitoloValue = document.getElementById('editTitleInput')?.value || "";
@@ -2340,6 +2570,7 @@
             const currentDoc1TextValue = document.getElementById('docLink1_Text')?.value || "";
             const currentDoc2URLValue = document.getElementById('docLink2_URL')?.value || "";
             const currentDoc2TextValue = document.getElementById('docLink2_Text')?.value || "";
+            const currentInfoBoxValue = document.getElementById('infoBoxText')?.value || "";
             
             // Aggiorna solo se non siamo in modalità editing
             if(!isEditingTitolo && currentTitoloValue === "") {
@@ -2359,6 +2590,10 @@
                 if (currentDoc2TextValue === "") document.getElementById('docLink2_Text').value = txt2;
             }
             
+            if(!isEditingInfo && currentInfoBoxValue === "") {
+                document.getElementById('infoBoxText').value = infoBoxContent;
+            }
+            
             document.getElementById('deadlineInput').value = sca?.valore || "";
         }
         
@@ -2373,6 +2608,32 @@
         });
         
         document.getElementById('mainTitle').innerText = tit?.valore || "Juvenilia Racing Team - Iscrizioni Gara 1";
+        
+        // Aggiorna Info Box
+        const infoBox = document.getElementById('infoBox');
+        const infoBoxContentDiv = document.getElementById('infoBoxContent');
+        const toggleBtn = document.getElementById('toggleInfoBoxBtn');
+        
+        if (mostraInfoBox && infoBoxContent) {
+            infoBox.style.display = 'flex';
+            infoBoxContentDiv.innerHTML = formatInfoBoxContent(infoBoxContent);
+            
+            if (isAdmin) {
+                toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Nascondi agli utenti';
+            }
+        } else {
+            if (!isAdmin) {
+                infoBox.style.display = 'none';
+            } else {
+                infoBox.style.display = 'flex';
+                toggleBtn.innerHTML = '<i class="fas fa-eye"></i> Mostra agli utenti';
+                if (!infoBoxContent) {
+                    infoBoxContentDiv.innerHTML = '<p style="color: #666; font-style: italic; text-align: center;">Nessun contenuto configurato. Usa la sezione admin per aggiungere informazioni.</p>';
+                } else {
+                    infoBoxContentDiv.innerHTML = formatInfoBoxContent(infoBoxContent);
+                }
+            }
+        }
         
         const cBox = document.getElementById('countdownBox');
         if(sca?.valore && sca.valore !== "") {
@@ -2391,6 +2652,75 @@
         }
         
         if(isAdmin && !isEditingCosti) renderCostiInputs();
+    }
+
+    function formatInfoBoxContent(content) {
+        // Sostituisce le nuove righe con <br> e gestisce i bullet points
+        let formatted = content.replace(/\n/g, '<br>');
+        
+        // Gestione delle liste semplici
+        formatted = formatted.replace(/\*\s*(.*?)(?=<br>|$)/g, '<li>$1</li>');
+        
+        // Se ci sono <li> aggiunge <ul>
+        if (formatted.includes('<li>')) {
+            formatted = formatted.replace(/<li>/g, '</p><ul><li>').replace(/<\/li>/g, '</li></ul><p>');
+            // Rimuove i tag <p> vuoti
+            formatted = formatted.replace(/<p><\/p>/g, '');
+        }
+        
+        // Aggiunge stile ai link
+        formatted = formatted.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color: var(--racing-blue); font-weight: bold; text-decoration: underline;">$1</a>');
+        
+        // Aggiunge stile ai testi importanti
+        formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        formatted = formatted.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        return `<p>${formatted}</p>`;
+    }
+
+    async function salvaInfoBox() {
+        const content = document.getElementById('infoBoxText').value.trim();
+        
+        await _supabase.from(T_CONF).upsert([
+            { chiave: 'infobox_content', valore: content }
+        ], { onConflict: 'chiave' });
+        
+        showToast("Informazioni salvate!");
+        isEditingInfo = false;
+        await caricaConfig();
+    }
+
+    async function azzeraInfoBox() {
+        if(confirm("Cancellare il contenuto del box informazioni?")) {
+            await _supabase.from(T_CONF).upsert([
+                { chiave: 'infobox_content', valore: "" }
+            ], { onConflict: 'chiave' });
+            document.getElementById('infoBoxText').value = "";
+            showToast("Contenuto azzerato!");
+            await caricaConfig();
+        }
+    }
+
+    async function toggleInfoBoxVisibility() {
+        if (!isAdmin) return;
+        
+        mostraInfoBox = !mostraInfoBox;
+        
+        await _supabase.from(T_CONF).upsert({
+            chiave: 'infobox_visible',
+            valore: mostraInfoBox.toString()
+        }, { onConflict: 'chiave' });
+        
+        const toggleBtn = document.getElementById('toggleInfoBoxBtn');
+        if (mostraInfoBox) {
+            toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Nascondi agli utenti';
+            showToast("Info Box ora visibile agli utenti");
+        } else {
+            toggleBtn.innerHTML = '<i class="fas fa-eye"></i> Mostra agli utenti';
+            showToast("Info Box nascosto agli utenti");
+        }
+        
+        await caricaConfig();
     }
 
     async function caricaTimers() {
@@ -3189,6 +3519,7 @@
             document.getElementById('adminButtons').style.display = 'grid';
             document.getElementById('riepilogoAccompagnatori').style.display = 'block';
             document.getElementById('toggleAccompagnatoriBtn').style.display = 'inline-block';
+            document.getElementById('infoBoxAdmin').style.display = 'block';
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
             
             caricaConfig(); 
