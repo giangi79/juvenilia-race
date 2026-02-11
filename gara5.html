@@ -1544,6 +1544,7 @@
             overflow: hidden;
             transition: all 0.4s ease;
             flex-shrink: 0;
+            display: none; /* Nascosto di default */
         }
         
         .dark-mode .info-section {
@@ -1709,6 +1710,96 @@
         .btn-info-cancel:hover {
             background: #5a6268;
             transform: translateY(-3px);
+        }
+        
+        /* Stili per il toggle del box info */
+        .info-toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(42, 157, 143, 0.1);
+            border-radius: 15px;
+            border: 2px dashed var(--racing-green);
+        }
+        
+        .dark-mode .info-toggle-row {
+            background: rgba(42, 59, 78, 0.5);
+            border-color: var(--racing-green);
+        }
+        
+        .info-toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            color: var(--racing-green);
+            font-size: 0.85rem;
+        }
+        
+        .info-toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+            margin-left: 5px;
+        }
+        
+        .info-toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .info-toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .info-toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .info-toggle-slider {
+            background-color: var(--racing-green);
+        }
+        
+        input:checked + .info-toggle-slider:before {
+            transform: translateX(30px);
+        }
+        
+        .info-toggle-status {
+            font-size: 0.8rem;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(0,0,0,0.1);
+        }
+        
+        .info-toggle-status.on {
+            background: var(--racing-green);
+            color: white;
+        }
+        
+        .info-toggle-status.off {
+            background: var(--racing-red);
+            color: white;
         }
         
         .preview-modal {
@@ -2146,6 +2237,11 @@
             .preview-content {
                 width: 95%;
             }
+            
+            .info-toggle-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
         
         @media screen and (min-width: 1400px) {
@@ -2228,8 +2324,8 @@
     <!-- Timer per categorie -->
     <div id="timerCategoryContainer" class="timer-category-container"></div>
 
-    <!-- INFO BOX - PERSONALIZZABILE -->
-    <div id="infoBox" class="info-section" style="display: none;">
+    <!-- INFO BOX - PERSONALIZZABILE CON TOGGLE VISIBILITÀ -->
+    <div id="infoBox" class="info-section">
         <div class="info-header">
             <i class="fas fa-info-circle"></i>
             <span>INFO & COMUNICAZIONI</span>
@@ -2258,6 +2354,19 @@
                 <button onclick="anteprimaInfo()" class="btn-info-preview"><i class="fas fa-eye"></i> Anteprima</button>
                 <button onclick="annullaModificaInfo()" class="btn-info-cancel"><i class="fas fa-times"></i> Annulla</button>
             </div>
+        </div>
+        
+        <!-- Toggle visibilità (solo admin) -->
+        <div id="infoToggleContainer" class="info-toggle-row" style="display: none;">
+            <div class="info-toggle-label">
+                <i class="fas fa-eye"></i>
+                <span>Mostra box info agli utenti:</span>
+            </div>
+            <label class="info-toggle-switch">
+                <input type="checkbox" id="infoVisibilityToggle" onchange="toggleInfoVisibility()">
+                <span class="info-toggle-slider"></span>
+            </label>
+            <span id="infoVisibilityStatus" class="info-toggle-status off">NASCOSTO</span>
         </div>
     </div>
 
@@ -2456,6 +2565,7 @@
     let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false, isEditingCategoria = false;
     let selectedIds = new Set();
     let mostraAccompagnatori = true;
+    let mostraInfoBox = false; // Variabile per la visibilità del box info
     let tempAccompagnatoriValues = {};
     let isTypingInAccompagnatore = false;
     let refreshInterval = null;
@@ -2634,6 +2744,12 @@
             mostraAccompagnatori = visibilitaAccompagnatori.valore === 'true';
         }
         
+        // Carica la visibilità del box info
+        const visibilitaInfoBox = data.find(c => c.chiave === 'mostra_info_box');
+        if (visibilitaInfoBox) {
+            mostraInfoBox = visibilitaInfoBox.valore === 'true';
+        }
+        
         if(isAdmin) {
             const currentTitoloValue = document.getElementById('editTitleInput')?.value || "";
             const currentDateAValue = document.getElementById('dateA_Label')?.value || "";
@@ -2662,6 +2778,13 @@
             }
             
             document.getElementById('deadlineInput').value = sca?.valore || "";
+            
+            // Aggiorna il toggle della visibilità info box
+            const toggle = document.getElementById('infoVisibilityToggle');
+            if (toggle) {
+                toggle.checked = mostraInfoBox;
+                aggiornaStatoVisibilitaInfo();
+            }
         }
         
         const docCont = document.getElementById('docLinksContainer');
@@ -3477,6 +3600,7 @@
             document.getElementById('adminButtons').style.display = 'grid';
             document.getElementById('riepilogoAccompagnatori').style.display = 'block';
             document.getElementById('toggleAccompagnatoriBtn').style.display = 'inline-block';
+            document.getElementById('infoToggleContainer').style.display = 'flex';
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
             
             caricaConfig(); 
@@ -4088,16 +4212,20 @@
             infoEditor.value = defaultText;
         }
         
-        infoBox.style.display = 'block';
-        
         if (isAdmin) {
             editBtn.style.display = 'flex';
             deleteBtn.style.display = 'flex';
             saveBtn.style.display = 'none';
+            
+            // Mostra il box info agli admin sempre
+            infoBox.style.display = 'block';
         } else {
             editBtn.style.display = 'none';
             deleteBtn.style.display = 'none';
             saveBtn.style.display = 'none';
+            
+            // Mostra o nascondi il box info in base alla configurazione
+            infoBox.style.display = mostraInfoBox ? 'block' : 'none';
         }
     }
     
@@ -4172,6 +4300,52 @@
                 document.getElementById('infoEditor').value = defaultText;
                 showToast("Informazioni ripristinate al default");
             }
+        }
+    }
+    
+    // Funzione per aggiornare lo stato visivo del toggle
+    function aggiornaStatoVisibilitaInfo() {
+        const toggle = document.getElementById('infoVisibilityToggle');
+        const status = document.getElementById('infoVisibilityStatus');
+        
+        if (toggle.checked) {
+            status.innerHTML = 'VISIBILE';
+            status.className = 'info-toggle-status on';
+        } else {
+            status.innerHTML = 'NASCOSTO';
+            status.className = 'info-toggle-status off';
+        }
+    }
+    
+    // Funzione per salvare la visibilità del box info
+    async function salvaVisibilitaInfoBox(visibile) {
+        const { error } = await _supabase.from(T_CONF).upsert({
+            chiave: 'mostra_info_box',
+            valore: visibile.toString()
+        }, { onConflict: 'chiave' });
+        
+        if (error) {
+            console.error("Errore salvataggio visibilità info box:", error);
+            showToast("Errore nel salvataggio della visibilità");
+            return false;
+        }
+        
+        mostraInfoBox = visibile;
+        showToast(`Box info ${visibile ? 'visibile' : 'nascosto'} per gli utenti`);
+        return true;
+    }
+    
+    // Funzione chiamata quando si cambia il toggle
+    async function toggleInfoVisibility() {
+        const toggle = document.getElementById('infoVisibilityToggle');
+        const visibile = toggle.checked;
+        
+        await salvaVisibilitaInfoBox(visibile);
+        aggiornaStatoVisibilitaInfo();
+        
+        // Aggiorna la visibilità per gli utenti (admin vede sempre)
+        if (!isAdmin) {
+            document.getElementById('infoBox').style.display = visibile ? 'block' : 'none';
         }
     }
 
