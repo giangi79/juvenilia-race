@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Juvenilia Racing Team - Iscrizioni Gara 5</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
+    
+    <!-- ANTI-CACHE: Forza il ricaricamento dei file JavaScript -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -28,7 +34,7 @@
             /* Colori Categorie aggiornati */
             --cat-senior: #1D3557; --cat-junior: #E63946; --cat-allievi: #2A9D8F;
             --cat-ragazzi: #457B9D; --cat-r12: #6A4C93; --cat-esordienti: #F4A261;
-            --cat-giovanissimi: #4ECDC4; --cat-default: #8A8D93;
+            --cat-giovanissimi: #4ECDC4; --cat-default: #8A8D933;
             
             /* Variabili per Dark Mode */
             --dark-bg-body: #0a1929;
@@ -458,6 +464,41 @@
             color: var(--racing-light);
         }
 
+        /* Stili per il pulsante di refresh */
+        .refresh-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-medium);
+            transition: all 0.3s ease;
+            position: fixed;
+            bottom: 90px;
+            right: 25px;
+            z-index: 998;
+        }
+        
+        .refresh-btn:hover {
+            transform: rotate(180deg) scale(1.1);
+            background: var(--gradient-success);
+        }
+        
+        .refresh-btn:active {
+            transform: rotate(360deg) scale(0.9);
+        }
+        
+        .dark-mode .refresh-btn {
+            background: var(--gradient-warning);
+            color: var(--racing-blue);
+        }
+
         * {
             box-sizing: border-box;
         }
@@ -630,7 +671,7 @@
             border-radius: 2px;
         }
 
-        /* STILI TIMER - DUPLICATI */
+        /* STILI TIMER */
         .countdown-container { 
             text-align: center; 
             margin: 15px 0; 
@@ -1806,7 +1847,6 @@
             background: linear-gradient(45deg, rgba(29, 53, 87, 0.3) 0%, rgba(42, 59, 78, 0.9) 100%);
         }
         
-        /* Stili per il testo formattato */
         .info-text {
             font-size: 1.1rem;
             line-height: 1.7;
@@ -1961,7 +2001,6 @@
             transform: translateY(-3px);
         }
         
-        /* Stili per il toggle del box info */
         .info-toggle-row {
             display: flex;
             align-items: center;
@@ -2527,6 +2566,14 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
+            
+            .refresh-btn {
+                bottom: 150px;
+                right: 15px;
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
         }
         
         @media screen and (min-width: 1400px) {
@@ -2890,6 +2937,11 @@
     </div>
 </div>
 
+<!-- PULSANTE DI REFRESH MANUALE -->
+<button class="refresh-btn" onclick="forzaRefresh()" title="Aggiorna dati (forza refresh)">
+    <i class="fas fa-sync-alt"></i>
+</button>
+
 <button onclick="scrollToTop()" id="backToTopBtn" title="Torna in cima">
     <i class="fas fa-chevron-up"></i>
 </button>
@@ -2925,6 +2977,26 @@
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
+    // ===== SISTEMA ANTI-CACHE AUTOMATICO SILENZIOSO =====
+
+    // Genera un timestamp unico per forzare il refresh
+    function getCacheBuster() {
+        return new Date().getTime();
+    }
+
+    // Forza il refresh completo della pagina (hard refresh) - SOLO MANUALE
+    function forzaRefresh() {
+        showToast("Aggiornamento dati in corso..."); // Solo questo è visibile perché è volontario
+        window.location.href = window.location.pathname + '?v=' + getCacheBuster();
+    }
+
+    // Controlla periodicamente se ci sono aggiornamenti (ogni 30 secondi) - SILENZIOSO
+    setInterval(async function() {
+        if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingTitolo && !isEditingDateLabels && !isEditingTimers && !isEditingCategoria) {
+            await fullLoad(); // Nessun toast, nessun messaggio - COMPLETAMENTE SILENZIOSO
+        }
+    }, 30000); // 30 secondi
+
     function checkTimeForDarkMode() {
         const now = new Date();
         const hour = now.getHours();
@@ -2955,7 +3027,7 @@
 
     async function checkAndRefresh() {
         if (!isTypingInAccompagnatore && !isEditingCosti && !isEditingDocs && !isEditingTitolo && !isEditingDateLabels && !isEditingTimers && !isEditingCategoria) {
-            await fullLoad();
+            await fullLoad(); // SILENZIOSO
         }
     }
 
