@@ -2895,6 +2895,76 @@
 </button>
 
 <script>
+    // ============================================
+    // PULIZIA CACHE INTELLIGENTE ALL'AVVIO
+    // ============================================
+    (function intelligentCacheCleanup() {
+        console.log('🧹 Avvio pulizia cache intelligente...');
+        
+        try {
+            // 1. Pulisci localStorage ma preserva dati essenziali (se presenti)
+            const keysToKeep = []; // Aggiungi qui eventuali chiavi da preservare (es. preferenze utente)
+            const savedItems = {};
+            
+            keysToKeep.forEach(key => {
+                try {
+                    const value = localStorage.getItem(key);
+                    if (value) savedItems[key] = value;
+                } catch(e) {}
+            });
+            
+            // Pulisci storage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Ripristina solo i dati essenziali
+            Object.keys(savedItems).forEach(key => {
+                try {
+                    localStorage.setItem(key, savedItems[key]);
+                } catch(e) {}
+            });
+            
+            console.log('✅ Storage locale pulito');
+            
+            // 2. Aggiungi timestamp anti-cache a tutte le richieste future
+            const originalFetch = window.fetch;
+            window.fetch = function(url, options = {}) {
+                // Aggiungi cache buster solo per le chiamate a Supabase
+                if (typeof url === 'string' && url.includes('supabase.co')) {
+                    const separator = url.includes('?') ? '&' : '?';
+                    const cacheBuster = `_cb=${Date.now()}`;
+                    url = url + separator + cacheBuster;
+                }
+                
+                return originalFetch.call(this, url, {
+                    ...options,
+                    headers: {
+                        ...options.headers,
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+            };
+            
+            console.log('✅ Sistema anti-cache attivato');
+            
+            // 3. Forza il reload dei CSS (opzionale, per evitare cache dei fogli di stile)
+            const links = document.getElementsByTagName('link');
+            for (let link of links) {
+                if (link.rel === 'stylesheet') {
+                    const href = link.href;
+                    if (href && !href.includes('?cb=')) {
+                        link.href = href.split('?')[0] + '?cb=' + Date.now();
+                    }
+                }
+            }
+            
+        } catch(e) {
+            console.warn('⚠️ Errore durante la pulizia cache:', e);
+        }
+    })();
+
     // SUPABASE CONFIGURATION
     const SUPABASE_URL = 'https://jnfnfszekfstuoiemkgf.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuZm5mc3pla2ZzdHVvaWVta2dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODkzOTEsImV4cCI6MjA4MzQ2NTM5MX0.lh7eRFlg7nnI7kEzVPBL9kNyZWX-XFeWQxVbvmzRlvA';
@@ -2905,7 +2975,25 @@
     
     const O_P = "anV2ZW5pbGlhMTE3OQ==";
     
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+        fetch: (url, options) => {
+            // Aggiungi sempre il timestamp per bypassare la cache
+            const separator = url.includes('?') ? '&' : '?';
+            const cacheBuster = `_cb=${Date.now()}`;
+            const newUrl = url + separator + cacheBuster;
+            
+            return fetch(newUrl, {
+                ...options,
+                headers: {
+                    ...options?.headers,
+                    'Cache-Control': 'no-cache, no-store, must-revalidate',
+                    'Pragma': 'no-cache',
+                    'Expires': '0'
+                }
+            });
+        }
+    });
+    
     const T_DATA = 'presenze_gara5';
     const T_CONF = 'configurazione_gara5';
     const T_TIMERS = 'timers_gara5';
