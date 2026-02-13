@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <!-- GENERATO DA create-gare-html.js il 11/02/2026, 16:32:07 per Gara 4 -->
+    <!-- GENERATO DA create-gare-html.js il 13/02/2026, 13:18:40 per Gara 4 -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Juvenilia Racing Team - Iscrizioni Gara 4</title>
@@ -271,6 +271,192 @@
         .dark-mode .costo-in:focus {
             border-color: var(--racing-blue) !important;
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3) !important;
+        }
+
+        /* Stili per il box info formattato e toolbar */
+        .info-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-main);
+            padding: 15px;
+            border-left: 5px solid var(--racing-orange);
+            background: rgba(244, 162, 97, 0.05);
+            border-radius: 0 15px 15px 0;
+            font-weight: 500;
+            white-space: pre-wrap;
+            word-break: break-word;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.02);
+        }
+        
+        .info-text strong, .info-text b {
+            font-weight: 700;
+            color: var(--racing-blue);
+        }
+        
+        .info-text em, .info-text i {
+            font-style: italic;
+            color: var(--racing-purple);
+        }
+        
+        .info-text u {
+            text-decoration: underline;
+            text-decoration-color: var(--racing-red);
+            text-underline-offset: 3px;
+        }
+        
+        .info-text h1, .info-text h2, .info-text h3, .info-text h4 {
+            margin: 0.5em 0;
+            color: var(--racing-blue);
+        }
+        
+        .info-text ul, .info-text ol {
+            padding-left: 25px;
+            margin: 10px 0;
+        }
+        
+        .info-text li {
+            margin: 5px 0;
+        }
+        
+        .info-text a {
+            color: var(--racing-green);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .info-text a:hover {
+            text-decoration: underline;
+        }
+        
+        .info-text p {
+            margin: 0.5em 0;
+        }
+        
+        .dark-mode .info-text {
+            color: var(--dark-text-main);
+            border-left-color: var(--racing-red);
+            background: rgba(230, 57, 70, 0.1);
+        }
+        
+        .dark-mode .info-text strong, 
+        .dark-mode .info-text b {
+            color: var(--racing-light);
+        }
+        
+        .dark-mode .info-text em,
+        .dark-mode .info-text i {
+            color: #ffb3b3;
+        }
+        
+        .dark-mode .info-text h1,
+        .dark-mode .info-text h2,
+        .dark-mode .info-text h3,
+        .dark-mode .info-text h4 {
+            color: white;
+        }
+
+        /* TOOLBAR STILE WORD */
+        .info-toolbar {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            border: 2px solid var(--racing-light);
+            border-radius: 12px;
+            padding: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            align-items: center;
+            box-shadow: var(--shadow-light);
+        }
+        
+        .dark-mode .info-toolbar {
+            background: #2a3b4e;
+            border-color: #3a4b5e;
+        }
+        
+        .toolbar-group {
+            display: flex;
+            gap: 2px;
+            padding: 0 5px;
+            border-right: 2px solid rgba(29, 53, 87, 0.2);
+        }
+        
+        .dark-mode .toolbar-group {
+            border-right-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .toolbar-group:last-child {
+            border-right: none;
+        }
+        
+        .toolbar-btn {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--racing-blue);
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .toolbar-btn:hover {
+            background: var(--racing-yellow);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .toolbar-btn.active {
+            background: var(--racing-blue);
+            color: white;
+            border-color: var(--racing-blue);
+        }
+        
+        .dark-mode .toolbar-btn {
+            background: #3a4b5e;
+            border-color: #4a5b6e;
+            color: var(--racing-light);
+        }
+        
+        .dark-mode .toolbar-btn:hover {
+            background: var(--racing-yellow);
+            color: var(--racing-blue);
+        }
+        
+        .dark-mode .toolbar-btn.active {
+            background: var(--racing-blue);
+            color: white;
+        }
+        
+        .toolbar-color-picker {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        
+        .toolbar-font-select, .toolbar-size-select {
+            height: 36px;
+            padding: 0 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            color: var(--racing-blue);
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .dark-mode .toolbar-font-select,
+        .dark-mode .toolbar-size-select {
+            background: #3a4b5e;
+            border-color: #4a5b6e;
+            color: var(--racing-light);
         }
 
         * {
@@ -1545,7 +1731,7 @@
             overflow: hidden;
             transition: all 0.4s ease;
             flex-shrink: 0;
-            display: none; /* Nascosto di default */
+            display: none;
         }
         
         .dark-mode .info-section {
@@ -1621,6 +1807,7 @@
             background: linear-gradient(45deg, rgba(29, 53, 87, 0.3) 0%, rgba(42, 59, 78, 0.9) 100%);
         }
         
+        /* Stili per il testo formattato */
         .info-text {
             font-size: 1.1rem;
             line-height: 1.7;
@@ -1635,10 +1822,71 @@
             box-shadow: inset 0 0 15px rgba(0,0,0,0.02);
         }
         
+        .info-text strong, .info-text b {
+            font-weight: 700;
+            color: var(--racing-blue);
+        }
+        
+        .info-text em, .info-text i {
+            font-style: italic;
+            color: var(--racing-purple);
+        }
+        
+        .info-text u {
+            text-decoration: underline;
+            text-decoration-color: var(--racing-red);
+            text-underline-offset: 3px;
+        }
+        
+        .info-text h1, .info-text h2, .info-text h3, .info-text h4 {
+            margin: 0.5em 0;
+            color: var(--racing-blue);
+        }
+        
+        .info-text ul, .info-text ol {
+            padding-left: 25px;
+            margin: 10px 0;
+        }
+        
+        .info-text li {
+            margin: 5px 0;
+        }
+        
+        .info-text a {
+            color: var(--racing-green);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .info-text a:hover {
+            text-decoration: underline;
+        }
+        
+        .info-text p {
+            margin: 0.5em 0;
+        }
+        
         .dark-mode .info-text {
             color: var(--dark-text-main);
             border-left-color: var(--racing-red);
             background: rgba(230, 57, 70, 0.1);
+        }
+        
+        .dark-mode .info-text strong, 
+        .dark-mode .info-text b {
+            color: var(--racing-light);
+        }
+        
+        .dark-mode .info-text em,
+        .dark-mode .info-text i {
+            color: #ffb3b3;
+        }
+        
+        .dark-mode .info-text h1,
+        .dark-mode .info-text h2,
+        .dark-mode .info-text h3,
+        .dark-mode .info-text h4 {
+            color: white;
         }
         
         .info-edit-mode {
@@ -1654,7 +1902,7 @@
         
         .info-editor {
             width: 100%;
-            min-height: 120px;
+            min-height: 200px;
             padding: 15px;
             border: 3px solid var(--racing-light);
             border-radius: 15px;
@@ -1666,6 +1914,7 @@
             font-weight: 500;
             transition: all 0.3s ease;
             box-shadow: var(--shadow-light);
+            line-height: 1.6;
         }
         
         .info-editor:focus {
@@ -1819,7 +2068,7 @@
         
         .preview-content {
             background: white;
-            max-width: 500px;
+            max-width: 600px;
             width: 90%;
             border-radius: 25px;
             overflow: hidden;
@@ -1876,8 +2125,44 @@
             line-height: 1.7;
             white-space: pre-wrap;
             word-break: break-word;
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
+        }
+        
+        .preview-body strong, .preview-body b {
+            font-weight: 700;
+            color: var(--racing-blue);
+        }
+        
+        .preview-body em, .preview-body i {
+            font-style: italic;
+            color: var(--racing-purple);
+        }
+        
+        .preview-body u {
+            text-decoration: underline;
+            text-decoration-color: var(--racing-red);
+        }
+        
+        .preview-body h1, .preview-body h2, .preview-body h3, .preview-body h4 {
+            margin: 0.5em 0;
+            color: var(--racing-blue);
+        }
+        
+        .preview-body ul, .preview-body ol {
+            padding-left: 25px;
+        }
+        
+        .dark-mode .preview-body strong,
+        .dark-mode .preview-body b {
+            color: var(--racing-light);
+        }
+        
+        .dark-mode .preview-body h1,
+        .dark-mode .preview-body h2,
+        .dark-mode .preview-body h3,
+        .dark-mode .preview-body h4 {
+            color: white;
         }
         
         @keyframes infoGlow {
@@ -2291,6 +2576,17 @@
                 width: 45px; 
                 height: 45px; 
             }
+            
+            .info-toolbar {
+                flex-wrap: wrap;
+            }
+            
+            .toolbar-group {
+                border-right: none;
+                border-bottom: 1px solid rgba(29, 53, 87, 0.2);
+                padding-bottom: 5px;
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
@@ -2316,6 +2612,7 @@
     </div>
 
     <h2 id="mainTitle">🎯 Juvenilia Racing Team - Iscrizioni Gara 4 - Coppa Italia</h2>
+    <h3 style="text-align: center; color: var(--racing-light); margin-top: -10px; margin-bottom: 20px; font-weight: 500; font-size: 1.1rem;">Palazzo dello Sport - 25 Settembre 2026</h3>
     
     <!-- Timer principale -->
     <div id="countdownBox" class="countdown-container">
@@ -2325,7 +2622,7 @@
     <!-- Timer per categorie -->
     <div id="timerCategoryContainer" class="timer-category-container"></div>
 
-    <!-- INFO BOX - PERSONALIZZABILE CON TOGGLE VISIBILITÀ -->
+    <!-- INFO BOX CON TOOLBAR STILE WORD -->
     <div id="infoBox" class="info-section">
         <div class="info-header">
             <i class="fas fa-info-circle"></i>
@@ -2343,14 +2640,69 @@
             </div>
         </div>
         
-        <!-- Visualizzazione normale -->
+        <!-- Visualizzazione normale con formattazione ricca -->
         <div id="infoDisplay" class="info-content">
-            <div id="infoText" class="info-text">📢 Benvenuti al sistema di iscrizioni Gara 4! Qui troverete tutte le comunicazioni importanti.</div>
+            <div id="infoText" class="info-text"></div>
         </div>
         
-        <!-- Modalità modifica (solo admin) -->
+        <!-- Modalità modifica con toolbar stile Word -->
         <div id="infoEditMode" class="info-edit-mode" style="display: none;">
-            <textarea id="infoEditor" class="info-editor" placeholder="Scrivi qui le informazioni da comunicare..."></textarea>
+            <!-- TOOLBAR STILE WORD -->
+            <div class="info-toolbar">
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="formatText('bold')" title="Grassetto (Ctrl+B)"><i class="fas fa-bold"></i></button>
+                    <button class="toolbar-btn" onclick="formatText('italic')" title="Corsivo (Ctrl+I)"><i class="fas fa-italic"></i></button>
+                    <button class="toolbar-btn" onclick="formatText('underline')" title="Sottolineato (Ctrl+U)"><i class="fas fa-underline"></i></button>
+                </div>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="formatText('strikethrough')" title="Barrato"><i class="fas fa-strikethrough"></i></button>
+                    <button class="toolbar-btn" onclick="formatText('superscript')" title="Apice"><i class="fas fa-superscript"></i></button>
+                    <button class="toolbar-btn" onclick="formatText('subscript')" title="Pedice"><i class="fas fa-subscript"></i></button>
+                </div>
+                <div class="toolbar-group">
+                    <select class="toolbar-font-select" onchange="formatText('fontName', this.value)">
+                        <option value="Montserrat">Montserrat</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                    <select class="toolbar-size-select" onchange="formatText('fontSize', this.value)">
+                        <option value="1">Piccolo</option>
+                        <option value="3" selected>Normale</option>
+                        <option value="5">Grande</option>
+                        <option value="7">Molto grande</option>
+                    </select>
+                </div>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="formatText('justifyLeft')" title="Allinea a sinistra"><i class="fas fa-align-left"></i></button>
+                    <button class="toolbar-btn" onclick="formatText('justifyCenter')" title="Centra"><i class="fas fa-align-center"></i></button>
+                    <button class="toolbar-btn" onclick="formatText('justifyRight')" title="Allinea a destra"><i class="fas fa-align-right"></i></button>
+                    <button class="toolbar-btn" onclick="formatText('justifyFull')" title="Giustifica"><i class="fas fa-align-justify"></i></button>
+                </div>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="formatText('insertUnorderedList')" title="Elenco puntato"><i class="fas fa-list-ul"></i></button>
+                    <button class="toolbar-btn" onclick="formatText('insertOrderedList')" title="Elenco numerato"><i class="fas fa-list-ol"></i></button>
+                    <button class="toolbar-btn" onclick="formatText('indent')" title="Aumenta rientro"><i class="fas fa-indent"></i></button>
+                    <button class="toolbar-btn" onclick="formatText('outdent')" title="Diminuisci rientro"><i class="fas fa-outdent"></i></button>
+                </div>
+                <div class="toolbar-group">
+                    <input type="color" class="toolbar-color-picker" onchange="formatText('foreColor', this.value)" title="Colore testo">
+                    <input type="color" class="toolbar-color-picker" onchange="formatText('backColor', this.value)" title="Colore sfondo">
+                </div>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="formatText('createLink')" title="Inserisci link"><i class="fas fa-link"></i></button>
+                    <button class="toolbar-btn" onclick="formatText('unlink')" title="Rimuovi link"><i class="fas fa-unlink"></i></button>
+                </div>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="formatText('removeFormat')" title="Rimuovi formattazione"><i class="fas fa-eraser"></i></button>
+                </div>
+            </div>
+            
+            <!-- Editor di testo -->
+            <div id="infoEditor" class="info-editor" contenteditable="true" style="overflow-y: auto;"></div>
+            
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
                 <button onclick="anteprimaInfo()" class="btn-info-preview"><i class="fas fa-eye"></i> Anteprima</button>
                 <button onclick="annullaModificaInfo()" class="btn-info-cancel"><i class="fas fa-times"></i> Annulla</button>
@@ -2566,7 +2918,7 @@
     let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false, isEditingCategoria = false;
     let selectedIds = new Set();
     let mostraAccompagnatori = true;
-    let mostraInfoBox = false; // Variabile per la visibilità del box info
+    let mostraInfoBox = false;
     let tempAccompagnatoriValues = {};
     let isTypingInAccompagnatore = false;
     let refreshInterval = null;
@@ -4194,7 +4546,29 @@
         }
     }
 
-    // ===== INFO BOX FUNCTIONS =====
+    // ===== FUNZIONI PER LA TOOLBAR DI FORMATTAZIONE =====
+    function formatText(command, value = null) {
+        const editor = document.getElementById('infoEditor');
+        
+        if (command === 'createLink') {
+            const url = prompt('Inserisci l\'URL del link:', 'https://');
+            if (url) {
+                document.execCommand('createLink', false, url);
+            }
+        } else if (command === 'fontSize') {
+            document.execCommand('fontSize', false, value);
+        } else if (command === 'fontName') {
+            document.execCommand('fontName', false, value);
+        } else if (command === 'foreColor' || command === 'backColor') {
+            document.execCommand(command, false, value);
+        } else {
+            document.execCommand(command, false, value);
+        }
+        
+        editor.focus();
+    }
+
+    // ===== INFO BOX FUNCTIONS CON SUPPORTO FORMATTAZIONE RICCA =====
     async function caricaInfoBox() {
         const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'info_box_text');
         const infoBox = document.getElementById('infoBox');
@@ -4205,12 +4579,16 @@
         const deleteBtn = document.getElementById('deleteInfoBtn');
         
         if (data && data.length > 0 && data[0].valore) {
-            infoText.innerText = data[0].valore;
-            infoEditor.value = data[0].valore;
+            // Usa innerHTML per mantenere la formattazione HTML
+            infoText.innerHTML = data[0].valore;
+            infoEditor.innerHTML = data[0].valore;
         } else {
-            const defaultText = "📢 Juvenilia Racing Team - Benvenuti al sistema di iscrizioni Gara 4! 🛼\n\n• Seleziona PARTECIPA o NON PARTECIPA per ogni atleta\n• Per i minorenni è obbligatorio indicare un accompagnatore\n• Le scadenze per categoria sono indicate dai timer colorati";
-            infoText.innerText = defaultText;
-            infoEditor.value = defaultText;
+            const defaultText = "<strong>📢 Juvenilia Racing Team</strong> - Benvenuti al sistema di iscrizioni Gara 4! 🛼<br><br>" +
+                              "• Seleziona <strong style='color: var(--racing-green);'>PARTECIPA</strong> o <strong style='color: var(--racing-red);'>NON PARTECIPA</strong> per ogni atleta<br>" +
+                              "• Per i <u>minorenni</u> è obbligatorio indicare un accompagnatore<br>" +
+                              "• Le scadenze per categoria sono indicate dai <em>timer colorati</em>";
+            infoText.innerHTML = defaultText;
+            infoEditor.innerHTML = defaultText;
         }
         
         if (isAdmin) {
@@ -4239,9 +4617,9 @@
     }
     
     function anteprimaInfo() {
-        const testo = document.getElementById('infoEditor').value;
+        const testo = document.getElementById('infoEditor').innerHTML;
         const previewBody = document.getElementById('previewBody');
-        previewBody.innerHTML = testo.replace(/\n/g, '<br>');
+        previewBody.innerHTML = testo;
         document.getElementById('infoPreviewModal').style.display = 'flex';
     }
     
@@ -4259,7 +4637,7 @@
     }
     
     async function salvaInfo() {
-        const testo = document.getElementById('infoEditor').value;
+        const testo = document.getElementById('infoEditor').innerHTML;
         
         const { error } = await _supabase.from(T_CONF).upsert({
             chiave: 'info_box_text',
@@ -4272,7 +4650,8 @@
             return;
         }
         
-        document.getElementById('infoText').innerText = testo;
+        // Usa innerHTML per mantenere la formattazione
+        document.getElementById('infoText').innerHTML = testo;
         document.getElementById('infoDisplay').style.display = 'block';
         document.getElementById('infoEditMode').style.display = 'none';
         document.getElementById('editInfoBtn').style.display = 'flex';
@@ -4289,7 +4668,10 @@
     
     async function cancellaInfo() {
         if (confirm("Vuoi davvero cancellare tutte le informazioni? Il box tornerà al testo predefinito.")) {
-            const defaultText = "📢 Juvenilia Racing Team - Benvenuti al sistema di iscrizioni Gara 4! 🛼\n\n• Seleziona PARTECIPA o NON PARTECIPA per ogni atleta\n• Per i minorenni è obbligatorio indicare un accompagnatore\n• Le scadenze per categoria sono indicate dai timer colorati";
+            const defaultText = "<strong>📢 Juvenilia Racing Team</strong> - Benvenuti al sistema di iscrizioni Gara 4! 🛼<br><br>" +
+                              "• Seleziona <strong style='color: var(--racing-green);'>PARTECIPA</strong> o <strong style='color: var(--racing-red);'>NON PARTECIPA</strong> per ogni atleta<br>" +
+                              "• Per i <u>minorenni</u> è obbligatorio indicare un accompagnatore<br>" +
+                              "• Le scadenze per categoria sono indicate dai <em>timer colorati</em>";
             
             const { error } = await _supabase.from(T_CONF).upsert({
                 chiave: 'info_box_text',
@@ -4297,8 +4679,8 @@
             }, { onConflict: 'chiave' });
             
             if (!error) {
-                document.getElementById('infoText').innerText = defaultText;
-                document.getElementById('infoEditor').value = defaultText;
+                document.getElementById('infoText').innerHTML = defaultText;
+                document.getElementById('infoEditor').innerHTML = defaultText;
                 showToast("Informazioni ripristinate al default");
             }
         }
