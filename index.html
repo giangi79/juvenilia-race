@@ -3,84 +3,769 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-    <title>Juvenilia Dashboard - Sync</title>
     
+    <!-- SEO e Meta Tags -->
+    <title>Juvenilia Dashboard - Gestione Gare</title>
+    <meta name="description" content="Dashboard per la gestione e il riordino delle gare Juvenilia">
+    <meta name="theme-color" content="#1a237e">
+    
+    <!-- Favicon e Icone -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" sizes="48x48" href="icon-48.png">
+    <link rel="icon" type="image/png" sizes="72x72" href="icon-72.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="icon-96.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="icon-128.png">
+    <link rel="icon" type="image/png" sizes="144x144" href="icon-144.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+    
+    <!-- PWA support -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Scripts e CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap">
 
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; background: #f0f2f5; padding-bottom: 50px; }
-        header { background: #1a237e; color: white; padding: 30px; text-align: center; border-radius: 0 0 20px 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+        /* Reset e stili base */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
         
-        .race-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: 0.3s; }
-        .reorder-active { border: 3px dashed #43e97b; transform: scale(0.97); }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 30px; 
+        }
         
-        .card-header { padding: 20px; color: white; text-align: center; font-weight: 700; }
-        .color-1 { background: linear-gradient(135deg, #1a237e, #3f51b5); }
-        .color-2 { background: linear-gradient(135deg, #2e7d32, #4caf50); }
-        .color-3 { background: linear-gradient(135deg, #c62828, #f44336); }
-        .color-4 { background: linear-gradient(135deg, #ef6c00, #ff9800); }
-        .color-5 { background: linear-gradient(135deg, #6a1b9a, #9c27b0); }
+        /* Header con logo ENORME */
+        header { 
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: white; 
+            padding: 20px 20px 30px 20px; 
+            text-align: center; 
+            border-radius: 0 0 30px 30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
         
-        .card-body { padding: 20px; }
-        .btn { padding: 15px; border-radius: 10px; border: none; font-weight: 600; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; transition: 0.2s; }
-        .btn-main { background: #1a237e; color: white; }
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
         
-        .reorder-controls { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
-        .reorder-btn { padding: 12px 25px; border-radius: 50px; border: none; background: #1a237e; color: white; cursor: pointer; font-weight: 600; }
-        .save-btn { background: #43e97b; color: #1a237e; }
+        .main-logo {
+            width: 540px;
+            height: auto;
+            max-width: 90vw;
+            object-fit: contain;
+            filter: drop-shadow(0 12px 24px rgba(0,0,0,0.4));
+            animation: float 4s ease-in-out infinite;
+            margin-bottom: 10px;
+        }
         
-        #loader { position: fixed; inset: 0; background: white; z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        #notif { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 10px; background: #1a237e; color: white; display: none; z-index: 3000; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        
+        .brand-name {
+            font-size: 1.4em;
+            font-weight: 300;
+            letter-spacing: 4px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 25px;
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            font-weight: 300;
+            margin-top: 15px;
+        }
+        
+        /* Container grid 3x2 */
+        .container { 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 0 20px; 
+            display: grid; 
+            gap: 25px; 
+            grid-template-columns: repeat(3, 1fr);
+            justify-content: center;
+        }
+        
+        /* Card stili */
+        .race-card { 
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px; 
+            overflow: hidden; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+            animation: fadeInUp 0.5s ease-out;
+            width: 100%;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .race-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        }
+        
+        .reorder-active { 
+            border: 4px solid #43e97b;
+            transform: scale(0.98);
+            box-shadow: 0 0 30px rgba(67, 233, 123, 0.4);
+        }
+        
+        /* Header con numero e icona */
+        .card-header { 
+            padding: 20px 15px; 
+            color: white; 
+            text-align: center; 
+            font-weight: 700;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .race-card:hover .card-header::before {
+            opacity: 1;
+        }
+        
+        .card-number {
+            font-size: 2.5em;
+            font-weight: 800;
+            line-height: 1;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            background: rgba(255,255,255,0.15);
+            padding: 5px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 1;
+        }
+        
+        .card-logo {
+            font-size: 3em;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
+            z-index: 1;
+        }
+        
+        .card-header h2 {
+            font-size: 1.2em;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin: 0;
+            max-width: 100%;
+            word-break: break-word;
+        }
+        
+        /* Gradienti per le card */
+        .color-1 { background: linear-gradient(135deg, #1a237e, #3f51b5, #7986cb); }
+        .color-2 { background: linear-gradient(135deg, #1b5e20, #2e7d32, #4caf50); }
+        .color-3 { background: linear-gradient(135deg, #b71c1c, #c62828, #f44336); }
+        .color-4 { background: linear-gradient(135deg, #bf360c, #ef6c00, #ff9800); }
+        .color-5 { background: linear-gradient(135deg, #4a148c, #6a1b9a, #9c27b0); }
+        
+        .card-body { 
+            padding: 20px; 
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .btn { 
+            padding: 12px 15px; 
+            border-radius: 12px; 
+            border: none; 
+            font-weight: 600; 
+            cursor: pointer; 
+            width: 100%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            text-decoration: none; 
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-main { 
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: white; 
+            box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
+        }
+        
+        .btn-main:hover {
+            background: linear-gradient(135deg, #283593, #1a237e);
+            box-shadow: 0 6px 20px rgba(26, 35, 126, 0.5);
+            transform: scale(1.03);
+        }
+        
+        /* Pulsante copia */
+        .btn-copy {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .btn-copy::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn-copy:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn-copy:hover {
+            background: linear-gradient(135deg, #764ba2, #667eea);
+            transform: scale(1.03);
+        }
+        
+        .btn-copy-success {
+            background: linear-gradient(135deg, #43e97b, #38f9d7) !important;
+            color: #1a237e !important;
+        }
+        
+        /* Tooltip */
+        .tooltip-text {
+            visibility: hidden;
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a237e;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 50px;
+            font-size: 0.85em;
+            white-space: nowrap;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .btn-copy:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Animazione copia */
+        @keyframes copyPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .copy-pulse {
+            animation: copyPulse 0.3s ease-in-out;
+        }
+        
+        /* Controlli riordino */
+        .reorder-controls { 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
+            margin: 30px auto;
+            max-width: 600px;
+            padding: 0 20px;
+        }
+        
+        .reorder-btn { 
+            padding: 15px 35px; 
+            border-radius: 50px; 
+            border: none; 
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            flex: 1;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .reorder-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .save-btn { 
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            color: #1a237e;
+            border: none;
+        }
+        
+        .save-btn:hover {
+            background: linear-gradient(135deg, #38f9d7, #43e97b);
+        }
+        
+        /* Loader */
+        #loader { 
+            position: fixed; 
+            inset: 0; 
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            z-index: 2000; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center;
+            color: white;
+            transition: opacity 0.5s ease;
+        }
+        
+        .loader-spinner {
+            width: 80px;
+            height: 80px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loader-logo {
+            width: 200px;
+            height: auto;
+            margin: 30px 0 10px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        /* Notifiche */
+        #notif { 
+            position: fixed; 
+            top: 30px; 
+            right: 30px; 
+            padding: 15px 30px; 
+            border-radius: 50px; 
+            background: white;
+            color: #1a237e; 
+            display: none; 
+            z-index: 3000;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        #notif.success { 
+            background: linear-gradient(135deg, #43e97b, #38f9d7);
+            color: #1a237e; 
+        }
+        
+        #notif.error { 
+            background: linear-gradient(135deg, #c62828, #f44336);
+            color: white; 
+        }
+        
+        #notif.info { 
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white; 
+        }
+        
+        /* Responsive */
+        @media (max-width: 900px) {
+            .container { 
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .container { 
+                grid-template-columns: 1fr;
+            }
+            .main-logo { width: 90vw; }
+            .brand-name { font-size: 1.1em; letter-spacing: 2px; }
+            .reorder-controls { flex-direction: column; }
+            #notif { 
+                left: 20px;
+                right: 20px;
+                text-align: center;
+            }
+            .card-number { font-size: 2em; }
+            .card-logo { font-size: 2.5em; }
+        }
+        
+        /* Utility */
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
-    <div id="loader"><i class="fas fa-sync fa-spin fa-3x"></i><p style="margin-top:15px">Sincronizzazione Cloud...</p></div>
+    <!-- Loader -->
+    <div id="loader">
+        <div class="loader-spinner"></div>
+        <img src="logo.png" alt="Juvenilia Logo" class="loader-logo" onerror="this.style.display='none'">
+        <p style="margin-top:25px; font-size:1.2em; font-weight:300;">Caricamento gare dal database...</p>
+        <p style="font-size:0.9em; opacity:0.8;">Recupero titoli e tabelle</p>
+    </div>
+    
+    <!-- Notifiche -->
     <div id="notif"></div>
 
+    <!-- Header con logo ENORME -->
     <header>
-        <h1>Juvenilia Dashboard</h1>
-        <p>Gare sincronizzate PC & Mobile</p>
+        <div class="logo-container">
+            <img src="logo.png" alt="Juvenilia Logo" class="main-logo" onerror="this.style.display='none'">
+            <div class="brand-name">DASHBOARD GARE</div>
+        </div>
+        <p><i class="fas fa-cloud-upload-alt"></i> <span id="race-count">0</span> Gare Sincronizzate</p>
     </header>
 
+    <!-- Controlli riordino -->
     <div class="reorder-controls">
-        <button id="toggle-reorder" class="reorder-btn"><i class="fas fa-sort"></i> Riordina</button>
-        <button id="save-order" class="reorder-btn save-btn" style="display:none;"><i class="fas fa-save"></i> Salva su Cloud</button>
+        <button id="toggle-reorder" class="reorder-btn">
+            <i class="fas fa-sort"></i> Riordina Gare
+        </button>
+        <button id="save-order" class="reorder-btn save-btn" style="display:none;">
+            <i class="fas fa-cloud-upload-alt"></i> Salva Ordine
+        </button>
     </div>
 
+    <!-- Griglia gare 3x2 -->
     <div class="container" id="race-grid"></div>
 
     <script>
+        // Configurazione Supabase
         const SUPABASE_URL = 'https://jnfnfszekfstuoiemkgf.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuZm5mc3pla2ZzdHVvaWVta2dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODkzOTEsImV4cCI6MjA4MzQ2NTM5MX0.lh7eRFlg7nnI7kEzVPBL9kNyZWX-XFeWQxVbvmzRlvA';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const SYNC_ID = 'juvenilia_global_order';
 
+        // Variabili globali
         let allRaces = [];
         let isReorderMode = false;
 
-        async function init() {
-            try {
-                const { data: races, error: rErr } = await _supabase.from('races').select('*');
-                if (rErr) throw rErr;
-                allRaces = races;
+        // Funzione di escape per HTML
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
 
-                const { data: pref } = await _supabase.from('user_preferences').select('custom_order').eq('user_id', SYNC_ID).maybeSingle();
+        // Mappa icone per numero gara
+        function getRaceIcon(raceNumber) {
+            const icons = ['fa-trophy', 'fa-medal', 'fa-award', 'fa-star', 'fa-crown'];
+            return icons[(raceNumber - 1) % 5];
+        }
+
+        // Mostra notifica
+        function showNotification(msg, type = "success") {
+            const n = document.getElementById('notif');
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            n.innerHTML = `${icon} ${msg}`;
+            n.className = type;
+            n.style.display = 'block';
+            
+            setTimeout(() => {
+                n.style.display = 'none';
+            }, 3000);
+        }
+
+        // Funzione per recuperare i dati delle gare dal database
+        async function fetchRaceData() {
+            try {
+                // Recupera tutte le tabelle delle gare dal database
+                // Nota: potrebbe essere necessario creare una funzione RPC in Supabase chiamata 'get_race_tables'
+                // In alternativa, puoi usare una query diretta sulle tabelle del sistema
                 
-                renderRaces(allRaces, pref ? pref.custom_order : null);
-                document.getElementById('loader').style.display = 'none';
-            } catch (err) {
-                console.error(err);
-                document.getElementById('loader').innerHTML = "<p>Errore di connessione al database.</p>";
+                // Tentativo 1: Usare una tabella 'race_tables' che elenca le tabelle delle gare
+                const { data: tables, error: tableError } = await _supabase
+                    .from('race_tables')
+                    .select('table_name')
+                    .order('id');
+                
+                if (tableError) {
+                    console.warn('Tabella race_tables non trovata, uso metodo alternativo');
+                    
+                    // Tentativo 2: Cerca tabelle con pattern 'gara_' o simili
+                    // Questa è una soluzione di fallback - in produzione crea una tabella race_tables
+                    const tableNames = ['gara1', 'gara2', 'gara3', 'gara4', 'gara5'];
+                    
+                    const fallbackTables = tableNames.map(name => ({ table_name: name }));
+                    
+                    // Per ogni tabella, recupera il titolo
+                    const titleRequests = fallbackTables.map(t => 
+                        _supabase
+                            .from(t.table_name)
+                            .select('valore')
+                            .eq('chiave', 'titolo_gara')
+                            .maybeSingle()
+                    );
+                    
+                    const results = await Promise.all(titleRequests);
+                    
+                    // Costruisce l'array con i dati delle gare
+                    const raceData = results.map((res, index) => {
+                        const tableName = fallbackTables[index].table_name;
+                        const raceNumber = index + 1;
+                        // Qui viene estratto il titolo della gara
+                        const raceTitle = (res.data && res.data.valore) ? res.data.valore : `Gara ${raceNumber}`;
+                        
+                        return {
+                            tableName,
+                            raceNumber: raceNumber,
+                            raceTitle,  // ← Questo è il nome della gara
+                            fileName: `gara${raceNumber}.html`,
+                            id: raceNumber.toString(),
+                            icon: getRaceIcon(raceNumber)
+                        };
+                    });
+                    
+                    return raceData;
+                }
+                
+                // Se abbiamo la tabella race_tables, procediamo normalmente
+                // Per ogni tabella gara, recupera il titolo
+                const titleRequests = tables.map(t => 
+                    _supabase
+                        .from(t.table_name)
+                        .select('valore')
+                        .eq('chiave', 'titolo_gara')
+                        .maybeSingle()
+                );
+                
+                const results = await Promise.all(titleRequests);
+                
+                // Costruisce l'array con i dati delle gare
+                const raceData = results.map((res, index) => {
+                    const tableName = tables[index].table_name;
+                    const raceNumber = tableName.match(/\d+/) ? parseInt(tableName.match(/\d+/)[0]) : (index + 1);
+                    // Qui viene estratto il titolo della gara
+                    const raceTitle = (res.data && res.data.valore) ? res.data.valore : `Gara ${raceNumber}`;
+                    
+                    return {
+                        tableName,
+                        raceNumber: raceNumber,
+                        raceTitle,  // ← Questo è il nome della gara
+                        fileName: `gara${raceNumber}.html`,
+                        id: raceNumber.toString(),
+                        icon: getRaceIcon(raceNumber)
+                    };
+                });
+                
+                return raceData;
+                
+            } catch (error) {
+                console.error('Errore in fetchRaceData:', error);
+                // Fallback a dati statici
+                return [
+                    { id: "1", raceNumber: 1, raceTitle: "Trofeo Città di Roma", fileName: "gara1.html", icon: "fa-trophy" },
+                    { id: "2", raceNumber: 2, raceTitle: "Memorial Rossi", fileName: "gara2.html", icon: "fa-medal" },
+                    { id: "3", raceNumber: 3, raceTitle: "Campionato Regionale", fileName: "gara3.html", icon: "fa-award" },
+                    { id: "4", raceNumber: 4, raceTitle: "Coppa Primavera", fileName: "gara4.html", icon: "fa-star" },
+                    { id: "5", raceNumber: 5, raceTitle: "Gran Premio Finale", fileName: "gara5.html", icon: "fa-crown" }
+                ];
             }
         }
 
+        // Funzione per copiare il link
+        async function copyLink(link, raceName, buttonElement) {
+            try {
+                const fullUrl = new URL(link, window.location.origin).href;
+                
+                buttonElement.classList.add('copy-pulse');
+                
+                await navigator.clipboard.writeText(fullUrl);
+                
+                const originalHTML = buttonElement.innerHTML;
+                
+                buttonElement.innerHTML = '<i class="fas fa-check"></i> Copiato!';
+                buttonElement.classList.add('btn-copy-success');
+                
+                showNotification(`Link ${raceName} copiato!`, 'success');
+                
+                setTimeout(() => {
+                    buttonElement.innerHTML = originalHTML;
+                    buttonElement.classList.remove('copy-pulse', 'btn-copy-success');
+                }, 2000);
+                
+            } catch (err) {
+                console.error('Errore copia:', err);
+                showNotification('Errore durante la copia', 'error');
+                
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = new URL(link, window.location.origin).href;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    showNotification(`Link ${raceName} copiato!`, 'success');
+                } catch (e) {
+                    showNotification('Errore: copia manuale necessaria', 'error');
+                }
+                
+                document.body.removeChild(textarea);
+            }
+        }
+
+        // Inizializzazione principale
+        async function init() {
+            const loader = document.getElementById('loader');
+            const raceCountSpan = document.getElementById('race-count');
+            
+            try {
+                // Timeout di sicurezza
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error("Timeout connessione")), 10000)
+                );
+                
+                // Recupera i dati delle gare con fetchRaceData
+                const raceDataPromise = fetchRaceData();
+                const raceData = await Promise.race([raceDataPromise, timeoutPromise]);
+                
+                // Converti nel formato atteso dal resto dell'app
+                allRaces = raceData.map(race => ({
+                    id: race.id,
+                    name: race.raceTitle,
+                    fullName: `Gara ${race.raceNumber} - ${race.raceTitle}`,
+                    link: race.fileName,
+                    number: `#${String(race.raceNumber).padStart(3, '0')}`,
+                    icon: race.icon
+                }));
+                
+                // Aggiorna contatore
+                raceCountSpan.textContent = allRaces.length;
+                
+                // Carica preferenze ordine
+                const { data: pref } = await _supabase
+                    .from('user_preferences')
+                    .select('custom_order')
+                    .eq('user_id', SYNC_ID)
+                    .maybeSingle();
+                
+                renderRaces(allRaces, pref ? pref.custom_order : null);
+                
+                // Nascondi loader
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
+                
+            } catch (err) {
+                console.error('Errore init:', err);
+                
+                // Fallback a dati statici
+                allRaces = [
+                    { id: "1", name: "Trofeo Città di Roma", fullName: "Gara 1 - Trofeo Città di Roma", link: "gara1.html", number: "#001", icon: "fa-trophy" },
+                    { id: "2", name: "Memorial Rossi", fullName: "Gara 2 - Memorial Rossi", link: "gara2.html", number: "#002", icon: "fa-medal" },
+                    { id: "3", name: "Campionato Regionale", fullName: "Gara 3 - Campionato Regionale", link: "gara3.html", number: "#003", icon: "fa-award" },
+                    { id: "4", name: "Coppa Primavera", fullName: "Gara 4 - Coppa Primavera", link: "gara4.html", number: "#004", icon: "fa-star" },
+                    { id: "5", name: "Gran Premio Finale", fullName: "Gara 5 - Gran Premio Finale", link: "gara5.html", number: "#005", icon: "fa-crown" }
+                ];
+                
+                raceCountSpan.textContent = allRaces.length;
+                renderRaces(allRaces, null);
+                
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    showNotification('Modalità offline - Dati statici', 'info');
+                }, 500);
+            }
+        }
+
+        // Renderizza le gare
         function renderRaces(races, order) {
             const grid = document.getElementById('race-grid');
             grid.innerHTML = '';
+            
             let sorted = [...races];
 
             if (order && Array.isArray(order)) {
@@ -91,66 +776,123 @@
                 });
             }
 
-            sorted.forEach((race, i) => {
+            sorted.forEach((race, index) => {
                 const card = document.createElement('div');
                 card.className = `race-card ${isReorderMode ? 'reorder-active' : ''}`;
                 card.dataset.id = race.id;
+                card.dataset.index = index;
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                const colorIndex = (parseInt(race.id) % 5) || 5;
+                const raceIcon = `<i class="fas ${race.icon}"></i>`;
+                const raceTitle = isReorderMode ? race.fullName : race.name;
+                
                 card.innerHTML = `
-                    <div class="card-header color-${(i % 5) + 1}"><h2>${race.name}</h2></div>
+                    <div class="card-header color-${colorIndex}">
+                        <div class="card-number">${race.number}</div>
+                        <div class="card-logo">${raceIcon}</div>
+                        ${escapeHtml(raceTitle)}
+                    </div>
                     <div class="card-body">
                         ${isReorderMode ? `
-                            <div style="display:flex; gap:10px;">
-                                <button onclick="move('${race.id}', 'up')" class="btn btn-main"><i class="fas fa-arrow-left"></i></button>
-                                <button onclick="move('${race.id}', 'down')" class="btn btn-main"><i class="fas fa-arrow-right"></i></button>
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="window.move('${race.id}', 'up')" class="btn btn-main" ${index === 0 ? 'disabled' : ''}>
+                                    <i class="fas fa-arrow-up"></i> Su
+                                </button>
+                                <button onclick="window.move('${race.id}', 'down')" class="btn btn-main" ${index === sorted.length - 1 ? 'disabled' : ''}>
+                                    <i class="fas fa-arrow-down"></i> Giù
+                                </button>
                             </div>
                         ` : `
-                            <a href="${race.link}" class="btn btn-main" target="_blank">Visualizza Tabellone</a>
+                            <a href="${race.link}" class="btn btn-main" target="_blank" rel="noopener noreferrer">
+                                <i class="fas fa-trophy"></i> Apri Tabellone
+                            </a>
+                            <button class="btn btn-copy" onclick="window.copyLink('${race.link}', '${race.name}', this)">
+                                <i class="fas fa-copy"></i> Copia Link
+                                <span class="tooltip-text">Copia link negli appunti</span>
+                            </button>
                         `}
                     </div>`;
                 grid.appendChild(card);
             });
         }
 
+        // Funzione move
         function move(id, dir) {
+            if (!isReorderMode) return;
+            
             const grid = document.getElementById('race-grid');
             const cards = Array.from(grid.children);
             const idx = cards.findIndex(c => c.dataset.id == id);
-            if (dir === 'up' && idx > 0) grid.insertBefore(cards[idx], cards[idx-1]);
-            if (dir === 'down' && idx < cards.length - 1) grid.insertBefore(cards[idx+1], cards[idx]);
+            
+            if (dir === 'up' && idx > 0) {
+                grid.insertBefore(cards[idx], cards[idx-1]);
+            }
+            if (dir === 'down' && idx < cards.length - 1) {
+                grid.insertBefore(cards[idx+1], cards[idx]);
+            }
         }
 
+        // Salva su cloud
         async function saveToCloud() {
             const newOrder = Array.from(document.querySelectorAll('.race-card')).map(c => c.dataset.id);
-            const { error } = await _supabase.from('user_preferences').upsert({ 
-                user_id: SYNC_ID, 
-                custom_order: newOrder
-            });
             
-            if (!error) {
-                showNotification("Ordine sincronizzato!");
-                isReorderMode = false;
-                document.getElementById('save-order').style.display = 'none';
-                document.getElementById('toggle-reorder').innerText = 'Riordina';
+            try {
+                const { error } = await _supabase.from('user_preferences').upsert({ 
+                    user_id: SYNC_ID, 
+                    custom_order: newOrder
+                });
+                
+                if (!error) {
+                    showNotification("Ordine sincronizzato!", "success");
+                    isReorderMode = false;
+                    
+                    document.getElementById('save-order').style.display = 'none';
+                    document.getElementById('toggle-reorder').innerHTML = '<i class="fas fa-sort"></i> Riordina Gare';
+                    
+                    const { data: pref } = await _supabase
+                        .from('user_preferences')
+                        .select('custom_order')
+                        .eq('user_id', SYNC_ID)
+                        .maybeSingle();
+                    
+                    renderRaces(allRaces, pref ? pref.custom_order : null);
+                } else {
+                    throw error;
+                }
+            } catch (err) {
+                showNotification("Errore salvataggio", "error");
+            }
+        }
+
+        // Toggle modalità riordino
+        function toggleReorder() {
+            isReorderMode = !isReorderMode;
+            
+            const saveBtn = document.getElementById('save-order');
+            const toggleBtn = document.getElementById('toggle-reorder');
+            
+            if (isReorderMode) {
+                saveBtn.style.display = 'block';
+                toggleBtn.innerHTML = '<i class="fas fa-times"></i> Annulla';
+                renderRaces(allRaces, null);
+            } else {
+                saveBtn.style.display = 'none';
+                toggleBtn.innerHTML = '<i class="fas fa-sort"></i> Riordina Gare';
                 init();
             }
         }
 
-        function toggleReorder() {
-            isReorderMode = !isReorderMode;
-            document.getElementById('save-order').style.display = isReorderMode ? 'block' : 'none';
-            document.getElementById('toggle-reorder').innerText = isReorderMode ? 'Annulla' : 'Riordina';
-            if (isReorderMode) renderRaces(allRaces, null);
-            else init();
-        }
-
-        function showNotification(msg) {
-            const n = document.getElementById('notif');
-            n.innerText = msg; n.style.display = 'block';
-            setTimeout(() => n.style.display = 'none', 3000);
-        }
-
+        // Esponi funzioni globalmente
+        window.move = move;
+        window.init = init;
+        window.copyLink = copyLink;
+        
+        // Event listeners
         document.getElementById('toggle-reorder').onclick = toggleReorder;
         document.getElementById('save-order').onclick = saveToCloud;
+        
+        // Avvia
         init();
     </script>
 </body>
