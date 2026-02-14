@@ -22,8 +22,8 @@
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" href="icon-192.png">
     
-    <!-- PWA support -->
-    <link rel="manifest" href="manifest.json">
+    <!-- PWA support - commentato perché manca il file -->
+    <!-- <link rel="manifest" href="manifest.json"> -->
     
     <!-- Scripts e CSS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -162,6 +162,8 @@
             flex-direction: column;
             align-items: center;
             gap: 15px;
+            min-height: 180px;
+            justify-content: center;
         }
         
         .card-header::before {
@@ -187,7 +189,7 @@
         }
         
         .card-header h2 {
-            font-size: 1.4em;
+            font-size: 1.2em;
             font-weight: 700;
             position: relative;
             z-index: 1;
@@ -195,7 +197,7 @@
             margin: 0;
             max-width: 100%;
             word-break: break-word;
-            line-height: 1.3;
+            line-height: 1.4;
         }
         
         /* Gradienti per le card */
@@ -457,7 +459,7 @@
                 text-align: center;
             }
             .card-logo { font-size: 3em; }
-            .card-header h2 { font-size: 1.2em; }
+            .card-header h2 { font-size: 1.1em; }
         }
         
         /* Utility */
@@ -570,7 +572,6 @@
                     const tableName = `configurazione_gara${raceNumber}`;
                     
                     // Qui viene estratto il titolo della gara
-                    // La struttura attesa: { data: { valore: "Nome Gara" } }
                     let raceTitle = `Gara ${raceNumber}`; // Default
                     
                     if (res.data && res.data.valore) {
@@ -602,7 +603,7 @@
                     { 
                         id: "1", 
                         raceNumber: 1, 
-                        raceTitle: "Trofeo Città di Roma", 
+                        raceTitle: "CAMPIONATO REGIONALE STRADA - SAN SEVERINO - 28/29 MARZO", 
                         fileName: "gara1.html", 
                         icon: "fa-trophy",
                         tableName: "configurazione_gara1"
@@ -610,7 +611,7 @@
                     { 
                         id: "2", 
                         raceNumber: 2, 
-                        raceTitle: "Memorial Rossi", 
+                        raceTitle: "CAMPIONATI ITALIANI INDOOR - PESCARA", 
                         fileName: "gara2.html", 
                         icon: "fa-medal",
                         tableName: "configurazione_gara2"
@@ -618,7 +619,7 @@
                     { 
                         id: "3", 
                         raceNumber: 3, 
-                        raceTitle: "Campionato Regionale", 
+                        raceTitle: "CAMPIONATO REGIONALE PISTA - CIVITANOVA MARCHE - 11/12 APRILE", 
                         fileName: "gara3.html", 
                         icon: "fa-award",
                         tableName: "configurazione_gara3"
@@ -626,7 +627,7 @@
                     { 
                         id: "4", 
                         raceNumber: 4, 
-                        raceTitle: "Coppa Primavera", 
+                        raceTitle: "ANCORA DA ORGANIZZARE", 
                         fileName: "gara4.html", 
                         icon: "fa-star",
                         tableName: "configurazione_gara4"
@@ -634,7 +635,7 @@
                     { 
                         id: "5", 
                         raceNumber: 5, 
-                        raceTitle: "Gran Premio Finale", 
+                        raceTitle: "ANCORA DA ORGANIZZARE", 
                         fileName: "gara5.html", 
                         icon: "fa-crown",
                         tableName: "configurazione_gara5"
@@ -736,13 +737,13 @@
             } catch (err) {
                 console.error('Errore init:', err);
                 
-                // Fallback a dati statici
+                // Fallback a dati statici con i titoli reali
                 allRaces = [
-                    { id: "1", name: "Trofeo Città di Roma", fullName: "Gara 1 - Trofeo Città di Roma", link: "gara1.html", number: "#001", icon: "fa-trophy", tableName: "configurazione_gara1" },
-                    { id: "2", name: "Memorial Rossi", fullName: "Gara 2 - Memorial Rossi", link: "gara2.html", number: "#002", icon: "fa-medal", tableName: "configurazione_gara2" },
-                    { id: "3", name: "Campionato Regionale", fullName: "Gara 3 - Campionato Regionale", link: "gara3.html", number: "#003", icon: "fa-award", tableName: "configurazione_gara3" },
-                    { id: "4", name: "Coppa Primavera", fullName: "Gara 4 - Coppa Primavera", link: "gara4.html", number: "#004", icon: "fa-star", tableName: "configurazione_gara4" },
-                    { id: "5", name: "Gran Premio Finale", fullName: "Gara 5 - Gran Premio Finale", link: "gara5.html", number: "#005", icon: "fa-crown", tableName: "configurazione_gara5" }
+                    { id: "1", name: "CAMPIONATO REGIONALE STRADA - SAN SEVERINO - 28/29 MARZO", fullName: "Gara 1 - CAMPIONATO REGIONALE STRADA - SAN SEVERINO - 28/29 MARZO", link: "gara1.html", number: "#001", icon: "fa-trophy", tableName: "configurazione_gara1" },
+                    { id: "2", name: "CAMPIONATI ITALIANI INDOOR - PESCARA", fullName: "Gara 2 - CAMPIONATI ITALIANI INDOOR - PESCARA", link: "gara2.html", number: "#002", icon: "fa-medal", tableName: "configurazione_gara2" },
+                    { id: "3", name: "CAMPIONATO REGIONALE PISTA - CIVITANOVA MARCHE - 11/12 APRILE", fullName: "Gara 3 - CAMPIONATO REGIONALE PISTA - CIVITANOVA MARCHE - 11/12 APRILE", link: "gara3.html", number: "#003", icon: "fa-award", tableName: "configurazione_gara3" },
+                    { id: "4", name: "ANCORA DA ORGANIZZARE", fullName: "Gara 4 - ANCORA DA ORGANIZZARE", link: "gara4.html", number: "#004", icon: "fa-star", tableName: "configurazione_gara4" },
+                    { id: "5", name: "ANCORA DA ORGANIZZARE", fullName: "Gara 5 - ANCORA DA ORGANIZZARE", link: "gara5.html", number: "#005", icon: "fa-crown", tableName: "configurazione_gara5" }
                 ];
                 
                 raceCountSpan.textContent = allRaces.length;
