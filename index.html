@@ -29,7 +29,7 @@
     <meta property="og:title" content="Juvenilia Dashboard">
     <meta property="og:description" content="Gestione centralizzata delle manifestazioni sportive">
     <meta property="og:image" content="icon-512.png">
-    <meta property="og:url" content="https://juvenilia-dashboard.it">
+    <meta property="og:url" content="https://giangi79.github.io/juvenilia-race/">
     <meta name="twitter:card" content="summary_large_image">
     
     <!-- PWA MANIFEST -->
@@ -38,19 +38,14 @@
     <title>Dashboard Polisportiva Juvenilia</title>
     
     <!-- ============ FAVICON E ICONE COMPLETE ============ -->
-    <!-- Favicon principale .ico (per browser vecchi) -->
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-    
-    <!-- Favicon PNG per browser moderni -->
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-    
-    <!-- Icone per Android/Chrome -->
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
     
-    <!-- Icone Apple Touch (iOS Safari) - TUTTE LE DIMENSIONI -->
+    <!-- Icone Apple Touch -->
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="apple-touch-icon" sizes="57x57" href="icon-144.png">
     <link rel="apple-touch-icon" sizes="60x60" href="icon-144.png">
@@ -62,9 +57,6 @@
     <link rel="apple-touch-icon" sizes="152x152" href="icon-192.png">
     <link rel="apple-touch-icon" sizes="167x167" href="icon-192.png">
     <link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
-    
-    <!-- LINK PER APPLE TOUCH ICON -->
-    <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="mask-icon" href="safari-pinned-tab.svg" color="#1a237e">
     
     <!-- CDN SCRIPT & STYLE -->
@@ -86,7 +78,6 @@
             touch-action: pan-x pan-y;
         }
         
-        /* Abilita selezione per elementi testuali */
         .selectable-text {
             -webkit-user-select: text;
             user-select: text;
@@ -105,13 +96,11 @@
         }
         
         :root {
-            /* VARIABILI ADATTIVE */
             --safe-area-top: max(env(safe-area-inset-top), 20px);
             --safe-area-bottom: max(env(safe-area-inset-bottom), 20px);
             --safe-area-left: env(safe-area-inset-left, 0px);
             --safe-area-right: env(safe-area-inset-right, 0px);
             
-            /* COLORI PRINCIPALI */
             --primary: #1a237e;
             --secondary: #283593;
             --accent: #5c6bc0;
@@ -120,13 +109,11 @@
             --drag-color: #ff9800;
             --drag-accent: #ff5722;
             
-            /* BACKGROUNDS */
             --bg: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
             --card-bg: #ffffff;
             --text: #2c3e50;
             --text-light: #7f8c8d;
             
-            /* DIMENSIONI DINAMICHE */
             --header-height-mobile: 180px;
             --header-height-desktop: 220px;
             --card-min-width: min(350px, 90vw);
@@ -137,7 +124,6 @@
             --font-size-medium: clamp(1.2rem, 4vw, 1.3rem);
             --font-size-small: clamp(0.9rem, 3vw, 1rem);
             
-            /* SHADOW & RADIUS */
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.15);
             --radius: clamp(15px, 4vw, 20px);
@@ -146,12 +132,6 @@
             --swap-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* DETECTION DISPOSITIVO */
-        body::after {
-            content: '';
-            display: none;
-        }
-        
         .device-mobile .container {
             grid-template-columns: 1fr;
             padding: 0 clamp(10px, 3vw, 15px);
@@ -171,7 +151,6 @@
             flex-direction: column;
         }
 
-        /* PWA INSTALLED STYLES */
         body.pwa-installed header {
             padding-top: calc(var(--safe-area-top) + 10px);
             min-height: calc(var(--header-height-mobile) - 20px);
@@ -183,7 +162,6 @@
             }
         }
 
-        /* HEADER RESPONSIVE */
         header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white; 
@@ -225,7 +203,6 @@
             background-position: bottom;
         }
 
-        /* LOGO CON FALLBACK MIGLIORATO */
         .logo-header {
             height: clamp(80px, 20vw, 120px);
             width: auto;
@@ -245,7 +222,6 @@
             display: block;
         }
 
-        /* Fallback per logo mancante */
         .logo-header:after {
             content: '🏆';
             display: none;
@@ -299,7 +275,6 @@
             font-weight: 300;
         }
 
-        /* CONTROLLI RIORDINO */
         .reorder-controls {
             display: flex;
             justify-content: center;
@@ -363,7 +338,6 @@
             opacity: 1;
         }
 
-        /* CONTAINER PRINCIPALE ADATTIVO */
         main {
             flex: 1;
             width: 100%;
@@ -381,7 +355,6 @@
             overscroll-behavior-y: contain;
         }
 
-        /* GRID ADATTIVA */
         @media (max-width: 479px) {
             .container {
                 grid-template-columns: 1fr;
@@ -406,12 +379,10 @@
             }
         }
 
-        /* LANDSCAPE OPTIMIZATION */
         body.landscape .container {
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         }
 
-        /* CARD GARA RESPONSIVE */
         .race-card {
             background: var(--card-bg);
             border-radius: var(--radius);
@@ -534,7 +505,6 @@
             touch-action: manipulation;
         }
 
-        /* iOS optimization */
         @supports (-webkit-touch-callout: none) {
             .move-btn {
                 width: 44px;
@@ -574,7 +544,6 @@
             flex-grow: 1;
         }
 
-        /* PULSANTI TOUCH-FRIENDLY */
         .btn {
             padding: clamp(14px, 4vw, 16px) clamp(16px, 4vw, 20px);
             border-radius: clamp(12px, 3vw, 14px);
@@ -599,7 +568,6 @@
             user-select: none;
         }
 
-        /* iOS specific button styles */
         @supports (-webkit-touch-callout: none) {
             .btn {
                 min-height: 48px;
@@ -671,7 +639,6 @@
             color: white;
         }
 
-        /* ANIMAZIONE SPOSTAMENTO */
         @keyframes move-up {
             0% {
                 transform: translateY(0);
@@ -710,7 +677,6 @@
             animation: move-down 0.3s ease;
         }
 
-        /* COLORI DINAMICI */
         .color-1 { background: linear-gradient(135deg, #667eea, #764ba2); }
         .color-2 { background: linear-gradient(135deg, #f5576c, #f093fb); }
         .color-3 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
@@ -720,7 +686,6 @@
         .color-7 { background: linear-gradient(135deg, #a8edea, #fed6e3); }
         .color-8 { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
 
-        /* LOADER RESPONSIVE */
         #loader {
             position: fixed;
             top: 0;
@@ -763,7 +728,6 @@
             padding: 0 20px;
         }
 
-        /* PROGRESS BAR */
         .progress-bar {
             width: 80%;
             max-width: 300px;
@@ -782,7 +746,6 @@
             transition: width 0.3s ease;
         }
 
-        /* NOTIFICA MOBILE-FRIENDLY */
         #notif {
             position: fixed;
             bottom: calc(20px + var(--safe-area-bottom));
@@ -810,7 +773,6 @@
             }
         }
 
-        /* CONTATORE GARE RESPONSIVE */
         .race-counter {
             text-align: center;
             margin-bottom: clamp(20px, 5vw, 40px);
@@ -856,7 +818,6 @@
             font-size: clamp(0.8rem, 3vw, 0.9rem);
         }
 
-        /* FOOTER RESPONSIVE */
         .footer {
             text-align: center;
             padding: clamp(20px, 5vw, 30px) clamp(15px, 4vw, 20px);
@@ -878,7 +839,6 @@
             text-decoration: underline;
         }
 
-        /* MESSAGGIO VUOTO RESPONSIVE */
         .empty-state {
             grid-column: 1/-1;
             text-align: center;
@@ -934,7 +894,6 @@
             transform: translateY(-2px);
         }
 
-        /* IOS SPECIFIC FIXES */
         @supports (-webkit-touch-callout: none) {
             body {
                 min-height: -webkit-fill-available;
@@ -950,7 +909,6 @@
             }
         }
 
-        /* REDUCE MOTION SUPPORT */
         @media (prefers-reduced-motion: reduce) {
             * {
                 animation-duration: 0.01ms !important;
@@ -967,7 +925,6 @@
             }
         }
 
-        /* DARK MODE SUPPORT */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
@@ -1001,7 +958,6 @@
             }
         }
 
-        /* PWA INSTALL BUTTON - STILI MIGLIORATI */
         #installButton {
             position: fixed;
             bottom: 100px;
@@ -1050,7 +1006,6 @@
             display: none !important;
         }
 
-        /* PWA BANNER STYLES */
         .pwa-banner {
             position: fixed;
             bottom: 20px;
@@ -1125,7 +1080,6 @@
             color: #666;
         }
 
-        /* PULSANTE AGGIORNAMENTO SERVICE WORKER */
         #updateBtn {
             position: fixed;
             bottom: 150px;
@@ -1334,7 +1288,6 @@
                             console.log('✅ Service Worker registrato con scope:', registration.scope);
                             swRegistration = registration;
                             
-                            // Gestione aggiornamento
                             registration.addEventListener('updatefound', () => {
                                 const newWorker = registration.installing;
                                 console.log('🔄 Nuovo Service Worker in installazione...');
@@ -1349,7 +1302,6 @@
                                 });
                             });
                             
-                            // Controlla aggiornamenti ogni ora
                             setInterval(() => {
                                 registration.update();
                                 console.log('🔄 Controllo aggiornamenti Service Worker...');
@@ -1385,7 +1337,6 @@
             }, 10000);
         }
 
-        // Ascolta messaggi dal Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.addEventListener('message', event => {
                 console.log('📨 Messaggio da Service Worker:', event.data);
@@ -1431,44 +1382,6 @@
                     }
                 });
                 console.log('🔄 Precaching gare completato');
-            }
-        }
-
-        function setupPeriodicSync() {
-            if ('serviceWorker' in navigator && 'PeriodicSyncManager' in window) {
-                navigator.serviceWorker.ready.then(registration => {
-                    if (registration.periodicSync) {
-                        registration.periodicSync.register('sync-orders', {
-                            minInterval: 60 * 60 * 1000 // 1 ora
-                        }).then(() => {
-                            console.log('✅ Sincronizzazione periodica attivata');
-                        }).catch(error => {
-                            console.log('❌ Sincronizzazione periodica non supportata:', error);
-                        });
-                    }
-                });
-            }
-        }
-
-        function setupPushNotifications() {
-            if ('Notification' in window && 'PushManager' in window) {
-                if (Notification.permission === 'default') {
-                    Notification.requestPermission().then(permission => {
-                        if (permission === 'granted') {
-                            console.log('✅ Notifiche abilitate');
-                            
-                            if (swRegistration) {
-                                swRegistration.pushManager.subscribe({
-                                    userVisibleOnly: true
-                                }).then(subscription => {
-                                    console.log('✅ Sottoscritto alle notifiche push:', subscription);
-                                }).catch(error => {
-                                    console.log('❌ Errore sottoscrizione push:', error);
-                                });
-                            }
-                        }
-                    });
-                }
             }
         }
 
@@ -1721,56 +1634,30 @@
             return currentUserId;
         }
 
+        // ============ FUNZIONI SUPABASE CORRETTE CON LA COLONNA GIUSTA ============
         async function saveOrderToCloud(userId, orderData) {
             try {
                 console.log('💾 Preparando salvataggio cloud...', { userId, orderData });
                 
-                const dataToSave = {
-                    user_id: userId,
-                    device_type: deviceType,
-                    order_preference: {
-                        order: orderData.order || currentOrder,
-                        timestamp: orderData.timestamp || Date.now(),
-                        deviceType: deviceType,
-                        userAgent: orderData.userAgent || navigator.userAgent.substring(0, 100),
-                        updated_at: new Date().toISOString()
-                    },
-                    updated_at: new Date().toISOString()
-                };
-                
-                console.log('📤 Dati da salvare:', dataToSave);
-                
-                if (!/^user_\d+_[a-zA-Z0-9]+$/.test(userId)) {
-                    throw new Error(`Formato user_id non valido: ${userId}`);
-                }
-                
-                if (!['mobile', 'tablet', 'desktop', 'unknown'].includes(deviceType)) {
-                    throw new Error(`device_type non valido: ${deviceType}`);
-                }
-                
+                // Usando la colonna CORRETTA: juvenilia_global_order
                 const { data, error } = await _supabase
                     .from('user_preferences')
                     .upsert({
                         user_id: userId,
                         device_type: deviceType,
-                        order_preference: dataToSave.order_preference,
-                        updated_at: dataToSave.updated_at
+                        juvenilia_global_order: {
+                            order: orderData.order || currentOrder,
+                            timestamp: orderData.timestamp || Date.now(),
+                            deviceType: deviceType,
+                            userAgent: orderData.userAgent || navigator.userAgent.substring(0, 100)
+                        },
+                        updated_at: new Date().toISOString()
                     }, {
                         onConflict: 'user_id,device_type'
                     });
                 
                 if (error) {
                     console.error('❌ Errore Supabase:', error);
-                    
-                    if (error.message.includes('policy')) {
-                        console.warn('🚨 Problema con RLS policy!');
-                        console.warn('Dettagli errori:', {
-                            code: error.code,
-                            details: error.details,
-                            hint: error.hint,
-                            message: error.message
-                        });
-                    }
                     throw error;
                 }
                 
@@ -1779,6 +1666,7 @@
             } catch (error) {
                 console.error('❌ Errore salvataggio cloud:', error);
                 
+                // Fallback: salva in localStorage
                 try {
                     localStorage.setItem('racesCustomOrder', JSON.stringify({
                         order: orderData.order || currentOrder,
@@ -1801,9 +1689,10 @@
                 
                 console.log('📡 Caricamento ordine dal cloud per user:', userId);
                 
+                // Usando la colonna CORRETTA: juvenilia_global_order
                 const { data, error } = await _supabase
                     .from('user_preferences')
-                    .select('order_preference, updated_at')
+                    .select('juvenilia_global_order, updated_at')
                     .eq('user_id', userId)
                     .eq('device_type', deviceType)
                     .order('updated_at', { ascending: false })
@@ -1815,7 +1704,7 @@
                 }
                 
                 if (data && data.length > 0) {
-                    const cloudOrder = data[0].order_preference;
+                    const cloudOrder = data[0].juvenilia_global_order;
                     console.log('✅ Ordine caricato dal cloud:', cloudOrder);
                     
                     const localOrder = localStorage.getItem('racesCustomOrder');
@@ -1881,9 +1770,9 @@
                     }
                 }
                 
-                if (latestOrder.order_preference.timestamp > localTimestamp) {
+                if (latestOrder.juvenilia_global_order.timestamp > localTimestamp) {
                     console.log('🔄 Aggiorno ordine locale da cloud');
-                    localStorage.setItem('racesCustomOrder', JSON.stringify(latestOrder.order_preference));
+                    localStorage.setItem('racesCustomOrder', JSON.stringify(latestOrder.juvenilia_global_order));
                     
                     if (racesData.length > 0) {
                         renderRaceGrid(document.getElementById('race-grid'), racesData);
@@ -1934,7 +1823,6 @@
         // ============ SISTEMA RIORDINO ============
         function toggleReorderMode() {
             isReorderMode = !isReorderMode;
-            const body = document.body;
             const toggleBtn = document.getElementById('toggle-reorder');
             const saveBtn = document.getElementById('save-order');
             const resetBtn = document.getElementById('reset-order');
@@ -2131,7 +2019,6 @@
         let lastFetchTime = 0;
         const CACHE_DURATION = 5 * 60 * 1000;
         
-        let copyButtonsState = {};
         const copiedLinksCache = new Map();
         const COPY_COOLDOWN = 2000;
 
@@ -2228,7 +2115,7 @@
                 const cached = localStorage.getItem('racesCache');
                 if (!cached) return null;
                 
-                const { data, timestamp, deviceType: cachedDeviceType } = JSON.parse(cached);
+                const { data, timestamp } = JSON.parse(cached);
                 const now = Date.now();
                 
                 if (now - timestamp < 30 * 60 * 1000) {
@@ -2253,14 +2140,7 @@
             try {
                 detectDevice();
                 
-                const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-                const timeout = connection?.effectiveType === 'slow-2g' ? 30000 : 15000;
-                
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), timeout);
-                
                 const raceData = await fetchRaceData();
-                clearTimeout(timeoutId);
                 
                 if (!raceData || raceData.length === 0) {
                     console.log('📭 Nessuna gara trovata');
@@ -2282,28 +2162,16 @@
                     setTimeout(syncOrdersAcrossDevices, 2000);
                 }
                 
-                // Precaching dopo il rendering
                 setTimeout(preloadRacePages, 3000);
                 
             } catch (err) {
                 console.error("❌ Errore caricamento dashboard:", err);
-                
-                if (err.name === 'AbortError') {
-                    console.log('⏱️ Fetch timeout - caricamento lento');
-                    showErrorMessage(grid, counter, { 
-                        message: 'Connessione lenta. Caricamento in corso...' 
-                    });
-                    
-                    setTimeout(() => initDashboard(), 5000);
-                    return;
-                }
                 
                 if (!navigator.onLine) {
                     console.log('🌐 Modalità offline');
                     const offlineData = await loadFromOfflineCache();
                     if (offlineData && offlineData.length > 0) {
                         renderRaceGrid(grid, offlineData);
-                        
                         showNotification('Modalità offline - Dati in cache', 'info');
                         return;
                     }
@@ -2603,10 +2471,8 @@
             
             detectDevice();
             
-            // Registra Service Worker
             registerServiceWorker();
             
-            // Inizializza la dashboard
             if ('requestIdleCallback' in window) {
                 requestIdleCallback(() => {
                     initDashboard();
@@ -2617,7 +2483,6 @@
                 }, 500);
             }
             
-            // Event listeners
             window.addEventListener('resize', () => {
                 setTimeout(detectDevice, 100);
                 setTimeout(handleOrientationChange, 150);
@@ -2639,12 +2504,6 @@
                     }
                 }
             });
-            
-            // Setup PWA avanzato
-            setTimeout(() => {
-                setupPeriodicSync();
-                setupPushNotifications();
-            }, 5000);
         }
 
         if (document.readyState === 'loading') {
@@ -2670,16 +2529,11 @@
             checkOfflineStatus();
         });
 
-        // ============ SINCRONIZZAZIONE AUTOMATICA ============
         setInterval(() => {
             if (navigator.onLine) {
                 syncOrdersAcrossDevices();
             }
         }, 60 * 1000);
-
-        window.addEventListener('online', () => {
-            setTimeout(syncOrdersAcrossDevices, 2000);
-        });
 
         window.addEventListener('storage', (e) => {
             if (e.key === 'racesCustomOrder' && e.newValue) {
@@ -2724,7 +2578,7 @@
                 const testData = {
                     user_id: userId,
                     device_type: deviceType,
-                    order_preference: {
+                    juvenilia_global_order: {
                         order: ["race-1", "race-2", "race-3"],
                         timestamp: Date.now(),
                         deviceType: deviceType,
