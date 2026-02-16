@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Juvenilia Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a237e, #283593);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .offline-container {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.6s ease;
+        }
+        .offline-icon {
+            font-size: 80px;
+            color: #1a237e;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #1a237e;
+            margin-bottom: 15px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(26,35,126,0.4);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .cached-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .cached-info i {
+            color: #4caf50;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">
+            <i class="fas fa-wifi-slash"></i>
+        </div>
+        <h1>Sei offline</h1>
+        <p>La connessione internet è assente. <br>Non preoccuparti, puoi comunque:</p>
+        
+        <div style="margin: 30px 0; text-align: left;">
+            <div style="margin-bottom: 15px;">
+                <i class="fas fa-check-circle" style="color: #4caf50; margin-right: 10px;"></i>
+                Visualizzare le gare in cache
+            </div>
+            <div style="margin-bottom: 15px;">
+                <i class="fas fa-check-circle" style="color: #4caf50; margin-right: 10px;"></i>
+                Copiare i link delle gare
+            </div>
+            <div>
+                <i class="fas fa-check-circle" style="color: #4caf50; margin-right: 10px;"></i>
+                Riordinare le card (si sincronizzerà al ritorno online)
+            </div>
+        </div>
+        
+        <a href="index.html" class="btn">
+            <i class="fas fa-arrow-left"></i>
+            Torna alla Dashboard
+        </a>
+        
+        <div class="cached-info">
+            <i class="fas fa-database"></i>
+            I dati vengono sincronizzati automaticamente quando torni online
+        </div>
+    </div>
+</body>
+</html>
