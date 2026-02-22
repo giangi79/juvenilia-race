@@ -1224,401 +1224,39 @@
     </button>
 
     <script>
-        // ============ VERIFICA ICONE ============
-        function verifyAllIcons() {
-            console.log('🔍 VERIFICA ICONE IN CORSO...');
-            
-            const iconFiles = [
-                { name: 'favicon.ico', type: 'ico', required: true },
-                { name: 'favicon-16x16.png', type: 'png', size: '16x16', required: true },
-                { name: 'favicon-32x32.png', type: 'png', size: '32x32', required: true },
-                { name: 'icon-144.png', type: 'png', size: '144x144', required: true },
-                { name: 'icon-192.png', type: 'png', size: '192x192', required: true },
-                { name: 'icon-512.png', type: 'png', size: '512x512', required: true },
-                { name: 'logo.png', type: 'png', size: 'logo', required: false }
-            ];
-            
-            iconFiles.forEach(icon => {
-                const img = new Image();
-                img.onload = function() {
-                    console.log(`✅ ${icon.name} (${this.width}x${this.height}) - CARICATA`);
-                    
-                    if (icon.size && icon.size.includes('x')) {
-                        const [expectedWidth, expectedHeight] = icon.size.split('x').map(Number);
-                        if (this.width !== expectedWidth || this.height !== expectedHeight) {
-                            console.warn(`⚠️  ${icon.name}: Dimensione attesa ${icon.size}, trovata ${this.width}x${this.height}`);
-                        }
-                    }
-                };
-                img.onerror = function() {
-                    if (icon.required) {
-                        console.error(`❌ ${icon.name} - NON TROVATA!`);
-                    } else {
-                        console.warn(`⚠️  ${icon.name} - Non trovata (opzionale)`);
-                    }
-                };
-                img.src = icon.name;
-            });
-            
-            console.log('\n📌 LINK ICONE NEL DOM:');
-            const iconLinks = document.querySelectorAll('link[rel*="icon"], link[rel*="apple"]');
-            iconLinks.forEach(link => {
-                console.log(`  ${link.rel}: ${link.href.split('/').pop()}`);
-            });
-            
-            console.log('\n📱 MANIFEST VERIFICATION:');
-            if (document.querySelector('link[rel="manifest"]')) {
-                console.log('✅ Manifest link presente');
-            } else {
-                console.error('❌ Manifest link mancante!');
-            }
-        }
+        // ============ CONFIGURAZIONE SUPABASE ============
+        const SUPABASE_URL = 'https://jnfnfszekfstuoiemkgf.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuZm5mc3pla2ZzdHVvaWVta2dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODkzOTEsImV4cCI6MjA4MzQ2NTM5MX0.lh7eRFlg7nnI7kEzVPBL9kNyZWX-XFeWQxVbvmzRlvA';
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        setTimeout(verifyAllIcons, 3000);
-
-        // ============ GESTIONE SERVICE WORKER AVANZATA ============
-        let swRegistration = null;
-        const updateBtn = document.getElementById('updateBtn');
-
-        function registerServiceWorker() {
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('service-worker.js')
-                        .then(registration => {
-                            console.log('✅ Service Worker registrato con scope:', registration.scope);
-                            swRegistration = registration;
-                            
-                            registration.addEventListener('updatefound', () => {
-                                const newWorker = registration.installing;
-                                console.log('🔄 Nuovo Service Worker in installazione...');
-                                
-                                newWorker.addEventListener('statechange', () => {
-                                    console.log('📊 Service Worker state:', newWorker.state);
-                                    
-                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                        console.log('✨ Nuova versione disponibile!');
-                                        showUpdateNotification();
-                                    }
-                                });
-                            });
-                            
-                            setInterval(() => {
-                                registration.update();
-                                console.log('🔄 Controllo aggiornamenti Service Worker...');
-                            }, 60 * 60 * 1000);
-                            
-                        })
-                        .catch(error => {
-                            console.log('❌ Service Worker registration failed:', error);
-                        });
-                });
-            }
-        }
-
-        function showUpdateNotification() {
-            updateBtn.style.display = 'flex';
-            
-            updateBtn.onclick = () => {
-                if (swRegistration && swRegistration.waiting) {
-                    swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
-                }
-                
-                updateBtn.style.display = 'none';
-                
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            };
-            
-            setTimeout(() => {
-                if (updateBtn.style.display === 'flex') {
-                    updateBtn.style.display = 'none';
-                }
-            }, 10000);
-        }
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.addEventListener('message', event => {
-                console.log('📨 Messaggio da Service Worker:', event.data);
-                
-                if (event.data && event.data.type === 'SYNC_ORDERS') {
-                    console.log('🔄 Sincronizzazione richiesta dal Service Worker');
-                    syncOrdersAcrossDevices();
-                }
-            });
-        }
-
-        // ============ GESTIONE OFFLINE E CACHE ============
-        function checkOfflineStatus() {
-            const isOffline = !navigator.onLine;
-            
-            if (isOffline) {
-                const cachedData = localStorage.getItem('racesCache');
-                if (cachedData) {
-                    try {
-                        const { data, timestamp } = JSON.parse(cachedData);
-                        const minutesAgo = Math.floor((Date.now() - timestamp) / 60000);
-                        showNotification(`🌐 Offline - Dati cache di ${minutesAgo} minuti fa`, 'info');
-                    } catch (e) {
-                        console.warn('Errore parsing cache:', e);
-                    }
-                } else {
-                    showNotification('🌐 Offline - Nessuna cache disponibile', 'warning');
-                }
-            }
-        }
-
-        function preloadRacePages() {
-            if ('serviceWorker' in navigator && navigator.onLine) {
-                const races = document.querySelectorAll('[data-race-id]');
-                races.forEach(race => {
-                    const raceNumber = race.dataset.raceNumber;
-                    
-                    if (raceNumber) {
-                        const preloadLink = document.createElement('link');
-                        preloadLink.rel = 'prefetch';
-                        preloadLink.href = `gara${raceNumber}.html`;
-                        document.head.appendChild(preloadLink);
-                    }
-                });
-                console.log('🔄 Precaching gare completato');
-            }
-        }
-
-        // ============ PWA INSTALLATION ============
-        let deferredPrompt = null;
-        const installButton = document.getElementById('installButton');
-        const pwaBanner = document.getElementById('pwaBanner');
-        const pwaBannerInstall = document.getElementById('pwaBannerInstall');
-        const pwaBannerLater = document.getElementById('pwaBannerLater');
-
-        function canShowBanner() {
-            if (checkIfPWAInstalled()) return false;
-            
-            const lastRefused = localStorage.getItem('pwa-last-refused');
-            if (lastRefused) {
-                const daysSinceRefusal = (Date.now() - parseInt(lastRefused)) / (1000 * 60 * 60 * 24);
-                if (daysSinceRefusal < 7) return false;
-            }
-            
-            const isDesktop = window.innerWidth > 1024;
-            if (isDesktop) return false;
-            
-            const shownCount = parseInt(localStorage.getItem('pwa-banner-shown') || '0');
-            if (shownCount > 3) return false;
-            
-            return true;
-        }
-
-        function showPwaBanner() {
-            if (!canShowBanner()) return;
-            
-            const shownCount = parseInt(localStorage.getItem('pwa-banner-shown') || '0');
-            localStorage.setItem('pwa-banner-shown', (shownCount + 1).toString());
-            
-            setTimeout(() => {
-                pwaBanner.style.display = 'block';
-            }, 5000);
-        }
-
-        function hidePwaBanner() {
-            pwaBanner.style.display = 'none';
-        }
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('✅ beforeinstallprompt event fired - PWA can be installed');
-            
-            deferredPrompt = e;
-            window.deferredInstallPrompt = e;
-            
-            showInstallButton();
-            
-            setTimeout(() => {
-                if (deferredPrompt && canShowBanner()) {
-                    showPwaBanner();
-                }
-            }, 5000);
-        });
-
-        function showInstallButton() {
-            installButton.style.display = 'flex';
-            installButton.classList.add('animate__animated', 'animate__fadeInUp');
-        }
-
-        function hideInstallButton() {
-            installButton.style.display = 'none';
-            installButton.classList.remove('animate__animated', 'animate__fadeInUp');
-        }
-
-        function installApp() {
-            if (!deferredPrompt && !window.deferredInstallPrompt) {
-                console.log('❌ No deferred prompt available');
-                showNotification('Impossibile installare in questo momento', 'warning');
-                return;
-            }
-            
-            const promptToUse = deferredPrompt || window.deferredInstallPrompt;
-            
-            console.log('📲 Showing install prompt...');
-            
-            promptToUse.prompt()
-                .then(() => {
-                    return promptToUse.userChoice;
-                })
-                .then((choiceResult) => {
-                    console.log('👤 User choice:', choiceResult.outcome);
-                    
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('🎉 User accepted the install prompt');
-                        showNotification('App installata con successo! 🎉', 'success');
-                        markAsInstalled();
-                    } else {
-                        console.log('❌ User dismissed the install prompt');
-                        showNotification('Installazione annullata', 'info');
-                        markAsRefused();
-                    }
-                    
-                    deferredPrompt = null;
-                    window.deferredInstallPrompt = null;
-                    
-                    hideInstallButton();
-                    hidePwaBanner();
-                })
-                .catch((error) => {
-                    console.error('💥 Error during installation:', error);
-                    showNotification('Errore durante l\'installazione', 'warning');
-                    
-                    deferredPrompt = null;
-                    window.deferredInstallPrompt = null;
-                    
-                    hideInstallButton();
-                    hidePwaBanner();
-                });
-        }
-
-        window.addEventListener('appinstalled', (evt) => {
-            console.log('✅ PWA installed successfully');
-            markAsInstalled();
-            hideInstallButton();
-            hidePwaBanner();
-            document.body.classList.add('pwa-installed');
-            
-            setTimeout(() => {
-                showNotification('App installata con successo! 🎉', 'success');
-            }, 1000);
-        });
-
-        function checkIfPWAInstalled() {
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                console.log('📱 Running in standalone mode');
-                document.body.classList.add('pwa-installed');
-                hideInstallButton();
-                hidePwaBanner();
-                return true;
-            }
-            
-            if (window.navigator.standalone === true) {
-                console.log('📱 Running in standalone mode (iOS)');
-                document.body.classList.add('pwa-installed');
-                hideInstallButton();
-                hidePwaBanner();
-                return true;
-            }
-            
-            if (localStorage.getItem('pwa-installed') === 'true') {
-                console.log('📱 PWA already marked as installed');
-                document.body.classList.add('pwa-installed');
-                hideInstallButton();
-                hidePwaBanner();
-                return true;
-            }
-            
-            return false;
-        }
-
-        function markAsInstalled() {
-            localStorage.setItem('pwa-installed', 'true');
-            localStorage.removeItem('pwa-last-refused');
-            document.body.classList.add('pwa-installed');
-        }
-
-        function markAsRefused() {
-            localStorage.setItem('pwa-last-refused', Date.now().toString());
-        }
-
-        installButton.addEventListener('click', installApp);
-        pwaBannerInstall.addEventListener('click', installApp);
-        pwaBannerLater.addEventListener('click', () => {
-            markAsRefused();
-            hidePwaBanner();
-            showNotification('Ricordati di installare l\'app per un accesso più veloce!', 'info');
-        });
-
-        setTimeout(() => {
-            checkIfPWAInstalled();
-        }, 1000);
-
-        // ============ PULIZIA CACHE VECCHIA ============
-        function clearOldCaches() {
-            if ('caches' in window) {
-                caches.keys().then(cacheNames => {
-                    console.log('🗑️ Cache trovate:', cacheNames);
-                    
-                    const deletePromises = cacheNames.map(cacheName => {
-                        if (cacheName.includes('juvenilia-dashboard') && 
-                            !cacheName.includes('v3.2')) {
-                            console.log('🧹 Rimuovendo vecchia cache:', cacheName);
-                            return caches.delete(cacheName);
-                        }
-                        return Promise.resolve();
-                    });
-                    
-                    return Promise.all(deletePromises);
-                }).then(() => {
-                    console.log('✅ Pulizia cache completata');
-                }).catch(error => {
-                    console.error('❌ Errore nella pulizia cache:', error);
-                });
-            }
-        }
-
-        setTimeout(clearOldCaches, 2000);
-
-        // ============ FORZA AGGIORNAMENTO SW ============
-        function forceServiceWorkerUpdate() {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistration().then(registration => {
-                    if (registration) {
-                        registration.unregister().then(() => {
-                            console.log('🗑️ Service Worker rimosso');
-                            
-                            clearOldCaches();
-                            
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 1000);
-                        });
-                    }
-                });
-            }
-        }
-
-        window.forceSWUpdate = forceServiceWorkerUpdate;
-
-        // ============ SISTEMA SINCRONIZZAZIONE CLOUD ============
+        // ============ VARIABILI GLOBALI ============
         let currentUserId = null;
         let isReorderMode = false;
         let originalOrder = [];
         let currentOrder = [];
         let racesData = [];
         let deviceType = 'unknown';
-
-        // CONFIGURAZIONE SUPABASE
-        const SUPABASE_URL = 'https://jnfnfszekfstuoiemkgf.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpuZm5mc3pla2ZzdHVvaWVta2dmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc4ODkzOTEsImV4cCI6MjA4MzQ2NTM5MX0.lh7eRFlg7nnI7kEzVPBL9kNyZWX-XFeWQxVbvmzRlvA';
+        let swRegistration = null;
         
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        // Cache per le copie dei link
+        const copiedLinksCache = new Map();
+        const COPY_COOLDOWN = 2000;
+        
+        // Cache per i dati delle gare
+        let cachedRacesData = null;
+        let lastFetchTime = 0;
+        const CACHE_DURATION = 5 * 60 * 1000;
 
+        // Riferimenti DOM
+        const updateBtn = document.getElementById('updateBtn');
+        const installButton = document.getElementById('installButton');
+        const pwaBanner = document.getElementById('pwaBanner');
+        const pwaBannerInstall = document.getElementById('pwaBannerInstall');
+        const pwaBannerLater = document.getElementById('pwaBannerLater');
+        let deferredPrompt = null;
+
+        // ============ FUNZIONI UTILITY ============
         function getUserId() {
             if (!currentUserId) {
                 let userId = localStorage.getItem('juvenilia_user_id');
@@ -1634,26 +1272,114 @@
             return currentUserId;
         }
 
-        // ============ FUNZIONI SUPABASE CORRETTE CON LA COLONNA GIUSTA ============
+        function showNotification(message, type = 'success') {
+            const notif = document.getElementById('notif');
+            
+            let bgColor = 'linear-gradient(135deg, var(--success), #2ecc71)';
+            if (type === 'info') bgColor = 'linear-gradient(135deg, var(--accent), #5c6bc0)';
+            if (type === 'warning') bgColor = 'linear-gradient(135deg, var(--warning), #ff9800)';
+            
+            notif.style.background = bgColor;
+            notif.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}" 
+                   style="margin-right: 10px;"></i>
+                ${message}
+            `;
+            notif.style.display = 'block';
+            
+            setTimeout(() => {
+                notif.style.display = 'none';
+            }, 3000);
+        }
+
+        function showProgress(percent) {
+            const progressFill = document.getElementById('progress-fill');
+            if (progressFill) {
+                progressFill.style.width = percent + '%';
+            }
+        }
+
+        function showLoader(isVisible) {
+            const loader = document.getElementById('loader');
+            if (isVisible) {
+                loader.style.display = 'flex';
+                loader.style.opacity = '1';
+            } else {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
+            }
+        }
+
+        function detectDevice() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const width = window.innerWidth;
+            
+            document.body.classList.remove('device-mobile', 'device-tablet', 'device-desktop', 'ios-device', 'android-device');
+            
+            if (width <= 768) {
+                document.body.classList.add('device-mobile');
+                deviceType = 'mobile';
+            } else if (width <= 1024) {
+                document.body.classList.add('device-tablet');
+                deviceType = 'tablet';
+            } else {
+                document.body.classList.add('device-desktop');
+                deviceType = 'desktop';
+            }
+            
+            const isIOS = /iPad|iPhone|iPod/.test(userAgent) || 
+                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            
+            if (isIOS) {
+                document.body.classList.add('ios-device');
+            } else if (/android/i.test(userAgent)) {
+                document.body.classList.add('android-device');
+            }
+            
+            handleOrientationChange();
+            
+            console.log('📱 Dispositivo rilevato:', deviceType);
+        }
+
+        function handleOrientationChange() {
+            const isPortrait = window.innerHeight > window.innerWidth;
+            document.body.classList.toggle('portrait', isPortrait);
+            document.body.classList.toggle('landscape', !isPortrait);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getFullRaceLink(fileName) {
+            const baseUrl = window.location.href.replace(/\/[^\/]*$/, '/');
+            return `${baseUrl}${fileName}`;
+        }
+
+        // ============ FUNZIONI SUPABASE CORRETTE (SENZA DEVICE_TYPE) ============
         async function saveOrderToCloud(userId, orderData) {
             try {
                 console.log('💾 Preparando salvataggio cloud...', { userId, orderData });
                 
-                // Usando la colonna CORRETTA: juvenilia_global_order
+                // RIMOSSO device_type dalla query
                 const { data, error } = await _supabase
                     .from('user_preferences')
                     .upsert({
                         user_id: userId,
-                        device_type: deviceType,
+                        // device_type rimosso - la colonna non esiste
                         juvenilia_global_order: {
                             order: orderData.order || currentOrder,
                             timestamp: orderData.timestamp || Date.now(),
-                            deviceType: deviceType,
+                            deviceType: deviceType,  // Mantieni nel JSON
                             userAgent: orderData.userAgent || navigator.userAgent.substring(0, 100)
                         },
                         updated_at: new Date().toISOString()
                     }, {
-                        onConflict: 'user_id,device_type'
+                        onConflict: 'user_id'  // Cambiato da 'user_id,device_type' a solo 'user_id'
                     });
                 
                 if (error) {
@@ -1689,12 +1415,12 @@
                 
                 console.log('📡 Caricamento ordine dal cloud per user:', userId);
                 
-                // Usando la colonna CORRETTA: juvenilia_global_order
+                // RIMOSSO device_type dalla query
                 const { data, error } = await _supabase
                     .from('user_preferences')
                     .select('juvenilia_global_order, updated_at')
                     .eq('user_id', userId)
-                    .eq('device_type', deviceType)
+                    // .eq('device_type', deviceType)  <-- RIMOSSO
                     .order('updated_at', { ascending: false })
                     .limit(1);
                 
@@ -1785,42 +1511,311 @@
             }
         }
 
-        async function saveOrder() {
+        // ============ FUNZIONI FETCH DATI ============
+        async function fetchRaceData() {
+            showProgress(30);
+            const now = Date.now();
+            
+            if (cachedRacesData && (now - lastFetchTime) < CACHE_DURATION) {
+                console.log('📦 Usando dati dalla cache');
+                showProgress(100);
+                return cachedRacesData;
+            }
+            
+            showProgress(50);
+            console.log('🌐 Fetching dati gare da Supabase...');
+            
             try {
-                const userId = getUserId();
+                // Prova prima con la RPC
+                let tables = [];
                 
-                const orderData = {
-                    order: currentOrder,
-                    deviceType: deviceType,
-                    timestamp: Date.now(),
-                    userAgent: navigator.userAgent.substring(0, 100)
-                };
-                
-                console.log('💾 Salvataggio ordine:', orderData);
-                
-                localStorage.setItem('racesCustomOrder', JSON.stringify(orderData));
-                originalOrder = [...currentOrder];
-                
-                if (navigator.onLine) {
-                    await saveOrderToCloud(userId, orderData);
-                    showNotification('Ordine salvato e sincronizzato!', 'success');
-                } else {
-                    showNotification('Ordine salvato localmente (offline)', 'info');
+                try {
+                    const { data: tablesData, error: tableError } = await _supabase.rpc('get_race_tables');
+                    
+                    if (!tableError && tablesData) {
+                        tables = tablesData;
+                    } else {
+                        console.warn('RPC non disponibile, uso metodo alternativo:', tableError);
+                        // Metodo alternativo: cerchiamo manualmente le tabelle
+                        const tableNames = [
+                            'configurazione_gara1',
+                            'configurazione_gara2',
+                            'configurazione_gara3',
+                            'configurazione_gara4',
+                            'configurazione_gara5',
+                            'configurazione_gara6',
+                            'configurazione_gara7',
+                            'configurazione_gara8'
+                        ];
+                        
+                        // Verifichiamo quali tabelle esistono
+                        for (const tableName of tableNames) {
+                            try {
+                                const { count, error } = await _supabase
+                                    .from(tableName)
+                                    .select('*', { count: 'exact', head: true });
+                                
+                                if (!error) {
+                                    tables.push({ table_name: tableName });
+                                }
+                            } catch (e) {
+                                // Tabella non esistente, ignoriamo
+                            }
+                        }
+                    }
+                } catch (rpcError) {
+                    console.warn('Errore RPC, uso metodo alternativo:', rpcError);
+                    // Fallback a dati hardcoded
+                    tables = [
+                        { table_name: 'configurazione_gara1' },
+                        { table_name: 'configurazione_gara2' },
+                        { table_name: 'configurazione_gara3' },
+                        { table_name: 'configurazione_gara4' },
+                        { table_name: 'configurazione_gara5' }
+                    ];
                 }
                 
-                if (racesData.length > 0) {
-                    renderRaceGrid(document.getElementById('race-grid'), racesData);
+                if (!tables || tables.length === 0) {
+                    console.log('📭 Nessuna tabella gara trovata, uso dati di esempio');
+                    // Dati di esempio per test
+                    const sampleData = [];
+                    for (let i = 1; i <= 5; i++) {
+                        sampleData.push({
+                            tableName: `configurazione_gara${i}`,
+                            raceNumber: i,
+                            raceTitle: `Gara ${i}`,
+                            fileName: `gara${i}.html`,
+                            id: `race-${i}`
+                        });
+                    }
+                    
+                    showProgress(100);
+                    cachedRacesData = sampleData;
+                    lastFetchTime = now;
+                    racesData = sampleData;
+                    return sampleData;
                 }
                 
-                toggleReorderMode();
+                console.log(`🏁 Trovate ${tables.length} tabelle gara:`, tables.map(t => t.table_name));
                 
-            } catch (e) {
-                console.warn('Errore nel salvataggio:', e);
-                showNotification('Errore nel salvataggio: ' + (e.message || 'Sconosciuto'), 'warning');
+                showProgress(70);
+                
+                const titleRequests = tables.map(t => 
+                    _supabase
+                        .from(t.table_name)
+                        .select('valore')
+                        .eq('chiave', 'titolo_gara')
+                        .maybeSingle()
+                );
+                
+                const results = await Promise.all(titleRequests);
+                showProgress(85);
+                
+                const raceData = results.map((res, index) => {
+                    const tableName = tables[index].table_name;
+                    const raceNumber = tableName.match(/\d+/) ? parseInt(tableName.match(/\d+/)[0]) : (index + 1);
+                    const raceTitle = (res.data && res.data.valore) ? res.data.valore : `Gara ${raceNumber}`;
+                    
+                    return {
+                        tableName,
+                        raceNumber: raceNumber,
+                        raceTitle,
+                        fileName: `gara${raceNumber}.html`,
+                        id: `race-${raceNumber}`
+                    };
+                });
+                
+                raceData.sort((a, b) => a.raceNumber - b.raceNumber);
+                
+                console.log('✅ Dati gare elaborati:', raceData);
+                
+                cachedRacesData = raceData;
+                lastFetchTime = now;
+                racesData = raceData;
+                
+                try {
+                    localStorage.setItem('racesCache', JSON.stringify({
+                        data: raceData,
+                        timestamp: now,
+                        deviceType: deviceType
+                    }));
+                } catch (e) {
+                    console.warn('Impossibile salvare in localStorage:', e);
+                }
+                
+                showProgress(100);
+                return raceData;
+                
+            } catch (error) {
+                console.error('💥 Errore fetchRaceData:', error);
+                throw error;
             }
         }
 
-        // ============ SISTEMA RIORDINO ============
+        async function loadFromOfflineCache() {
+            try {
+                const cached = localStorage.getItem('racesCache');
+                if (!cached) return null;
+                
+                const { data, timestamp } = JSON.parse(cached);
+                const now = Date.now();
+                
+                if (now - timestamp < 30 * 60 * 1000) {
+                    console.log('📱 Caricamento da cache offline');
+                    cachedRacesData = data;
+                    lastFetchTime = timestamp;
+                    racesData = data;
+                    return data;
+                }
+            } catch (e) {
+                console.warn('Errore nel caricamento cache offline:', e);
+            }
+            
+            return null;
+        }
+
+        // ============ FUNZIONI DI RENDERING ============
+        function renderRaceGrid(gridElement, raceData) {
+            console.log('🎨 Rendering griglia con', raceData.length, 'gare');
+            
+            const loadCustomOrder = async () => {
+                let customOrder = null;
+                
+                if (navigator.onLine) {
+                    customOrder = await loadOrderFromCloud();
+                }
+                
+                if (!customOrder) {
+                    try {
+                        const savedOrder = localStorage.getItem('racesCustomOrder');
+                        if (savedOrder) {
+                            const orderData = JSON.parse(savedOrder);
+                            customOrder = orderData.order;
+                            console.log('📁 Usando ordine locale:', customOrder);
+                        }
+                    } catch (e) {
+                        console.warn('Errore nel caricamento ordine locale:', e);
+                    }
+                }
+                
+                return customOrder;
+            };
+            
+            loadCustomOrder().then(customOrder => {
+                let orderedData = [...raceData];
+                
+                if (customOrder && customOrder.length > 0) {
+                    console.log('🔄 Applicando ordine personalizzato:', customOrder);
+                    
+                    const validOrder = customOrder.filter(id => 
+                        raceData.find(race => race.id === id)
+                    );
+                    
+                    orderedData = validOrder
+                        .map(id => raceData.find(race => race.id === id))
+                        .filter(race => race !== undefined);
+                    
+                    const remainingRaces = raceData.filter(race => !validOrder.includes(race.id));
+                    orderedData.push(...remainingRaces);
+                    
+                    console.log('✅ Ordine applicato. Gare ordinate:', orderedData.length);
+                } else {
+                    orderedData.sort((a, b) => a.raceNumber - b.raceNumber);
+                    console.log('🔢 Usando ordine predefinito (per numero)');
+                }
+                
+                const raceIcons = ['🏆', '⚽', '🎯', '🏃', '🏊', '🚴', '🤸', '🎾'];
+                
+                const fragment = document.createDocumentFragment();
+                
+                orderedData.forEach((race, index) => {
+                    const raceIcon = raceIcons[index % raceIcons.length] || '🏆';
+                    const colorIndex = (index % 8) + 1;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'race-card animate__animated animate__fadeInUp';
+                    card.id = race.id;
+                    card.dataset.raceId = race.id;
+                    card.dataset.raceNumber = race.raceNumber;
+                    card.dataset.index = index;
+                    card.style.animationDelay = `${Math.min(index * 0.05, 0.5)}s`;
+                    
+                    card.innerHTML = `
+                        <div class="reorder-buttons">
+                            <button class="move-btn up" onclick="moveCardUp('${race.id}')" 
+                                    aria-label="Sposta card verso l'alto" title="Sposta su">
+                                <i class="fas fa-arrow-up" aria-hidden="true"></i>
+                            </button>
+                            <button class="move-btn down" onclick="moveCardDown('${race.id}')" 
+                                    aria-label="Sposta card verso il basso" title="Sposta giù">
+                                <i class="fas fa-arrow-down" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="card-header color-${colorIndex}">
+                            <div class="card-number">${race.raceNumber}</div>
+                            <div class="card-logo">${raceIcon}</div>
+                            ${escapeHtml(race.raceTitle)}
+                        </div>
+                        <div class="card-body">
+                            <a href="${encodeURI(race.fileName)}" class="btn btn-main" target="_blank">
+                                <i class="fas fa-users" aria-hidden="true"></i> Gestisci Iscrizioni
+                            </a>
+                            
+                            <button class="btn btn-copy" data-race-number="${race.raceNumber}" 
+                                    onclick="copyRaceLink('${encodeURIComponent(race.fileName)}', ${race.raceNumber})"
+                                    aria-label="Copia link diretto alla gara ${race.raceNumber}">
+                                <i class="fas fa-link" aria-hidden="true"></i> Copia Link Diretto
+                            </button>
+                        </div>
+                    `;
+                    
+                    fragment.appendChild(card);
+                });
+                
+                gridElement.innerHTML = '';
+                gridElement.appendChild(fragment);
+                
+                updateMoveButtons();
+                
+                currentOrder = orderedData.map(race => race.id);
+                originalOrder = [...currentOrder];
+                
+                console.log('✅ Griglia renderizzata con', orderedData.length, 'card');
+            });
+        }
+
+        function showNoRacesMessage(grid, counter) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-trophy" aria-hidden="true"></i>
+                    <h3>Nessuna gara configurata</h3>
+                    <p>Non sono presenti manifestazioni attive nel sistema.<br>Configura una nuova gara per iniziare.</p>
+                    <button onclick="initDashboard()" class="retry-btn" aria-label="Ricarica la dashboard">
+                        <i class="fas fa-sync-alt" aria-hidden="true"></i> Ricarica
+                    </button>
+                </div>`;
+            counter.style.display = 'none';
+        }
+
+        function showErrorMessage(grid, counter, error) {
+            const isOnline = navigator.onLine;
+            const errorMessage = isOnline 
+                ? `Errore di connessione: ${error.message || 'Sconosciuto'}`
+                : 'Connessione internet assente';
+            
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle" style="color: #f5576c;" aria-hidden="true"></i>
+                    <h3 style="color: #f5576c;">${isOnline ? 'Errore di connessione' : 'Connessione assente'}</h3>
+                    <p>${errorMessage}<br>Verifica la connessione e riprova.</p>
+                    <button onclick="initDashboard()" class="retry-btn" aria-label="Riprova a caricare la dashboard">
+                        <i class="fas fa-redo" aria-hidden="true"></i> Riprova
+                    </button>
+                </div>`;
+            counter.style.display = 'none';
+        }
+
+        // ============ FUNZIONI DI RIORDINO ============
         function toggleReorderMode() {
             isReorderMode = !isReorderMode;
             const toggleBtn = document.getElementById('toggle-reorder');
@@ -1987,362 +1982,42 @@
             }
         }
 
-        // ============ FUNZIONI DI UTILITÀ ============
-        function showNotification(message, type = 'success') {
-            const notif = document.getElementById('notif');
-            
-            let bgColor = 'linear-gradient(135deg, var(--success), #2ecc71)';
-            if (type === 'info') bgColor = 'linear-gradient(135deg, var(--accent), #5c6bc0)';
-            if (type === 'warning') bgColor = 'linear-gradient(135deg, var(--warning), #ff9800)';
-            
-            notif.style.background = bgColor;
-            notif.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}" 
-                   style="margin-right: 10px;"></i>
-                ${message}
-            `;
-            notif.style.display = 'block';
-            
-            setTimeout(() => {
-                notif.style.display = 'none';
-            }, 3000);
-        }
-
-        function showProgress(percent) {
-            const progressFill = document.getElementById('progress-fill');
-            if (progressFill) {
-                progressFill.style.width = percent + '%';
-            }
-        }
-
-        let cachedRacesData = null;
-        let lastFetchTime = 0;
-        const CACHE_DURATION = 5 * 60 * 1000;
-        
-        const copiedLinksCache = new Map();
-        const COPY_COOLDOWN = 2000;
-
-        function getFullRaceLink(fileName) {
-            const baseUrl = window.location.href.replace(/\/[^\/]*$/, '/');
-            return `${baseUrl}${fileName}`;
-        }
-
-        async function fetchRaceData() {
-            showProgress(30);
-            const now = Date.now();
-            
-            if (cachedRacesData && (now - lastFetchTime) < CACHE_DURATION) {
-                console.log('📦 Usando dati dalla cache');
-                showProgress(100);
-                return cachedRacesData;
-            }
-            
-            showProgress(50);
-            console.log('🌐 Fetching dati gare da Supabase...');
-            
+        async function saveOrder() {
             try {
-                const { data: tables, error: tableError } = await _supabase.rpc('get_race_tables');
+                const userId = getUserId();
                 
-                if (tableError) {
-                    console.error('❌ Errore get_race_tables:', tableError);
-                    throw tableError;
-                }
+                const orderData = {
+                    order: currentOrder,
+                    deviceType: deviceType,
+                    timestamp: Date.now(),
+                    userAgent: navigator.userAgent.substring(0, 100)
+                };
                 
-                if (!tables || tables.length === 0) {
-                    console.log('📭 Nessuna tabella gara trovata');
-                    showProgress(100);
-                    return [];
-                }
+                console.log('💾 Salvataggio ordine:', orderData);
                 
-                console.log(`🏁 Trovate ${tables.length} tabelle gara:`, tables.map(t => t.table_name));
-                
-                showProgress(70);
-                
-                const titleRequests = tables.map(t => 
-                    _supabase
-                        .from(t.table_name)
-                        .select('valore')
-                        .eq('chiave', 'titolo_gara')
-                        .maybeSingle()
-                );
-                
-                const results = await Promise.all(titleRequests);
-                showProgress(85);
-                
-                const raceData = results.map((res, index) => {
-                    const tableName = tables[index].table_name;
-                    const raceNumber = tableName.match(/\d+/) ? parseInt(tableName.match(/\d+/)[0]) : (index + 1);
-                    const raceTitle = (res.data && res.data.valore) ? res.data.valore : `Gara ${raceNumber}`;
-                    
-                    return {
-                        tableName,
-                        raceNumber: raceNumber,
-                        raceTitle,
-                        fileName: `gara${raceNumber}.html`,
-                        id: `race-${raceNumber}`
-                    };
-                });
-                
-                raceData.sort((a, b) => a.raceNumber - b.raceNumber);
-                
-                console.log('✅ Dati gare elaborati:', raceData);
-                
-                cachedRacesData = raceData;
-                lastFetchTime = now;
-                racesData = raceData;
-                
-                try {
-                    localStorage.setItem('racesCache', JSON.stringify({
-                        data: raceData,
-                        timestamp: now,
-                        deviceType: deviceType
-                    }));
-                } catch (e) {
-                    console.warn('Impossibile salvare in localStorage:', e);
-                }
-                
-                showProgress(100);
-                return raceData;
-                
-            } catch (error) {
-                console.error('💥 Errore fetchRaceData:', error);
-                throw error;
-            }
-        }
-
-        async function loadFromOfflineCache() {
-            try {
-                const cached = localStorage.getItem('racesCache');
-                if (!cached) return null;
-                
-                const { data, timestamp } = JSON.parse(cached);
-                const now = Date.now();
-                
-                if (now - timestamp < 30 * 60 * 1000) {
-                    console.log('📱 Caricamento da cache offline');
-                    cachedRacesData = data;
-                    lastFetchTime = timestamp;
-                    racesData = data;
-                    return data;
-                }
-            } catch (e) {
-                console.warn('Errore nel caricamento cache offline:', e);
-            }
-            
-            return null;
-        }
-
-        async function initDashboard() {
-            showLoader(true);
-            const grid = document.getElementById('race-grid');
-            const counter = document.getElementById('race-counter');
-            
-            try {
-                detectDevice();
-                
-                const raceData = await fetchRaceData();
-                
-                if (!raceData || raceData.length === 0) {
-                    console.log('📭 Nessuna gara trovata');
-                    showNoRacesMessage(grid, counter);
-                    return;
-                }
-                
-                console.log(`🏁 Caricate ${raceData.length} gare`);
-                document.getElementById('counter-value').textContent = raceData.length;
-                counter.style.display = 'block';
-                
-                renderRaceGrid(grid, raceData);
-                
-                document.getElementById('toggle-reorder').addEventListener('click', toggleReorderMode);
-                document.getElementById('save-order').addEventListener('click', saveOrder);
-                document.getElementById('reset-order').addEventListener('click', resetOrder);
-                
-                if (navigator.onLine) {
-                    setTimeout(syncOrdersAcrossDevices, 2000);
-                }
-                
-                setTimeout(preloadRacePages, 3000);
-                
-            } catch (err) {
-                console.error("❌ Errore caricamento dashboard:", err);
-                
-                if (!navigator.onLine) {
-                    console.log('🌐 Modalità offline');
-                    const offlineData = await loadFromOfflineCache();
-                    if (offlineData && offlineData.length > 0) {
-                        renderRaceGrid(grid, offlineData);
-                        showNotification('Modalità offline - Dati in cache', 'info');
-                        return;
-                    }
-                }
-                
-                showErrorMessage(grid, counter, err);
-                
-            } finally {
-                showLoader(false);
-            }
-        }
-
-        function renderRaceGrid(gridElement, raceData) {
-            console.log('🎨 Rendering griglia con', raceData.length, 'gare');
-            
-            const loadCustomOrder = async () => {
-                let customOrder = null;
-                
-                if (navigator.onLine) {
-                    customOrder = await loadOrderFromCloud();
-                }
-                
-                if (!customOrder) {
-                    try {
-                        const savedOrder = localStorage.getItem('racesCustomOrder');
-                        if (savedOrder) {
-                            const orderData = JSON.parse(savedOrder);
-                            customOrder = orderData.order;
-                            console.log('📁 Usando ordine locale:', customOrder);
-                        }
-                    } catch (e) {
-                        console.warn('Errore nel caricamento ordine locale:', e);
-                    }
-                }
-                
-                return customOrder;
-            };
-            
-            loadCustomOrder().then(customOrder => {
-                let orderedData = [...raceData];
-                
-                if (customOrder && customOrder.length > 0) {
-                    console.log('🔄 Applicando ordine personalizzato:', customOrder);
-                    
-                    const validOrder = customOrder.filter(id => 
-                        raceData.find(race => race.id === id)
-                    );
-                    
-                    orderedData = validOrder
-                        .map(id => raceData.find(race => race.id === id))
-                        .filter(race => race !== undefined);
-                    
-                    const remainingRaces = raceData.filter(race => !validOrder.includes(race.id));
-                    orderedData.push(...remainingRaces);
-                    
-                    console.log('✅ Ordine applicato. Gare ordinate:', orderedData.length);
-                } else {
-                    orderedData.sort((a, b) => a.raceNumber - b.raceNumber);
-                    console.log('🔢 Usando ordine predefinito (per numero)');
-                }
-                
-                const raceIcons = ['🏆', '⚽', '🎯', '🏃', '🏊', '🚴', '🤸', '🎾'];
-                
-                const fragment = document.createDocumentFragment();
-                
-                orderedData.forEach((race, index) => {
-                    const raceIcon = raceIcons[index % raceIcons.length] || '🏆';
-                    const colorIndex = (index % 8) + 1;
-                    
-                    const card = document.createElement('div');
-                    card.className = 'race-card animate__animated animate__fadeInUp';
-                    card.id = race.id;
-                    card.dataset.raceId = race.id;
-                    card.dataset.raceNumber = race.raceNumber;
-                    card.dataset.index = index;
-                    card.style.animationDelay = `${Math.min(index * 0.05, 0.5)}s`;
-                    
-                    card.innerHTML = `
-                        <div class="reorder-buttons">
-                            <button class="move-btn up" onclick="moveCardUp('${race.id}')" 
-                                    aria-label="Sposta card verso l'alto" title="Sposta su">
-                                <i class="fas fa-arrow-up" aria-hidden="true"></i>
-                            </button>
-                            <button class="move-btn down" onclick="moveCardDown('${race.id}')" 
-                                    aria-label="Sposta card verso il basso" title="Sposta giù">
-                                <i class="fas fa-arrow-down" aria-hidden="true"></i>
-                            </button>
-                        </div>
-                        <div class="card-header color-${colorIndex}">
-                            <div class="card-number">${race.raceNumber}</div>
-                            <div class="card-logo">${raceIcon}</div>
-                            ${escapeHtml(race.raceTitle)}
-                        </div>
-                        <div class="card-body">
-                            <a href="${encodeURI(race.fileName)}" class="btn btn-main" target="_blank">
-                                <i class="fas fa-users" aria-hidden="true"></i> Gestisci Iscrizioni
-                            </a>
-                            
-                            <button class="btn btn-copy" data-race-number="${race.raceNumber}" 
-                                    onclick="copyRaceLink('${encodeURIComponent(race.fileName)}', ${race.raceNumber})"
-                                    aria-label="Copia link diretto alla gara ${race.raceNumber}">
-                                <i class="fas fa-link" aria-hidden="true"></i> Copia Link Diretto
-                            </button>
-                        </div>
-                    `;
-                    
-                    fragment.appendChild(card);
-                });
-                
-                gridElement.innerHTML = '';
-                gridElement.appendChild(fragment);
-                
-                updateMoveButtons();
-                
-                currentOrder = orderedData.map(race => race.id);
+                localStorage.setItem('racesCustomOrder', JSON.stringify(orderData));
                 originalOrder = [...currentOrder];
                 
-                console.log('✅ Griglia renderizzata con', orderedData.length, 'card');
-            });
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function showNoRacesMessage(grid, counter) {
-            grid.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-trophy" aria-hidden="true"></i>
-                    <h3>Nessuna gara configurata</h3>
-                    <p>Non sono presenti manifestazioni attive nel sistema.<br>Configura una nuova gara per iniziare.</p>
-                    <button onclick="initDashboard()" class="retry-btn" aria-label="Ricarica la dashboard">
-                        <i class="fas fa-sync-alt" aria-hidden="true"></i> Ricarica
-                    </button>
-                </div>`;
-            counter.style.display = 'none';
-        }
-
-        function showErrorMessage(grid, counter, error) {
-            const isOnline = navigator.onLine;
-            const errorMessage = isOnline 
-                ? `Errore di connessione: ${error.message || 'Sconosciuto'}`
-                : 'Connessione internet assente';
-            
-            grid.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-exclamation-triangle" style="color: #f5576c;" aria-hidden="true"></i>
-                    <h3 style="color: #f5576c;">${isOnline ? 'Errore di connessione' : 'Connessione assente'}</h3>
-                    <p>${errorMessage}<br>Verifica la connessione e riprova.</p>
-                    <button onclick="initDashboard()" class="retry-btn" aria-label="Riprova a caricare la dashboard">
-                        <i class="fas fa-redo" aria-hidden="true"></i> Riprova
-                    </button>
-                </div>`;
-            counter.style.display = 'none';
-        }
-
-        function showLoader(isVisible) {
-            const loader = document.getElementById('loader');
-            if (isVisible) {
-                loader.style.display = 'flex';
-                loader.style.opacity = '1';
-            } else {
-                loader.style.opacity = '0';
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                }, 500);
+                if (navigator.onLine) {
+                    await saveOrderToCloud(userId, orderData);
+                    showNotification('Ordine salvato e sincronizzato!', 'success');
+                } else {
+                    showNotification('Ordine salvato localmente (offline)', 'info');
+                }
+                
+                if (racesData.length > 0) {
+                    renderRaceGrid(document.getElementById('race-grid'), racesData);
+                }
+                
+                toggleReorderMode();
+                
+            } catch (e) {
+                console.warn('Errore nel salvataggio:', e);
+                showNotification('Errore nel salvataggio: ' + (e.message || 'Sconosciuto'), 'warning');
             }
         }
 
+        // ============ FUNZIONI DI COPIA LINK ============
         function copyRaceLink(fileName, raceNumber) {
             const now = Date.now();
             const cacheKey = `copy-${raceNumber}`;
@@ -2423,45 +2098,462 @@
             document.body.removeChild(textArea);
         }
 
+        // ============ FUNZIONI SERVICE WORKER ============
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('service-worker.js')
+                        .then(registration => {
+                            console.log('✅ Service Worker registrato con scope:', registration.scope);
+                            swRegistration = registration;
+                            
+                            registration.addEventListener('updatefound', () => {
+                                const newWorker = registration.installing;
+                                console.log('🔄 Nuovo Service Worker in installazione...');
+                                
+                                newWorker.addEventListener('statechange', () => {
+                                    console.log('📊 Service Worker state:', newWorker.state);
+                                    
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        console.log('✨ Nuova versione disponibile!');
+                                        showUpdateNotification();
+                                    }
+                                });
+                            });
+                            
+                            setInterval(() => {
+                                registration.update();
+                                console.log('🔄 Controllo aggiornamenti Service Worker...');
+                            }, 60 * 60 * 1000);
+                            
+                        })
+                        .catch(error => {
+                            console.log('❌ Service Worker registration failed:', error);
+                        });
+                });
+            }
+        }
+
+        function showUpdateNotification() {
+            updateBtn.style.display = 'flex';
+            
+            updateBtn.onclick = () => {
+                if (swRegistration && swRegistration.waiting) {
+                    swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+                
+                updateBtn.style.display = 'none';
+                
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            };
+            
+            setTimeout(() => {
+                if (updateBtn.style.display === 'flex') {
+                    updateBtn.style.display = 'none';
+                }
+            }, 10000);
+        }
+
+        // ============ FUNZIONI PWA ============
+        function checkIfPWAInstalled() {
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('📱 Running in standalone mode');
+                document.body.classList.add('pwa-installed');
+                hideInstallButton();
+                hidePwaBanner();
+                return true;
+            }
+            
+            if (window.navigator.standalone === true) {
+                console.log('📱 Running in standalone mode (iOS)');
+                document.body.classList.add('pwa-installed');
+                hideInstallButton();
+                hidePwaBanner();
+                return true;
+            }
+            
+            if (localStorage.getItem('pwa-installed') === 'true') {
+                console.log('📱 PWA already marked as installed');
+                document.body.classList.add('pwa-installed');
+                hideInstallButton();
+                hidePwaBanner();
+                return true;
+            }
+            
+            return false;
+        }
+
+        function hideInstallButton() {
+            installButton.style.display = 'none';
+        }
+
+        function hidePwaBanner() {
+            pwaBanner.style.display = 'none';
+        }
+
+        function showInstallButton() {
+            installButton.style.display = 'flex';
+        }
+
+        function markAsInstalled() {
+            localStorage.setItem('pwa-installed', 'true');
+            localStorage.removeItem('pwa-last-refused');
+            document.body.classList.add('pwa-installed');
+        }
+
+        function markAsRefused() {
+            localStorage.setItem('pwa-last-refused', Date.now().toString());
+        }
+
+        function canShowBanner() {
+            if (checkIfPWAInstalled()) return false;
+            
+            const lastRefused = localStorage.getItem('pwa-last-refused');
+            if (lastRefused) {
+                const daysSinceRefusal = (Date.now() - parseInt(lastRefused)) / (1000 * 60 * 60 * 24);
+                if (daysSinceRefusal < 7) return false;
+            }
+            
+            const isDesktop = window.innerWidth > 1024;
+            if (isDesktop) return false;
+            
+            const shownCount = parseInt(localStorage.getItem('pwa-banner-shown') || '0');
+            if (shownCount > 3) return false;
+            
+            return true;
+        }
+
+        function showPwaBanner() {
+            if (!canShowBanner()) return;
+            
+            const shownCount = parseInt(localStorage.getItem('pwa-banner-shown') || '0');
+            localStorage.setItem('pwa-banner-shown', (shownCount + 1).toString());
+            
+            setTimeout(() => {
+                pwaBanner.style.display = 'block';
+            }, 5000);
+        }
+
+        function installApp() {
+            if (!deferredPrompt && !window.deferredInstallPrompt) {
+                console.log('❌ No deferred prompt available');
+                showNotification('Impossibile installare in questo momento', 'warning');
+                return;
+            }
+            
+            const promptToUse = deferredPrompt || window.deferredInstallPrompt;
+            
+            console.log('📲 Showing install prompt...');
+            
+            promptToUse.prompt()
+                .then(() => {
+                    return promptToUse.userChoice;
+                })
+                .then((choiceResult) => {
+                    console.log('👤 User choice:', choiceResult.outcome);
+                    
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('🎉 User accepted the install prompt');
+                        showNotification('App installata con successo! 🎉', 'success');
+                        markAsInstalled();
+                    } else {
+                        console.log('❌ User dismissed the install prompt');
+                        showNotification('Installazione annullata', 'info');
+                        markAsRefused();
+                    }
+                    
+                    deferredPrompt = null;
+                    window.deferredInstallPrompt = null;
+                    
+                    hideInstallButton();
+                    hidePwaBanner();
+                })
+                .catch((error) => {
+                    console.error('💥 Error during installation:', error);
+                    showNotification('Errore durante l\'installazione', 'warning');
+                    
+                    deferredPrompt = null;
+                    window.deferredInstallPrompt = null;
+                    
+                    hideInstallButton();
+                    hidePwaBanner();
+                });
+        }
+
+        // ============ FUNZIONI DI INIZIALIZZAZIONE ============
+        async function initDashboard() {
+            showLoader(true);
+            const grid = document.getElementById('race-grid');
+            const counter = document.getElementById('race-counter');
+            
+            try {
+                detectDevice();
+                
+                const raceData = await fetchRaceData();
+                
+                if (!raceData || raceData.length === 0) {
+                    console.log('📭 Nessuna gara trovata');
+                    showNoRacesMessage(grid, counter);
+                    return;
+                }
+                
+                console.log(`🏁 Caricate ${raceData.length} gare`);
+                document.getElementById('counter-value').textContent = raceData.length;
+                counter.style.display = 'block';
+                
+                renderRaceGrid(grid, raceData);
+                
+                document.getElementById('toggle-reorder').addEventListener('click', toggleReorderMode);
+                document.getElementById('save-order').addEventListener('click', saveOrder);
+                document.getElementById('reset-order').addEventListener('click', resetOrder);
+                
+                if (navigator.onLine) {
+                    setTimeout(syncOrdersAcrossDevices, 2000);
+                }
+                
+                setTimeout(preloadRacePages, 3000);
+                
+            } catch (err) {
+                console.error("❌ Errore caricamento dashboard:", err);
+                
+                if (!navigator.onLine) {
+                    console.log('🌐 Modalità offline');
+                    const offlineData = await loadFromOfflineCache();
+                    if (offlineData && offlineData.length > 0) {
+                        renderRaceGrid(grid, offlineData);
+                        showNotification('Modalità offline - Dati in cache', 'info');
+                        return;
+                    }
+                }
+                
+                showErrorMessage(grid, counter, err);
+                
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        function preloadRacePages() {
+            if ('serviceWorker' in navigator && navigator.onLine) {
+                const races = document.querySelectorAll('[data-race-id]');
+                races.forEach(race => {
+                    const raceNumber = race.dataset.raceNumber;
+                    
+                    if (raceNumber) {
+                        const preloadLink = document.createElement('link');
+                        preloadLink.rel = 'prefetch';
+                        preloadLink.href = `gara${raceNumber}.html`;
+                        document.head.appendChild(preloadLink);
+                    }
+                });
+                console.log('🔄 Precaching gare completato');
+            }
+        }
+
+        function clearOldCaches() {
+            if ('caches' in window) {
+                caches.keys().then(cacheNames => {
+                    console.log('🗑️ Cache trovate:', cacheNames);
+                    
+                    const deletePromises = cacheNames.map(cacheName => {
+                        if (cacheName.includes('juvenilia-dashboard') && 
+                            !cacheName.includes('v3.3')) {  // Aggiornato a v3.3
+                            console.log('🧹 Rimuovendo vecchia cache:', cacheName);
+                            return caches.delete(cacheName);
+                        }
+                        return Promise.resolve();
+                    });
+                    
+                    return Promise.all(deletePromises);
+                }).then(() => {
+                    console.log('✅ Pulizia cache completata');
+                }).catch(error => {
+                    console.error('❌ Errore nella pulizia cache:', error);
+                });
+            }
+        }
+
+        function checkOfflineStatus() {
+            const isOffline = !navigator.onLine;
+            
+            if (isOffline) {
+                const cachedData = localStorage.getItem('racesCache');
+                if (cachedData) {
+                    try {
+                        const { data, timestamp } = JSON.parse(cachedData);
+                        const minutesAgo = Math.floor((Date.now() - timestamp) / 60000);
+                        showNotification(`🌐 Offline - Dati cache di ${minutesAgo} minuti fa`, 'info');
+                    } catch (e) {
+                        console.warn('Errore parsing cache:', e);
+                    }
+                } else {
+                    showNotification('🌐 Offline - Nessuna cache disponibile', 'warning');
+                }
+            }
+        }
+
+        function forceServiceWorkerUpdate() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistration().then(registration => {
+                    if (registration) {
+                        registration.unregister().then(() => {
+                            console.log('🗑️ Service Worker rimosso');
+                            
+                            clearOldCaches();
+                            
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 1000);
+                        });
+                    }
+                });
+            }
+        }
+
+        // ============ EVENT LISTENERS ============
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('✅ beforeinstallprompt event fired - PWA can be installed');
+            
+            deferredPrompt = e;
+            window.deferredInstallPrompt = e;
+            
+            showInstallButton();
+            
+            setTimeout(() => {
+                if (deferredPrompt && canShowBanner()) {
+                    showPwaBanner();
+                }
+            }, 5000);
+        });
+
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('✅ PWA installed successfully');
+            markAsInstalled();
+            hideInstallButton();
+            hidePwaBanner();
+            document.body.classList.add('pwa-installed');
+            
+            setTimeout(() => {
+                showNotification('App installata con successo! 🎉', 'success');
+            }, 1000);
+        });
+
+        window.addEventListener('online', () => {
+            console.log('🌐 Connessione ripristinata');
+            showNotification('Connessione ripristinata', 'success');
+            
+            setTimeout(() => {
+                initDashboard();
+                syncOrdersAcrossDevices();
+            }, 2000);
+        });
+
+        window.addEventListener('offline', () => {
+            console.log('🌐 Connessione persa');
+            showNotification('Connessione assente - Modalità offline', 'warning');
+            checkOfflineStatus();
+        });
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'racesCustomOrder' && e.newValue) {
+                try {
+                    const orderData = JSON.parse(e.newValue);
+                    if (orderData.deviceType === deviceType) {
+                        console.log('🔄 Ordine modificato in un\'altra tab');
+                        if (racesData.length > 0) {
+                            renderRaceGrid(document.getElementById('race-grid'), racesData);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Errore nel processing storage event:', e);
+                }
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            setTimeout(detectDevice, 100);
+            setTimeout(handleOrientationChange, 150);
+        });
+
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                detectDevice();
+                handleOrientationChange();
+            }, 300);
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && racesData.length > 0) {
+                const timeSinceLastLoad = Date.now() - lastFetchTime;
+                if (timeSinceLastLoad > 60000) {
+                    console.log('🔄 Ricaricamento dati (pagina tornata visibile)');
+                    initDashboard();
+                }
+            }
+        });
+
+        installButton.addEventListener('click', installApp);
+        pwaBannerInstall.addEventListener('click', installApp);
+        pwaBannerLater.addEventListener('click', () => {
+            markAsRefused();
+            hidePwaBanner();
+            showNotification('Ricordati di installare l\'app per un accesso più veloce!', 'info');
+        });
+
+        // ============ VERIFICA ICONE ============
+        function verifyAllIcons() {
+            console.log('🔍 VERIFICA ICONE IN CORSO...');
+            
+            const iconFiles = [
+                { name: 'favicon.ico', type: 'ico', required: true },
+                { name: 'favicon-16x16.png', type: 'png', size: '16x16', required: true },
+                { name: 'favicon-32x32.png', type: 'png', size: '32x32', required: true },
+                { name: 'icon-144.png', type: 'png', size: '144x144', required: true },
+                { name: 'icon-192.png', type: 'png', size: '192x192', required: true },
+                { name: 'icon-512.png', type: 'png', size: '512x512', required: true },
+                { name: 'logo.png', type: 'png', size: 'logo', required: false }
+            ];
+            
+            iconFiles.forEach(icon => {
+                const img = new Image();
+                img.onload = function() {
+                    console.log(`✅ ${icon.name} (${this.width}x${this.height}) - CARICATA`);
+                    
+                    if (icon.size && icon.size.includes('x')) {
+                        const [expectedWidth, expectedHeight] = icon.size.split('x').map(Number);
+                        if (this.width !== expectedWidth || this.height !== expectedHeight) {
+                            console.warn(`⚠️  ${icon.name}: Dimensione attesa ${icon.size}, trovata ${this.width}x${this.height}`);
+                        }
+                    }
+                };
+                img.onerror = function() {
+                    if (icon.required) {
+                        console.error(`❌ ${icon.name} - NON TROVATA!`);
+                    } else {
+                        console.warn(`⚠️  ${icon.name} - Non trovata (opzionale)`);
+                    }
+                };
+                img.src = icon.name;
+            });
+            
+            console.log('\n📌 LINK ICONE NEL DOM:');
+            const iconLinks = document.querySelectorAll('link[rel*="icon"], link[rel*="apple"]');
+            iconLinks.forEach(link => {
+                console.log(`  ${link.rel}: ${link.href.split('/').pop()}`);
+            });
+            
+            console.log('\n📱 MANIFEST VERIFICATION:');
+            if (document.querySelector('link[rel="manifest"]')) {
+                console.log('✅ Manifest link presente');
+            } else {
+                console.error('❌ Manifest link mancante!');
+            }
+        }
+
         // ============ INIZIALIZZAZIONE ============
         let isInitialized = false;
-
-        function handleOrientationChange() {
-            const isPortrait = window.innerHeight > window.innerWidth;
-            document.body.classList.toggle('portrait', isPortrait);
-            document.body.classList.toggle('landscape', !isPortrait);
-        }
-
-        function detectDevice() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            const width = window.innerWidth;
-            
-            document.body.classList.remove('device-mobile', 'device-tablet', 'device-desktop', 'ios-device', 'android-device');
-            
-            if (width <= 768) {
-                document.body.classList.add('device-mobile');
-                deviceType = 'mobile';
-            } else if (width <= 1024) {
-                document.body.classList.add('device-tablet');
-                deviceType = 'tablet';
-            } else {
-                document.body.classList.add('device-desktop');
-                deviceType = 'desktop';
-            }
-            
-            const isIOS = /iPad|iPhone|iPod/.test(userAgent) || 
-                         (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            
-            if (isIOS) {
-                document.body.classList.add('ios-device');
-            } else if (/android/i.test(userAgent)) {
-                document.body.classList.add('android-device');
-            }
-            
-            handleOrientationChange();
-            
-            console.log('📱 Dispositivo rilevato:', deviceType);
-        }
 
         function optimizedInitDashboard() {
             if (isInitialized) return;
@@ -2483,27 +2575,18 @@
                 }, 500);
             }
             
-            window.addEventListener('resize', () => {
-                setTimeout(detectDevice, 100);
-                setTimeout(handleOrientationChange, 150);
-            });
+            // Verifica icone dopo 3 secondi
+            setTimeout(verifyAllIcons, 3000);
             
-            window.addEventListener('orientationchange', () => {
-                setTimeout(() => {
-                    detectDevice();
-                    handleOrientationChange();
-                }, 300);
-            });
+            // Pulizia cache vecchie dopo 2 secondi
+            setTimeout(clearOldCaches, 2000);
             
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden && racesData.length > 0) {
-                    const timeSinceLastLoad = Date.now() - lastFetchTime;
-                    if (timeSinceLastLoad > 60000) {
-                        console.log('🔄 Ricaricamento dati (pagina tornata visibile)');
-                        initDashboard();
-                    }
+            // Sincronizzazione periodica ogni minuto
+            setInterval(() => {
+                if (navigator.onLine) {
+                    syncOrdersAcrossDevices();
                 }
-            });
+            }, 60 * 1000);
         }
 
         if (document.readyState === 'loading') {
@@ -2512,46 +2595,7 @@
             optimizedInitDashboard();
         }
 
-        // ============ GESTIONE CONNESSIONE ============
-        window.addEventListener('online', () => {
-            console.log('🌐 Connessione ripristinata');
-            showNotification('Connessione ripristinata', 'success');
-            
-            setTimeout(() => {
-                initDashboard();
-                syncOrdersAcrossDevices();
-            }, 2000);
-        });
-
-        window.addEventListener('offline', () => {
-            console.log('🌐 Connessione persa');
-            showNotification('Connessione assente - Modalità offline', 'warning');
-            checkOfflineStatus();
-        });
-
-        setInterval(() => {
-            if (navigator.onLine) {
-                syncOrdersAcrossDevices();
-            }
-        }, 60 * 1000);
-
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'racesCustomOrder' && e.newValue) {
-                try {
-                    const orderData = JSON.parse(e.newValue);
-                    if (orderData.deviceType === deviceType) {
-                        console.log('🔄 Ordine modificato in un\'altra tab');
-                        if (racesData.length > 0) {
-                            renderRaceGrid(document.getElementById('race-grid'), racesData);
-                        }
-                    }
-                } catch (e) {
-                    console.warn('Errore nel processing storage event:', e);
-                }
-            }
-        });
-
-        // ============ FUNZIONI DI DEBUG ============
+        // ============ DEBUG FUNCTIONS ============
         window.debugPWA = {
             checkInstallation: checkIfPWAInstalled,
             resetInstall: () => {
@@ -2577,7 +2621,6 @@
                 const userId = getUserId();
                 const testData = {
                     user_id: userId,
-                    device_type: deviceType,
                     juvenilia_global_order: {
                         order: ["race-1", "race-2", "race-3"],
                         timestamp: Date.now(),
@@ -2591,7 +2634,7 @@
                 try {
                     const { data, error } = await _supabase
                         .from('user_preferences')
-                        .upsert(testData, { onConflict: 'user_id,device_type' });
+                        .upsert(testData, { onConflict: 'user_id' });
                     
                     if (error) {
                         console.error('❌ RLS Test FAILED:', error);
@@ -2651,7 +2694,13 @@
             }
         };
 
-        console.log('🚀 Dashboard Juvenilia v3.2 loaded successfully!');
+        // Esponi funzioni globali per gli event listener inline
+        window.moveCardUp = moveCardUp;
+        window.moveCardDown = moveCardDown;
+        window.copyRaceLink = copyRaceLink;
+        window.initDashboard = initDashboard;
+
+        console.log('🚀 Dashboard Juvenilia v3.3 loaded successfully!');
         console.log('🔧 Debug commands available:');
         console.log('   - debugPWA.testRLSPolicies() - Testa le policy RLS');
         console.log('   - debugPWA.testSaveOrder() - Testa il salvataggio ordine');
