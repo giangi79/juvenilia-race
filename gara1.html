@@ -522,6 +522,7 @@
             margin-bottom: 20px; 
             position: relative; 
             display: flex; 
+            flex-direction: column;
             justify-content: center; 
             align-items: center; 
             padding: 15px; 
@@ -586,6 +587,60 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             position: relative;
             z-index: 1;
+        }
+        
+        /* PULSANTE TOGGLE IMMAGINE LATERALE SOTTO IL LOGO */
+        .side-image-toggle {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            z-index: 2;
+            position: relative;
+        }
+        
+        .toggle-image-btn {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            padding: 8px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .toggle-image-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+        
+        .toggle-image-btn.active {
+            background: var(--racing-green);
+            border-color: white;
+        }
+        
+        .toggle-image-btn.inactive {
+            background: var(--racing-red);
+            border-color: white;
+        }
+        
+        .dark-mode .toggle-image-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark-mode .toggle-image-btn.active {
+            background: var(--racing-green);
+        }
+        
+        .dark-mode .toggle-image-btn.inactive {
+            background: var(--racing-red);
         }
         
         .top-btns { 
@@ -2248,14 +2303,23 @@
             }
             
             .side-logo {
-                max-width: 100px;
-                max-height: 100px;
+                max-width: 150px;
+                max-height: 150px;
             }
             
             .main-logo {
                 max-width: 95%;
                 border: 3px solid white;
                 padding: 5px;
+            }
+            
+            .side-image-toggle {
+                margin-top: 10px;
+            }
+            
+            .toggle-image-btn {
+                padding: 6px 15px;
+                font-size: 0.75rem;
             }
             
             .top-btns {
@@ -2589,14 +2653,19 @@
             }
             
             .side-logo {
-                max-width: 70px;
-                max-height: 70px;
+                max-width: 100px;
+                max-height: 100px;
             }
             
             .main-logo {
                 order: 1;
                 margin-top: 10px;
                 max-width: 100%;
+            }
+            
+            .toggle-image-btn {
+                padding: 5px 12px;
+                font-size: 0.7rem;
             }
             
             h2 {
@@ -2661,6 +2730,14 @@
         <div class="logo-wrapper">
             <img src="immagine.png" alt="Immagine laterale" class="side-logo hidden" onerror="this.style.display='none'">
             <img src="logo.png" alt="Logo Juvenilia Racing Team" class="main-logo" onerror="this.style.display='none'">
+        </div>
+        
+        <!-- PULSANTE TOGGLE IMMAGINE LATERALE (solo admin) -->
+        <div class="side-image-toggle" id="sideImageToggleContainer" style="display: none;">
+            <button class="toggle-image-btn" id="sideImageToggleBtn" onclick="toggleSideImageFromButton()">
+                <i class="fas fa-image"></i>
+                <span id="sideImageToggleText">Mostra immagine laterale</span>
+            </button>
         </div>
     </div>
 
@@ -2857,19 +2934,6 @@
             <input type="datetime-local" id="deadlineInput">
             <button onclick="confermaScadenzaDB()" style="background:var(--racing-green);"><i class="fas fa-check-circle"></i> CONFERMA</button>
             <button onclick="resetScadenzaDB()" style="background:var(--racing-red);"><i class="fas fa-ban"></i> RESET</button>
-        </div>
-        <!-- NUOVA RIGA PER IL CONTROLLO IMMAGINE LATERALE -->
-        <div class="admin-row">
-            <div style="font-size: 12px; font-weight: bold; margin-left: 5px; display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-image"></i> IMMAGINE LATERALE:
-            </div>
-            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                <input type="checkbox" id="toggleSideImage" onchange="toggleSideImage()">
-                <span>Mostra immagine laterale</span>
-            </label>
-            <button onclick="resetSideImage()" style="background:var(--racing-orange);">
-                <i class="fas fa-undo"></i> Reset Default
-            </button>
         </div>
     </div>
 
@@ -4021,6 +4085,7 @@
             document.getElementById('riepilogoAccompagnatori').style.display = 'block';
             document.getElementById('toggleAccompagnatoriBtn').style.display = 'inline-block';
             document.getElementById('infoToggleContainer').style.display = 'flex';
+            document.getElementById('sideImageToggleContainer').style.display = 'flex';
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
             
             caricaConfig(); 
@@ -4803,28 +4868,46 @@
             .select('*')
             .eq('chiave', 'mostra_immagine_laterale');
         
-        const toggle = document.getElementById('toggleSideImage');
         const sideImage = document.querySelector('.side-logo');
+        const toggleBtn = document.getElementById('sideImageToggleBtn');
+        const toggleText = document.getElementById('sideImageToggleText');
+        
+        let immagineVisibile = false;
         
         if (data && data.length > 0 && data[0].valore === 'true') {
-            if (toggle) toggle.checked = true;
+            immagineVisibile = true;
+        }
+        
+        if (immagineVisibile) {
             if (sideImage) sideImage.classList.remove('hidden');
+            if (toggleBtn) {
+                toggleBtn.classList.remove('inactive');
+                toggleBtn.classList.add('active');
+                toggleText.innerHTML = '<i class="fas fa-eye-slash"></i> Nascondi immagine laterale';
+            }
         } else {
-            if (toggle) toggle.checked = false;
             if (sideImage) sideImage.classList.add('hidden');
+            if (toggleBtn) {
+                toggleBtn.classList.remove('active');
+                toggleBtn.classList.add('inactive');
+                toggleText.innerHTML = '<i class="fas fa-image"></i> Mostra immagine laterale';
+            }
         }
     }
 
-    async function toggleSideImage() {
-        const toggle = document.getElementById('toggleSideImage');
+    async function toggleSideImageFromButton() {
         const sideImage = document.querySelector('.side-logo');
-        const visibile = toggle.checked;
+        const toggleBtn = document.getElementById('sideImageToggleBtn');
+        const toggleText = document.getElementById('sideImageToggleText');
+        
+        const isCurrentlyVisible = sideImage && !sideImage.classList.contains('hidden');
+        const nuovaVisibilita = !isCurrentlyVisible;
         
         const { error } = await _supabase
             .from(T_CONF)
             .upsert({ 
                 chiave: 'mostra_immagine_laterale', 
-                valore: visibile.toString() 
+                valore: nuovaVisibilita.toString() 
             }, { onConflict: 'chiave' });
         
         if (error) {
@@ -4833,35 +4916,19 @@
             return;
         }
         
-        if (visibile) {
+        if (nuovaVisibilita) {
             sideImage.classList.remove('hidden');
+            toggleBtn.classList.remove('inactive');
+            toggleBtn.classList.add('active');
+            toggleText.innerHTML = '<i class="fas fa-eye-slash"></i> Nascondi immagine laterale';
             showToast("Immagine laterale attivata");
         } else {
             sideImage.classList.add('hidden');
+            toggleBtn.classList.remove('active');
+            toggleBtn.classList.add('inactive');
+            toggleText.innerHTML = '<i class="fas fa-image"></i> Mostra immagine laterale';
             showToast("Immagine laterale disattivata");
         }
-    }
-
-    async function resetSideImage() {
-        const toggle = document.getElementById('toggleSideImage');
-        const sideImage = document.querySelector('.side-logo');
-        
-        const { error } = await _supabase
-            .from(T_CONF)
-            .upsert({ 
-                chiave: 'mostra_immagine_laterale', 
-                valore: 'true' 
-            }, { onConflict: 'chiave' });
-        
-        if (error) {
-            console.error("Errore reset immagine:", error);
-            showToast("Errore nel reset");
-            return;
-        }
-        
-        toggle.checked = true;
-        sideImage.classList.remove('hidden');
-        showToast("Immagine laterale riattivata (default)");
     }
 
     init();
