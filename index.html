@@ -23,11 +23,19 @@
     <!-- META PER PWA AVANZATA -->
     <meta name="msapplication-TileColor" content="#1a237e">
     <meta name="msapplication-TileImage" content="icon-144.png">
+    <meta name="msapplication-config" content="browserconfig.xml">
+    
+    <!-- META PER SOCIAL SHARE -->
+    <meta property="og:title" content="Juvenilia Dashboard">
+    <meta property="og:description" content="Gestione centralizzata delle manifestazioni sportive">
+    <meta property="og:image" content="icon-512.png">
+    <meta property="og:url" content="https://giangi79.github.io/juvenilia-race/">
+    <meta name="twitter:card" content="summary_large_image">
     
     <!-- PWA MANIFEST -->
     <link rel="manifest" href="manifest.json">
     
-    <title>Dashboard Polisportiva Juvenilia - 15 Gare</title>
+    <title>Dashboard Polisportiva Juvenilia</title>
     
     <!-- ============ FAVICON E ICONE COMPLETE ============ -->
     <link rel="icon" href="favicon.ico" type="image/x-icon">
@@ -669,7 +677,6 @@
             animation: move-down 0.3s ease;
         }
 
-        /* COLORI PER 15 GARE */
         .color-1 { background: linear-gradient(135deg, #667eea, #764ba2); }
         .color-2 { background: linear-gradient(135deg, #f5576c, #f093fb); }
         .color-3 { background: linear-gradient(135deg, #4facfe, #00f2fe); }
@@ -678,13 +685,6 @@
         .color-6 { background: linear-gradient(135deg, #30cfd0, #330867); }
         .color-7 { background: linear-gradient(135deg, #a8edea, #fed6e3); }
         .color-8 { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
-        .color-9 { background: linear-gradient(135deg, #FF6B6B, #FF8E53); }
-        .color-10 { background: linear-gradient(135deg, #4ECDC4, #556270); }
-        .color-11 { background: linear-gradient(135deg, #FFB347, #FF6B6B); }
-        .color-12 { background: linear-gradient(135deg, #9B59B6, #8E44AD); }
-        .color-13 { background: linear-gradient(135deg, #3498DB, #2980B9); }
-        .color-14 { background: linear-gradient(135deg, #E74C3C, #C0392B); }
-        .color-15 { background: linear-gradient(135deg, #1ABC9C, #16A085); }
 
         #loader {
             position: fixed;
@@ -1148,7 +1148,7 @@
              onerror="this.classList.add('error')">
         <div class="header-content">
             <h1>Dashboard Gare</h1>
-            <p>Gestione centralizzata delle manifestazioni sportive - 15 Gare Attive</p>
+            <p>Gestione centralizzata delle manifestazioni sportive</p>
         </div>
     </header>
 
@@ -1190,8 +1190,7 @@
             <i class="fas fa-mobile-alt"></i> Ottimizzato per mobile | 
             <i class="fas fa-desktop"></i> Desktop ready |
             <i class="fas fa-arrows-alt-v"></i> Riordino semplice |
-            <i class="fas fa-cloud"></i> Sincronizzato |
-            <i class="fas fa-trophy"></i> 15 Gare Configurate
+            <i class="fas fa-cloud"></i> Sincronizzato
         </p>
     </footer>
 
@@ -1361,24 +1360,26 @@
             return `${baseUrl}${fileName}`;
         }
 
-        // ============ FUNZIONI SUPABASE CORRETTE ============
+        // ============ FUNZIONI SUPABASE CORRETTE (SENZA DEVICE_TYPE) ============
         async function saveOrderToCloud(userId, orderData) {
             try {
                 console.log('💾 Preparando salvataggio cloud...', { userId, orderData });
                 
+                // RIMOSSO device_type dalla query
                 const { data, error } = await _supabase
                     .from('user_preferences')
                     .upsert({
                         user_id: userId,
+                        // device_type rimosso - la colonna non esiste
                         juvenilia_global_order: {
                             order: orderData.order || currentOrder,
                             timestamp: orderData.timestamp || Date.now(),
-                            deviceType: deviceType,
+                            deviceType: deviceType,  // Mantieni nel JSON
                             userAgent: orderData.userAgent || navigator.userAgent.substring(0, 100)
                         },
                         updated_at: new Date().toISOString()
                     }, {
-                        onConflict: 'user_id'
+                        onConflict: 'user_id'  // Cambiato da 'user_id,device_type' a solo 'user_id'
                     });
                 
                 if (error) {
@@ -1391,6 +1392,7 @@
             } catch (error) {
                 console.error('❌ Errore salvataggio cloud:', error);
                 
+                // Fallback: salva in localStorage
                 try {
                     localStorage.setItem('racesCustomOrder', JSON.stringify({
                         order: orderData.order || currentOrder,
@@ -1413,10 +1415,12 @@
                 
                 console.log('📡 Caricamento ordine dal cloud per user:', userId);
                 
+                // RIMOSSO device_type dalla query
                 const { data, error } = await _supabase
                     .from('user_preferences')
                     .select('juvenilia_global_order, updated_at')
                     .eq('user_id', userId)
+                    // .eq('device_type', deviceType)  <-- RIMOSSO
                     .order('updated_at', { ascending: false })
                     .limit(1);
                 
@@ -1522,6 +1526,7 @@
             console.log('🌐 Fetching dati gare da Supabase...');
             
             try {
+                // Prova prima con la RPC
                 let tables = [];
                 
                 try {
@@ -1531,7 +1536,7 @@
                         tables = tablesData;
                     } else {
                         console.warn('RPC non disponibile, uso metodo alternativo:', tableError);
-                        // CERCA FINO A GARA 15
+                        // Metodo alternativo: cerchiamo manualmente le tabelle
                         const tableNames = [
                             'configurazione_gara1',
                             'configurazione_gara2',
@@ -1540,16 +1545,10 @@
                             'configurazione_gara5',
                             'configurazione_gara6',
                             'configurazione_gara7',
-                            'configurazione_gara8',
-                            'configurazione_gara9',
-                            'configurazione_gara10',
-                            'configurazione_gara11',
-                            'configurazione_gara12',
-                            'configurazione_gara13',
-                            'configurazione_gara14',
-                            'configurazione_gara15'
+                            'configurazione_gara8'
                         ];
                         
+                        // Verifichiamo quali tabelle esistono
                         for (const tableName of tableNames) {
                             try {
                                 const { count, error } = await _supabase
@@ -1566,29 +1565,21 @@
                     }
                 } catch (rpcError) {
                     console.warn('Errore RPC, uso metodo alternativo:', rpcError);
-                    // Dati di esempio per test (fino a 15 gare)
-                    const sampleData = [];
-                    for (let i = 1; i <= 15; i++) {
-                        sampleData.push({
-                            tableName: `configurazione_gara${i}`,
-                            raceNumber: i,
-                            raceTitle: `Gara ${i}`,
-                            fileName: `gara${i}.html`,
-                            id: `race-${i}`
-                        });
-                    }
-                    
-                    showProgress(100);
-                    cachedRacesData = sampleData;
-                    lastFetchTime = now;
-                    racesData = sampleData;
-                    return sampleData;
+                    // Fallback a dati hardcoded
+                    tables = [
+                        { table_name: 'configurazione_gara1' },
+                        { table_name: 'configurazione_gara2' },
+                        { table_name: 'configurazione_gara3' },
+                        { table_name: 'configurazione_gara4' },
+                        { table_name: 'configurazione_gara5' }
+                    ];
                 }
                 
                 if (!tables || tables.length === 0) {
                     console.log('📭 Nessuna tabella gara trovata, uso dati di esempio');
+                    // Dati di esempio per test
                     const sampleData = [];
-                    for (let i = 1; i <= 15; i++) {
+                    for (let i = 1; i <= 5; i++) {
                         sampleData.push({
                             tableName: `configurazione_gara${i}`,
                             raceNumber: i,
@@ -1733,14 +1724,13 @@
                     console.log('🔢 Usando ordine predefinito (per numero)');
                 }
                 
-                // ICONE PER 15 GARE
-                const raceIcons = ['🏆', '⚽', '🎯', '🏃', '🏊', '🚴', '🤸', '🎾', '🥇', '🥈', '🥉', '🎪', '🎨', '🎭', '⭐'];
+                const raceIcons = ['🏆', '⚽', '🎯', '🏃', '🏊', '🚴', '🤸', '🎾'];
                 
                 const fragment = document.createDocumentFragment();
                 
                 orderedData.forEach((race, index) => {
                     const raceIcon = raceIcons[index % raceIcons.length] || '🏆';
-                    const colorIndex = (index % 15) + 1;
+                    const colorIndex = (index % 8) + 1;
                     
                     const card = document.createElement('div');
                     card.className = 'race-card animate__animated animate__fadeInUp';
@@ -2369,7 +2359,7 @@
                     
                     const deletePromises = cacheNames.map(cacheName => {
                         if (cacheName.includes('juvenilia-dashboard') && 
-                            !cacheName.includes('v3.3')) {
+                            !cacheName.includes('v3.3')) {  // Aggiornato a v3.3
                             console.log('🧹 Rimuovendo vecchia cache:', cacheName);
                             return caches.delete(cacheName);
                         }
@@ -2585,10 +2575,13 @@
                 }, 500);
             }
             
+            // Verifica icone dopo 3 secondi
             setTimeout(verifyAllIcons, 3000);
             
+            // Pulizia cache vecchie dopo 2 secondi
             setTimeout(clearOldCaches, 2000);
             
+            // Sincronizzazione periodica ogni minuto
             setInterval(() => {
                 if (navigator.onLine) {
                     syncOrdersAcrossDevices();
@@ -2602,13 +2595,112 @@
             optimizedInitDashboard();
         }
 
+        // ============ DEBUG FUNCTIONS ============
+        window.debugPWA = {
+            checkInstallation: checkIfPWAInstalled,
+            resetInstall: () => {
+                localStorage.removeItem('pwa-installed');
+                localStorage.removeItem('pwa-last-refused');
+                localStorage.removeItem('pwa-banner-shown');
+                document.body.classList.remove('pwa-installed');
+                console.log('✅ PWA installation preferences reset');
+                showNotification('Preferenze PWA resettate', 'info');
+            },
+            simulateInstall: () => {
+                console.log('🧪 Simulating PWA installation...');
+                markAsInstalled();
+                hideInstallButton();
+                hidePwaBanner();
+                document.body.classList.add('pwa-installed');
+                showNotification('PWA simulation - App installed', 'success');
+            },
+            forceUpdate: forceServiceWorkerUpdate,
+            testRLSPolicies: async function() {
+                console.log('🧪 Testing RLS Policies...');
+                
+                const userId = getUserId();
+                const testData = {
+                    user_id: userId,
+                    juvenilia_global_order: {
+                        order: ["race-1", "race-2", "race-3"],
+                        timestamp: Date.now(),
+                        deviceType: deviceType,
+                        userAgent: 'Test User Agent'
+                    }
+                };
+                
+                console.log('Test data:', testData);
+                
+                try {
+                    const { data, error } = await _supabase
+                        .from('user_preferences')
+                        .upsert(testData, { onConflict: 'user_id' });
+                    
+                    if (error) {
+                        console.error('❌ RLS Test FAILED:', error);
+                        return { success: false, error };
+                    } else {
+                        console.log('✅ RLS Test PASSED:', data);
+                        return { success: true, data };
+                    }
+                } catch (error) {
+                    console.error('💥 RLS Test ERROR:', error);
+                    return { success: false, error };
+                }
+            },
+            forceSync: () => {
+                console.log('🔄 Forzando sincronizzazione...');
+                syncOrdersAcrossDevices();
+            },
+            checkSyncStatus: async () => {
+                const userId = getUserId();
+                console.log('👤 User ID:', userId);
+                
+                const { data, error } = await _supabase
+                    .from('user_preferences')
+                    .select('*')
+                    .eq('user_id', userId);
+                
+                if (error) {
+                    console.error('❌ Errore:', error);
+                    return;
+                }
+                
+                console.log('📊 Dati cloud:', data);
+                
+                const local = localStorage.getItem('racesCustomOrder');
+                console.log('💾 Dati locali:', local ? JSON.parse(local) : 'Nessuno');
+            },
+            clearAllData: () => {
+                if (confirm('Sicuro di voler cancellare TUTTI i dati?')) {
+                    localStorage.removeItem('racesCustomOrder');
+                    localStorage.removeItem('juvenilia_user_id');
+                    localStorage.removeItem('racesCache');
+                    localStorage.removeItem('pwa-installed');
+                    localStorage.removeItem('pwa-last-refused');
+                    localStorage.removeItem('pwa-banner-shown');
+                    console.log('🧹 Tutti i dati locali cancellati');
+                    showNotification('Dati locali cancellati', 'info');
+                    
+                    setTimeout(() => location.reload(), 1000);
+                }
+            },
+            testSaveOrder: () => {
+                console.log('🧪 Test salvataggio ordine...');
+                saveOrder();
+            },
+            showSWUpdate: () => {
+                showUpdateNotification();
+            }
+        };
+
         // Esponi funzioni globali per gli event listener inline
         window.moveCardUp = moveCardUp;
         window.moveCardDown = moveCardDown;
         window.copyRaceLink = copyRaceLink;
         window.initDashboard = initDashboard;
 
-        console.log('🚀 Dashboard Juvenilia v3.4 - 15 Gare loaded successfully!');
+        console.log('🚀 Dashboard Juvenilia v3.3 loaded successfully!');
         console.log('🔧 Debug commands available:');
         console.log('   - debugPWA.testRLSPolicies() - Testa le policy RLS');
         console.log('   - debugPWA.testSaveOrder() - Testa il salvataggio ordine');
