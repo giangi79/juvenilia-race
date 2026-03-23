@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Juvenilia Racing Team - Iscrizioni Gara 4</title>
+    <title>Juvenilia Racing Team - Iscrizioni Gara 12</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -12,7 +12,7 @@
     <style>
         :root { 
             /* TEMA CHIARO */
-            --racing-red: #E63946; --racing-blue: #F4A261; --racing-light: #A8DADC; 
+            --racing-red: #E63946; --racing-blue: #9C27B0; --racing-light: #A8DADC; 
             --racing-white: #F1FAEE; --racing-yellow: #FFD166; --racing-orange: #F4A261;
             --racing-green: #2A9D8F; --racing-purple: #6A4C93; --racing-silver: #C0C0C0;
             --gradient-primary: linear-gradient(135deg, #1D3557 0%, #457B9D 100%);
@@ -2741,7 +2741,7 @@
         </div>
     </div>
 
-    <h2 id="mainTitle">🎯 Juvenilia Racing Team - Iscrizioni Gara 4</h2>
+    <h2 id="mainTitle">🏃 Juvenilia Racing Team - Iscrizioni Gara 12</h2>
     
     <!-- Timer principale -->
     <div id="countdownBox" class="countdown-container">
@@ -3009,7 +3009,7 @@
     
     <!-- Footer tematico -->
     <div class="racing-footer">
-        <p>Juvenilia Racing Team - Sistema Iscrizioni Gara 4 - Pattinaggio Corsa</p>
+        <p>Juvenilia Racing Team - Sistema Iscrizioni Gara 12 - Pattinaggio Corsa</p>
         <div class="footer-icons">
             <i class="fas fa-trophy footer-icon"></i>
             <i class="fas fa-medal footer-icon"></i>
@@ -3037,9 +3037,9 @@
     const O_P = "anV2ZW5pbGlhMTE3OQ==";
     
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const T_DATA = 'presenze_gara4';
-    const T_CONF = 'configurazione_gara4';
-    const T_TIMERS = 'timers_gara4';
+    const T_DATA = 'presenze_gara1222';
+    const T_CONF = 'configurazione_gara1222';
+    const T_TIMERS = 'timers_gara1222';
 
     let isAdmin = false, isExpired = false, currentData = [], timerInterval;
     let labelA = "", labelB = "", labelC = "", sortBy = 'nome'; 
@@ -3279,7 +3279,7 @@
             costiCategorie[c.chiave.replace('costo_', '').toUpperCase()] = parseFloat(c.valore) || 0; 
         });
         
-        document.getElementById('mainTitle').innerText = tit?.valore || "Juvenilia Racing Team - Iscrizioni Gara 4";
+        document.getElementById('mainTitle').innerText = tit?.valore || "Juvenilia Racing Team - Iscrizioni Gara 12";
         
         const cBox = document.getElementById('countdownBox');
         if(sca?.valore && sca.valore !== "") {
@@ -3925,7 +3925,7 @@
         const ws = XLSX.utils.json_to_sheet(dataExp);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Accompagnatori");
-        XLSX.writeFile(wb, `Accompagnatori_Gara4_Juvenilia.xlsx`);
+        XLSX.writeFile(wb, `Accompagnatori_Gara12_Juvenilia.xlsx`);
         showToast("Excel esportato!");
     }
 
@@ -3977,7 +3977,7 @@
             return a.nome.localeCompare(b.nome);
         });
         
-        let messaggio = `*JUVENILIA RACING TEAM - RIEPILOGO QUOTE GARA 4*\n\n`;
+        let messaggio = `*JUVENILIA RACING TEAM - RIEPILOGO QUOTE GARA 12*\n\n`;
         messaggio += `🏆 *Evento:* ${document.getElementById('mainTitle').innerText}\n`;
         messaggio += `📅 *Data generazione:* ${new Date().toLocaleDateString('it-IT')}\n\n`;
         messaggio += `*📋 RIEPILOGO QUOTE:*\n`;
@@ -4031,7 +4031,7 @@
                 if(g === 'M') pCat[p.categoria].M.push(info); else if(g === 'F') pCat[p.categoria].F.push(info); else pCat[p.categoria].U.push(info);
             } 
         });
-        let msg = `🛼 *JUVENILIA RACING TEAM - RIEPILOGO ISCRIZIONI GARA 4*\n🏆 *Evento:* ${gara}\n\n`;
+        let msg = `🛼 *JUVENILIA RACING TEAM - RIEPILOGO ISCRIZIONI GARA 12*\n🏆 *Evento:* ${gara}\n\n`;
         Object.keys(pCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(c => {
             msg += `*${c.toUpperCase()}*\n`;
             if(pCat[c].M.length > 0) { pCat[c].M.sort(); msg += `♂️ Maschi: ${pCat[c].M.join(', ')}\n`; }
@@ -4063,8 +4063,8 @@
         }));
         const ws = XLSX.utils.json_to_sheet(dataExp);
         const wb = XLSX.utils.book_new(); 
-        XLSX.utils.book_append_sheet(wb, ws, "Iscrizioni Gara 4"); 
-        XLSX.writeFile(wb, `Iscrizioni_Gara4_Juvenilia_Racing_Team.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, "Iscrizioni Gara 12"); 
+        XLSX.writeFile(wb, `Iscrizioni_Gara12_Juvenilia_Racing_Team.xlsx`);
         showToast("Excel esportato!");
     }
 
@@ -4719,7 +4719,7 @@
             infoText.innerHTML = data[0].valore;
             infoEditor.innerHTML = data[0].valore;
         } else {
-            const defaultText = "<strong>📢 Juvenilia Racing Team</strong> - Benvenuti al sistema di iscrizioni Gara 4! 🛼<br><br>" +
+            const defaultText = "<strong>📢 Juvenilia Racing Team</strong> - Benvenuti al sistema di iscrizioni Gara 12! 🛼<br><br>" +
                               "• Seleziona <strong style='color: var(--racing-green);'>PARTECIPA</strong> o <strong style='color: var(--racing-red);'>NON PARTECIPA</strong> per ogni atleta<br>" +
                               "• Per i <u>minorenni</u> è obbligatorio indicare un accompagnatore<br>" +
                               "• Le scadenze per categoria sono indicate dai <em>timer colorati</em>";
@@ -4801,7 +4801,7 @@
     
     async function cancellaInfo() {
         if (confirm("Vuoi davvero cancellare tutte le informazioni? Il box tornerà al testo predefinito.")) {
-            const defaultText = "<strong>📢 Juvenilia Racing Team</strong> - Benvenuti al sistema di iscrizioni Gara 4! 🛼<br><br>" +
+            const defaultText = "<strong>📢 Juvenilia Racing Team</strong> - Benvenuti al sistema di iscrizioni Gara 12! 🛼<br><br>" +
                               "• Seleziona <strong style='color: var(--racing-green);'>PARTECIPA</strong> o <strong style='color: var(--racing-red);'>NON PARTECIPA</strong> per ogni atleta<br>" +
                               "• Per i <u>minorenni</u> è obbligatorio indicare un accompagnatore<br>" +
                               "• Le scadenze per categoria sono indicate dai <em>timer colorati</em>";
