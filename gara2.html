@@ -522,7 +522,6 @@
             margin-bottom: 20px; 
             position: relative; 
             display: flex; 
-            flex-direction: column;
             justify-content: center; 
             align-items: center; 
             padding: 15px; 
@@ -545,102 +544,18 @@
             z-index: 0;
         }
         
-        /* STILI PER IL WRAPPER DEL LOGO CON IMMAGINE LATERALE */
-        .logo-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            width: 100%;
+        .logo-container img { 
+            width: 100%; 
+            max-width: 800px; 
+            height: auto; 
+            border-radius: 15px; 
+            display: block;
             position: relative;
             z-index: 1;
-            flex-wrap: wrap;
-        }
-
-        .side-logo {
-            width: auto;
-            height: auto;
-            max-width: 200px;
-            max-height: 200px;
-            object-fit: contain;
-            border-radius: 15px;
-            border: 3px solid white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            transition: none;
-            flex-shrink: 0;
-        }
-
-        .side-logo.hidden {
-            display: none;
-        }
-
-        .main-logo {
-            flex: 1;
-            max-width: 800px;
-            min-width: 200px;
-            width: 100%;
-            height: auto;
-            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             border: 5px solid white;
             background: white;
             padding: 10px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 1;
-        }
-        
-        /* PULSANTE TOGGLE IMMAGINE LATERALE SOTTO IL LOGO */
-        .side-image-toggle {
-            margin-top: 15px;
-            display: flex;
-            justify-content: center;
-            z-index: 2;
-            position: relative;
-        }
-        
-        .toggle-image-btn {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50px;
-            padding: 8px 20px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: white;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-        }
-        
-        .toggle-image-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
-        }
-        
-        .toggle-image-btn.active {
-            background: var(--racing-green);
-            border-color: white;
-        }
-        
-        .toggle-image-btn.inactive {
-            background: var(--racing-red);
-            border-color: white;
-        }
-        
-        .dark-mode .toggle-image-btn {
-            background: rgba(0, 0, 0, 0.5);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-        
-        .dark-mode .toggle-image-btn.active {
-            background: var(--racing-green);
-        }
-        
-        .dark-mode .toggle-image-btn.inactive {
-            background: var(--racing-red);
         }
         
         .top-btns { 
@@ -2284,7 +2199,6 @@
             background: var(--gradient-primary);
         }
         
-        /* Responsive per mobile */
         @media screen and (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -2298,28 +2212,10 @@
                 margin-bottom: 15px;
             }
             
-            .logo-wrapper {
-                gap: 15px;
-            }
-            
-            .side-logo {
-                max-width: 150px;
-                max-height: 150px;
-            }
-            
-            .main-logo {
+            .logo-container img {
                 max-width: 95%;
                 border: 3px solid white;
                 padding: 5px;
-            }
-            
-            .side-image-toggle {
-                margin-top: 10px;
-            }
-            
-            .toggle-image-btn {
-                padding: 6px 15px;
-                font-size: 0.75rem;
             }
             
             .top-btns {
@@ -2642,30 +2538,14 @@
                 max-height: 600px;
             }
             
-            .main-logo {
+            .logo-container img {
                 max-width: 900px;
             }
         }
         
         @media screen and (max-width: 480px) {
-            .logo-wrapper {
-                gap: 10px;
-            }
-            
-            .side-logo {
-                max-width: 80px;
-                max-height: 80px;
-            }
-            
-            .main-logo {
-                order: 1;
-                margin-top: 10px;
+            .logo-container img {
                 max-width: 100%;
-            }
-            
-            .toggle-image-btn {
-                padding: 5px 12px;
-                font-size: 0.7rem;
             }
             
             h2 {
@@ -2727,18 +2607,7 @@
             <button class="logout-btn" id="logoutBtn" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> LOGOUT</button>
             <button class="icon-btn" id="adminIcon" onclick="toggleAdmin()"><i class="fas fa-cog"></i></button>
         </div>
-        <div class="logo-wrapper">
-            <img src="immagine.png" alt="Immagine laterale" class="side-logo hidden" onerror="this.style.display='none'">
-            <img src="logo.png" alt="Logo Juvenilia Racing Team" class="main-logo" onerror="this.style.display='none'">
-        </div>
-        
-        <!-- PULSANTE TOGGLE IMMAGINE LATERALE (solo admin) -->
-        <div class="side-image-toggle" id="sideImageToggleContainer" style="display: none;">
-            <button class="toggle-image-btn" id="sideImageToggleBtn" onclick="toggleSideImageFromButton()">
-                <i class="fas fa-image"></i>
-                <span id="sideImageToggleText">Mostra immagine laterale</span>
-            </button>
-        </div>
+        <img src="logo.png" alt="Logo Juvenilia Racing Team" onerror="this.style.display='none'">
     </div>
 
     <h2 id="mainTitle">🏁 Juvenilia Racing Team - Iscrizioni Gara 2</h2>
@@ -3298,8 +3167,6 @@
         }
         
         if(isAdmin && !isEditingCosti) renderCostiInputs();
-        
-        await caricaStatoImmagineLaterale();
     }
 
     async function caricaTimers() {
@@ -4085,7 +3952,6 @@
             document.getElementById('riepilogoAccompagnatori').style.display = 'block';
             document.getElementById('toggleAccompagnatoriBtn').style.display = 'inline-block';
             document.getElementById('infoToggleContainer').style.display = 'flex';
-            document.getElementById('sideImageToggleContainer').style.display = 'flex';
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
             
             caricaConfig(); 
@@ -4560,12 +4426,7 @@
                         : 
                         `<div class="accompagnatore-confirmed">
                             <i class="fas fa-check-circle"></i> Accompagnatore registrato
-                        </div>
-                        ${isAdmin ? `<div class="accompagnatore-actions" style="margin-top: 10px;">
-                            <button class="btn-modify" onclick="modificaAccompagnatore('${p.id}')"><i class="fas fa-edit"></i> Modifica</button>
-                            <button class="btn-remove" onclick="rimuoviAccompagnatore('${p.id}')"><i class="fas fa-trash"></i> Rimuovi</button>
-                        </div>` : ''}
-                    `
+                        </div>`
                     }
                 </div>
             `;
@@ -4716,6 +4577,7 @@
         const deleteBtn = document.getElementById('deleteInfoBtn');
         
         if (data && data.length > 0 && data[0].valore) {
+            // Usa innerHTML per mantenere la formattazione HTML
             infoText.innerHTML = data[0].valore;
             infoEditor.innerHTML = data[0].valore;
         } else {
@@ -4732,12 +4594,14 @@
             deleteBtn.style.display = 'flex';
             saveBtn.style.display = 'none';
             
+            // Mostra il box info agli admin sempre
             infoBox.style.display = 'block';
         } else {
             editBtn.style.display = 'none';
             deleteBtn.style.display = 'none';
             saveBtn.style.display = 'none';
             
+            // Mostra o nascondi il box info in base alla configurazione
             infoBox.style.display = mostraInfoBox ? 'block' : 'none';
         }
     }
@@ -4784,6 +4648,7 @@
             return;
         }
         
+        // Usa innerHTML per mantenere la formattazione
         document.getElementById('infoText').innerHTML = testo;
         document.getElementById('infoDisplay').style.display = 'block';
         document.getElementById('infoEditMode').style.display = 'none';
@@ -4819,6 +4684,7 @@
         }
     }
     
+    // Funzione per aggiornare lo stato visivo del toggle
     function aggiornaStatoVisibilitaInfo() {
         const toggle = document.getElementById('infoVisibilityToggle');
         const status = document.getElementById('infoVisibilityStatus');
@@ -4832,6 +4698,7 @@
         }
     }
     
+    // Funzione per salvare la visibilità del box info
     async function salvaVisibilitaInfoBox(visibile) {
         const { error } = await _supabase.from(T_CONF).upsert({
             chiave: 'mostra_info_box',
@@ -4849,6 +4716,7 @@
         return true;
     }
     
+    // Funzione chiamata quando si cambia il toggle
     async function toggleInfoVisibility() {
         const toggle = document.getElementById('infoVisibilityToggle');
         const visibile = toggle.checked;
@@ -4856,117 +4724,9 @@
         await salvaVisibilitaInfoBox(visibile);
         aggiornaStatoVisibilitaInfo();
         
+        // Aggiorna la visibilità per gli utenti (admin vede sempre)
         if (!isAdmin) {
             document.getElementById('infoBox').style.display = visibile ? 'block' : 'none';
-        }
-    }
-
-    // ===== FUNZIONI PER IL CONTROLLO DELL'IMMAGINE LATERALE =====
-    async function caricaStatoImmagineLaterale() {
-        const { data } = await _supabase
-            .from(T_CONF)
-            .select('*')
-            .eq('chiave', 'mostra_immagine_laterale');
-        
-        const sideImage = document.querySelector('.side-logo');
-        const toggleBtn = document.getElementById('sideImageToggleBtn');
-        const toggleText = document.getElementById('sideImageToggleText');
-        
-        let immagineVisibile = false;  // SEMPRE NASCOSTA DI DEFAULT PER TUTTE LE GARE
-        
-        if (data && data.length > 0 && data[0].valore === 'true') {
-            immagineVisibile = true;
-        } else if (data && data.length > 0 && data[0].valore === 'false') {
-            immagineVisibile = false;
-        } else {
-            await _supabase
-                .from(T_CONF)
-                .upsert({ 
-                    chiave: 'mostra_immagine_laterale', 
-                    valore: 'false' 
-                }, { onConflict: 'chiave' });
-        }
-        
-        if (immagineVisibile) {
-            if (sideImage) sideImage.classList.remove('hidden');
-            if (toggleBtn) {
-                toggleBtn.classList.remove('inactive');
-                toggleBtn.classList.add('active');
-                if (toggleText) toggleText.innerHTML = '<i class="fas fa-eye-slash"></i> Nascondi immagine laterale';
-            }
-        } else {
-            if (sideImage) sideImage.classList.add('hidden');
-            if (toggleBtn) {
-                toggleBtn.classList.remove('active');
-                toggleBtn.classList.add('inactive');
-                if (toggleText) toggleText.innerHTML = '<i class="fas fa-image"></i> Mostra immagine laterale';
-            }
-        }
-    } = await _supabase
-            .from(T_CONF)
-            .select('*')
-            .eq('chiave', 'mostra_immagine_laterale');
-        
-        const sideImage = document.querySelector('.side-logo');
-        const toggleBtn = document.getElementById('sideImageToggleBtn');
-        const toggleText = document.getElementById('sideImageToggleText');
-        
-        let immagineVisibile = false;
-        
-        if (data && data.length > 0 && data[0].valore === 'true') {
-            immagineVisibile = true;
-        }
-        
-        if (immagineVisibile) {
-            if (sideImage) sideImage.classList.remove('hidden');
-            if (toggleBtn) {
-                toggleBtn.classList.remove('inactive');
-                toggleBtn.classList.add('active');
-                toggleText.innerHTML = '<i class="fas fa-eye-slash"></i> Nascondi immagine laterale';
-            }
-        } else {
-            if (sideImage) sideImage.classList.add('hidden');
-            if (toggleBtn) {
-                toggleBtn.classList.remove('active');
-                toggleBtn.classList.add('inactive');
-                toggleText.innerHTML = '<i class="fas fa-image"></i> Mostra immagine laterale';
-            }
-        }
-    }
-
-    async function toggleSideImageFromButton() {
-        const sideImage = document.querySelector('.side-logo');
-        const toggleBtn = document.getElementById('sideImageToggleBtn');
-        const toggleText = document.getElementById('sideImageToggleText');
-        
-        const isCurrentlyVisible = sideImage && !sideImage.classList.contains('hidden');
-        const nuovaVisibilita = !isCurrentlyVisible;
-        
-        const { error } = await _supabase
-            .from(T_CONF)
-            .upsert({ 
-                chiave: 'mostra_immagine_laterale', 
-                valore: nuovaVisibilita.toString() 
-            }, { onConflict: 'chiave' });
-        
-        if (error) {
-            console.error("Errore salvataggio stato immagine:", error);
-            showToast("Errore nel salvataggio");
-            return;
-        }
-        
-        if (nuovaVisibilita) {
-            sideImage.classList.remove('hidden');
-            toggleBtn.classList.remove('inactive');
-            toggleBtn.classList.add('active');
-            toggleText.innerHTML = '<i class="fas fa-eye-slash"></i> Nascondi immagine laterale';
-            showToast("Immagine laterale attivata");
-        } else {
-            sideImage.classList.add('hidden');
-            toggleBtn.classList.remove('active');
-            toggleBtn.classList.add('inactive');
-            toggleText.innerHTML = '<i class="fas fa-image"></i> Mostra immagine laterale';
-            showToast("Immagine laterale disattivata");
         }
     }
 
