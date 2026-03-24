@@ -517,9 +517,32 @@
             z-index: 2;
         }
 
+        /* Logo container con immagine laterale */
+        .logo-main-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .side-image {
+            flex-shrink: 0;
+        }
+        
+        .side-image img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: var(--shadow-medium);
+            border: 3px solid white;
+            transition: all 0.3s ease;
+        }
+        
         .logo-container { 
             text-align: center; 
-            margin-bottom: 20px; 
             position: relative; 
             display: flex; 
             justify-content: center; 
@@ -529,7 +552,7 @@
             border-radius: 20px;
             box-shadow: var(--shadow-medium);
             overflow: hidden;
-            flex-shrink: 0;
+            flex: 1;
         }
         
         .logo-container::before {
@@ -556,6 +579,34 @@
             border: 5px solid white;
             background: white;
             padding: 10px;
+        }
+        
+        /* Pulsante toggle immagine laterale */
+        .toggle-side-image-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        
+        .toggle-side-image-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .toggle-side-image-btn i {
+            font-size: 1rem;
         }
         
         .top-btns { 
@@ -630,7 +681,32 @@
             border-radius: 2px;
         }
 
-        /* STILI TIMER - DUPLICATI */
+        /* Responsive per l'immagine laterale */
+        @media screen and (max-width: 992px) {
+            .side-image img {
+                width: 120px;
+                height: 120px;
+            }
+        }
+        
+        @media screen and (max-width: 768px) {
+            .logo-main-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .side-image img {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .toggle-side-image-btn {
+                padding: 8px 15px;
+                font-size: 0.7rem;
+            }
+        }
+        
+        /* Gli altri stili rimangono invariati */
         .countdown-container { 
             text-align: center; 
             margin: 15px 0; 
@@ -729,7 +805,6 @@
             min-width: 70px;
         }
 
-        /* NUOVI STILI PER TIMER ADMIN */
         .timer-admin-section {
             background: rgba(106, 76, 147, 0.05);
             border: 2px solid var(--racing-purple);
@@ -1714,7 +1789,6 @@
             flex-shrink: 0;
         }
         
-        /* ===== INFO BOX STYLES ===== */
         .info-section {
             background: linear-gradient(145deg, var(--racing-white) 0%, #ffffff 100%);
             border-radius: 25px;
@@ -1806,7 +1880,6 @@
             background: linear-gradient(45deg, rgba(29, 53, 87, 0.3) 0%, rgba(42, 59, 78, 0.9) 100%);
         }
         
-        /* Stili per il testo formattato */
         .info-text {
             font-size: 1.1rem;
             line-height: 1.7;
@@ -1961,7 +2034,6 @@
             transform: translateY(-3px);
         }
         
-        /* Stili per il toggle del box info */
         .info-toggle-row {
             display: flex;
             align-items: center;
@@ -2602,13 +2674,24 @@
 </div>
 
 <div class="container">
-    <div class="logo-container">
-        <div class="top-btns">
-            <button class="logout-btn" id="logoutBtn" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> LOGOUT</button>
-            <button class="icon-btn" id="adminIcon" onclick="toggleAdmin()"><i class="fas fa-cog"></i></button>
+    <!-- Logo con immagine laterale -->
+    <div class="logo-main-container">
+        <div class="side-image" id="sideImageContainer">
+            <img src="immagine.png" alt="Immagine laterale" id="sideImage" onerror="this.style.display='none'">
         </div>
-        <img src="logo.png" alt="Logo Juvenilia Racing Team" onerror="this.style.display='none'">
+        <div class="logo-container">
+            <div class="top-btns">
+                <button class="logout-btn" id="logoutBtn" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> LOGOUT</button>
+                <button class="icon-btn" id="adminIcon" onclick="toggleAdmin()"><i class="fas fa-cog"></i></button>
+            </div>
+            <img src="logo.png" alt="Logo Juvenilia Racing Team" onerror="this.style.display='none'">
+        </div>
     </div>
+    
+    <!-- Pulsante per attivare/disattivare l'immagine laterale (solo admin) -->
+    <button id="toggleSideImageBtn" class="toggle-side-image-btn" style="display: none;" onclick="toggleSideImage()">
+        <i class="fas fa-image"></i> Nascondi Immagine Laterale
+    </button>
 
     <h2 id="mainTitle">Juvenilia Racing Team - Iscrizioni Gara 5</h2>
     
@@ -2922,6 +3005,9 @@
     let refreshInterval = null;
     let categoryTimers = [];
     let categoryTimerIntervals = {};
+    
+    // Variabili per l'immagine laterale
+    let mostraImmagineLaterale = false;
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
@@ -2950,6 +3036,7 @@
         startTimeCheck();
         await fullLoad(); 
         await caricaInfoBox();
+        await caricaStatoImmagineLaterale();
         refreshInterval = setInterval(checkAndRefresh, 15000);
     }
 
@@ -3076,6 +3163,61 @@
             }
         });
     });
+
+    // Funzioni per l'immagine laterale
+async function caricaStatoImmagineLaterale() {
+    const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'mostra_immagine_laterale');
+    if (data && data.length > 0 && data[0].valore) {
+        mostraImmagineLaterale = data[0].valore === 'true';
+    } else {
+        // Se non c'è un valore salvato, imposta a false (nascosto di default)
+        mostraImmagineLaterale = false;
+        // Opzionale: salva immediatamente questo stato di default nel database
+        await _supabase.from(T_CONF).upsert({
+            chiave: 'mostra_immagine_laterale',
+            valore: 'false'
+        }, { onConflict: 'chiave' });
+    }
+    
+    const sideImageContainer = document.getElementById('sideImageContainer');
+    const toggleBtn = document.getElementById('toggleSideImageBtn');
+    
+    if (sideImageContainer) {
+        sideImageContainer.style.display = mostraImmagineLaterale ? 'block' : 'none';
+    }
+    
+    if (toggleBtn && isAdmin) {
+        toggleBtn.innerHTML = mostraImmagineLaterale ? 
+            '<i class="fas fa-image"></i> Nascondi Immagine Laterale' : 
+            '<i class="fas fa-image-slash"></i> Mostra Immagine Laterale';
+    }
+}
+    
+    async function toggleSideImage() {
+        if (!isAdmin) return;
+        
+        mostraImmagineLaterale = !mostraImmagineLaterale;
+        
+        const sideImageContainer = document.getElementById('sideImageContainer');
+        const toggleBtn = document.getElementById('toggleSideImageBtn');
+        
+        if (sideImageContainer) {
+            sideImageContainer.style.display = mostraImmagineLaterale ? 'block' : 'none';
+        }
+        
+        if (toggleBtn) {
+            toggleBtn.innerHTML = mostraImmagineLaterale ? 
+                '<i class="fas fa-image"></i> Nascondi Immagine Laterale' : 
+                '<i class="fas fa-image-slash"></i> Mostra Immagine Laterale';
+        }
+        
+        await _supabase.from(T_CONF).upsert({
+            chiave: 'mostra_immagine_laterale',
+            valore: mostraImmagineLaterale.toString()
+        }, { onConflict: 'chiave' });
+        
+        showToast(`Immagine laterale ${mostraImmagineLaterale ? 'mostrata' : 'nascosta'}`);
+    }
 
     async function caricaConfig() {
         const { data } = await _supabase.from(T_CONF).select('*');
@@ -3954,10 +4096,18 @@
             document.getElementById('infoToggleContainer').style.display = 'flex';
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
             
+        // Mostra il pulsante per l'immagine laterale
+        const toggleSideBtn = document.getElementById('toggleSideImageBtn');
+        if (toggleSideBtn) {
+            toggleSideBtn.style.display = 'flex';
+            // Il testo viene già impostato da caricaStatoImmagineLaterale()
+        }
+            
             caricaConfig(); 
             caricaTimers();
             renderData(); 
             caricaInfoBox();
+            caricaStatoImmagineLaterale();
             showToast("Modalità Admin Attiva");
         } else { 
             alert("Password Errata"); 
