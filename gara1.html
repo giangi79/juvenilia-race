@@ -517,9 +517,37 @@
             z-index: 2;
         }
 
+        /* Logo container con immagine laterale - NASCOSTA DI DEFAULT */
+        .logo-main-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .side-image {
+            display: none;
+            flex-shrink: 0;
+        }
+        
+        .side-image.visible {
+            display: block;
+        }
+        
+        .side-image img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: var(--shadow-medium);
+            border: 3px solid white;
+            transition: all 0.3s ease;
+        }
+        
         .logo-container { 
             text-align: center; 
-            margin-bottom: 20px; 
             position: relative; 
             display: flex; 
             justify-content: center; 
@@ -529,7 +557,7 @@
             border-radius: 20px;
             box-shadow: var(--shadow-medium);
             overflow: hidden;
-            flex-shrink: 0;
+            flex: 1;
         }
         
         .logo-container::before {
@@ -544,48 +572,46 @@
             z-index: 0;
         }
         
-        /* STILI PER IL WRAPPER DEL LOGO CON IMMAGINE LATERALE */
-        .logo-wrapper {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            width: 100%;
+        .logo-container img { 
+            width: 100%; 
+            max-width: 800px; 
+            height: auto; 
+            border-radius: 15px; 
+            display: block;
             position: relative;
             z-index: 1;
-            flex-wrap: wrap;
-        }
-
-        .side-logo {
-            width: auto;
-            height: auto;
-            max-width: 200px;
-            max-height: 200px;
-            object-fit: contain;
-            border-radius: 15px;
-            border: 3px solid white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            transition: none;
-            flex-shrink: 0;
-        }
-
-        .side-logo.hidden {
-            display: none;
-        }
-
-        .main-logo {
-            flex: 1;
-            max-width: 800px;
-            min-width: 200px;
-            width: 100%;
-            height: auto;
-            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             border: 5px solid white;
             background: white;
             padding: 10px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 1;
+        }
+        
+        /* Pulsante toggle immagine laterale */
+        .toggle-side-image-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-light);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        
+        .toggle-side-image-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .toggle-side-image-btn i {
+            font-size: 1rem;
         }
         
         .top-btns { 
@@ -660,7 +686,32 @@
             border-radius: 2px;
         }
 
-        /* STILI TIMER - DUPLICATI */
+        /* Responsive per l'immagine laterale */
+        @media screen and (max-width: 992px) {
+            .side-image.visible img {
+                width: 120px;
+                height: 120px;
+            }
+        }
+        
+        @media screen and (max-width: 768px) {
+            .logo-main-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .side-image.visible img {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .toggle-side-image-btn {
+                padding: 8px 15px;
+                font-size: 0.7rem;
+            }
+        }
+        
+        /* Gli altri stili rimangono invariati */
         .countdown-container { 
             text-align: center; 
             margin: 15px 0; 
@@ -759,7 +810,6 @@
             min-width: 70px;
         }
 
-        /* NUOVI STILI PER TIMER ADMIN */
         .timer-admin-section {
             background: rgba(106, 76, 147, 0.05);
             border: 2px solid var(--racing-purple);
@@ -1744,7 +1794,6 @@
             flex-shrink: 0;
         }
         
-        /* ===== INFO BOX STYLES ===== */
         .info-section {
             background: linear-gradient(145deg, var(--racing-white) 0%, #ffffff 100%);
             border-radius: 25px;
@@ -1836,7 +1885,6 @@
             background: linear-gradient(45deg, rgba(29, 53, 87, 0.3) 0%, rgba(42, 59, 78, 0.9) 100%);
         }
         
-        /* Stili per il testo formattato */
         .info-text {
             font-size: 1.1rem;
             line-height: 1.7;
@@ -1991,7 +2039,6 @@
             transform: translateY(-3px);
         }
         
-        /* Stili per il toggle del box info */
         .info-toggle-row {
             display: flex;
             align-items: center;
@@ -2229,7 +2276,6 @@
             background: var(--gradient-primary);
         }
         
-        /* Responsive per mobile */
         @media screen and (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -2243,16 +2289,7 @@
                 margin-bottom: 15px;
             }
             
-            .logo-wrapper {
-                gap: 15px;
-            }
-            
-            .side-logo {
-                max-width: 100px;
-                max-height: 100px;
-            }
-            
-            .main-logo {
+            .logo-container img {
                 max-width: 95%;
                 border: 3px solid white;
                 padding: 5px;
@@ -2578,24 +2615,13 @@
                 max-height: 600px;
             }
             
-            .main-logo {
+            .logo-container img {
                 max-width: 900px;
             }
         }
         
         @media screen and (max-width: 480px) {
-            .logo-wrapper {
-                gap: 10px;
-            }
-            
-            .side-logo {
-                max-width: 70px;
-                max-height: 70px;
-            }
-            
-            .main-logo {
-                order: 1;
-                margin-top: 10px;
+            .logo-container img {
                 max-width: 100%;
             }
             
@@ -2653,16 +2679,24 @@
 </div>
 
 <div class="container">
-    <div class="logo-container">
-        <div class="top-btns">
-            <button class="logout-btn" id="logoutBtn" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> LOGOUT</button>
-            <button class="icon-btn" id="adminIcon" onclick="toggleAdmin()"><i class="fas fa-cog"></i></button>
+    <!-- Logo con immagine laterale - NASCOSTA DI DEFAULT -->
+    <div class="logo-main-container">
+        <div class="side-image" id="sideImageContainer">
+            <img src="immagine.png" alt="Immagine laterale" id="sideImage" onerror="this.style.display='none'">
         </div>
-        <div class="logo-wrapper">
-            <img src="immagine.png" alt="Immagine laterale" class="side-logo hidden" onerror="this.style.display='none'">
-            <img src="logo.png" alt="Logo Juvenilia Racing Team" class="main-logo" onerror="this.style.display='none'">
+        <div class="logo-container">
+            <div class="top-btns">
+                <button class="logout-btn" id="logoutBtn" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> LOGOUT</button>
+                <button class="icon-btn" id="adminIcon" onclick="toggleAdmin()"><i class="fas fa-cog"></i></button>
+            </div>
+            <img src="logo.png" alt="Logo Juvenilia Racing Team" onerror="this.style.display='none'">
         </div>
     </div>
+    
+    <!-- Pulsante per attivare/disattivare l'immagine laterale (solo admin) -->
+    <button id="toggleSideImageBtn" class="toggle-side-image-btn" style="display: none;" onclick="toggleSideImage()">
+        <i class="fas fa-image"></i> Mostra Immagine Laterale
+    </button>
 
     <h2 id="mainTitle">🏆 Juvenilia Racing Team - Iscrizioni Gara 1</h2>
     
@@ -2858,19 +2892,6 @@
             <button onclick="confermaScadenzaDB()" style="background:var(--racing-green);"><i class="fas fa-check-circle"></i> CONFERMA</button>
             <button onclick="resetScadenzaDB()" style="background:var(--racing-red);"><i class="fas fa-ban"></i> RESET</button>
         </div>
-        <!-- NUOVA RIGA PER IL CONTROLLO IMMAGINE LATERALE -->
-        <div class="admin-row">
-            <div style="font-size: 12px; font-weight: bold; margin-left: 5px; display: flex; align-items: center; gap: 10px;">
-                <i class="fas fa-image"></i> IMMAGINE LATERALE:
-            </div>
-            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
-                <input type="checkbox" id="toggleSideImage" onchange="toggleSideImage()">
-                <span>Mostra immagine laterale</span>
-            </label>
-            <button onclick="resetSideImage()" style="background:var(--racing-orange);">
-                <i class="fas fa-undo"></i> Reset Default
-            </button>
-        </div>
     </div>
 
     <div id="costiBox">
@@ -2989,6 +3010,9 @@
     let refreshInterval = null;
     let categoryTimers = [];
     let categoryTimerIntervals = {};
+    
+    // Variabili per l'immagine laterale - NASCOSTA DI DEFAULT
+    let mostraImmagineLaterale = false;
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
@@ -3017,6 +3041,7 @@
         startTimeCheck();
         await fullLoad(); 
         await caricaInfoBox();
+        await caricaStatoImmagineLaterale();
         refreshInterval = setInterval(checkAndRefresh, 15000);
     }
 
@@ -3144,6 +3169,69 @@
         });
     });
 
+    // Funzioni per l'immagine laterale - NASCOSTA DI DEFAULT
+    async function caricaStatoImmagineLaterale() {
+        const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'mostra_immagine_laterale');
+        if (data && data.length > 0 && data[0].valore) {
+            mostraImmagineLaterale = data[0].valore === 'true';
+        } else {
+            // Se non c'è un valore salvato, rimane false (nascosto di default)
+            mostraImmagineLaterale = false;
+            // Opzionale: salva lo stato di default nel database
+            await _supabase.from(T_CONF).upsert({
+                chiave: 'mostra_immagine_laterale',
+                valore: 'false'
+            }, { onConflict: 'chiave' });
+        }
+        
+        const sideImageContainer = document.getElementById('sideImageContainer');
+        const toggleBtn = document.getElementById('toggleSideImageBtn');
+        
+        if (sideImageContainer) {
+            if (mostraImmagineLaterale) {
+                sideImageContainer.classList.add('visible');
+            } else {
+                sideImageContainer.classList.remove('visible');
+            }
+        }
+        
+        if (toggleBtn && isAdmin) {
+            toggleBtn.innerHTML = mostraImmagineLaterale ? 
+                '<i class="fas fa-image"></i> Nascondi Immagine Laterale' : 
+                '<i class="fas fa-image-slash"></i> Mostra Immagine Laterale';
+        }
+    }
+    
+    async function toggleSideImage() {
+        if (!isAdmin) return;
+        
+        mostraImmagineLaterale = !mostraImmagineLaterale;
+        
+        const sideImageContainer = document.getElementById('sideImageContainer');
+        const toggleBtn = document.getElementById('toggleSideImageBtn');
+        
+        if (sideImageContainer) {
+            if (mostraImmagineLaterale) {
+                sideImageContainer.classList.add('visible');
+            } else {
+                sideImageContainer.classList.remove('visible');
+            }
+        }
+        
+        if (toggleBtn) {
+            toggleBtn.innerHTML = mostraImmagineLaterale ? 
+                '<i class="fas fa-image"></i> Nascondi Immagine Laterale' : 
+                '<i class="fas fa-image-slash"></i> Mostra Immagine Laterale';
+        }
+        
+        await _supabase.from(T_CONF).upsert({
+            chiave: 'mostra_immagine_laterale',
+            valore: mostraImmagineLaterale.toString()
+        }, { onConflict: 'chiave' });
+        
+        showToast(`Immagine laterale ${mostraImmagineLaterale ? 'mostrata' : 'nascosta'}`);
+    }
+
     async function caricaConfig() {
         const { data } = await _supabase.from(T_CONF).select('*');
         if(!data) return;
@@ -3234,8 +3322,6 @@
         }
         
         if(isAdmin && !isEditingCosti) renderCostiInputs();
-        
-        await caricaStatoImmagineLaterale();
     }
 
     async function caricaTimers() {
@@ -4023,10 +4109,20 @@
             document.getElementById('infoToggleContainer').style.display = 'flex';
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
             
+            // Mostra il pulsante per l'immagine laterale
+            const toggleSideBtn = document.getElementById('toggleSideImageBtn');
+            if (toggleSideBtn) {
+                toggleSideBtn.style.display = 'flex';
+                toggleSideBtn.innerHTML = mostraImmagineLaterale ? 
+                    '<i class="fas fa-image"></i> Nascondi Immagine Laterale' : 
+                    '<i class="fas fa-image-slash"></i> Mostra Immagine Laterale';
+            }
+            
             caricaConfig(); 
             caricaTimers();
             renderData(); 
             caricaInfoBox();
+            caricaStatoImmagineLaterale();
             showToast("Modalità Admin Attiva");
         } else { 
             alert("Password Errata"); 
@@ -4495,12 +4591,7 @@
                         : 
                         `<div class="accompagnatore-confirmed">
                             <i class="fas fa-check-circle"></i> Accompagnatore registrato
-                        </div>
-                        ${isAdmin ? `<div class="accompagnatore-actions" style="margin-top: 10px;">
-                            <button class="btn-modify" onclick="modificaAccompagnatore('${p.id}')"><i class="fas fa-edit"></i> Modifica</button>
-                            <button class="btn-remove" onclick="rimuoviAccompagnatore('${p.id}')"><i class="fas fa-trash"></i> Rimuovi</button>
-                        </div>` : ''}
-                    `
+                        </div>`
                     }
                 </div>
             `;
@@ -4651,6 +4742,7 @@
         const deleteBtn = document.getElementById('deleteInfoBtn');
         
         if (data && data.length > 0 && data[0].valore) {
+            // Usa innerHTML per mantenere la formattazione HTML
             infoText.innerHTML = data[0].valore;
             infoEditor.innerHTML = data[0].valore;
         } else {
@@ -4667,12 +4759,14 @@
             deleteBtn.style.display = 'flex';
             saveBtn.style.display = 'none';
             
+            // Mostra il box info agli admin sempre
             infoBox.style.display = 'block';
         } else {
             editBtn.style.display = 'none';
             deleteBtn.style.display = 'none';
             saveBtn.style.display = 'none';
             
+            // Mostra o nascondi il box info in base alla configurazione
             infoBox.style.display = mostraInfoBox ? 'block' : 'none';
         }
     }
@@ -4719,6 +4813,7 @@
             return;
         }
         
+        // Usa innerHTML per mantenere la formattazione
         document.getElementById('infoText').innerHTML = testo;
         document.getElementById('infoDisplay').style.display = 'block';
         document.getElementById('infoEditMode').style.display = 'none';
@@ -4754,6 +4849,7 @@
         }
     }
     
+    // Funzione per aggiornare lo stato visivo del toggle
     function aggiornaStatoVisibilitaInfo() {
         const toggle = document.getElementById('infoVisibilityToggle');
         const status = document.getElementById('infoVisibilityStatus');
@@ -4767,6 +4863,7 @@
         }
     }
     
+    // Funzione per salvare la visibilità del box info
     async function salvaVisibilitaInfoBox(visibile) {
         const { error } = await _supabase.from(T_CONF).upsert({
             chiave: 'mostra_info_box',
@@ -4784,6 +4881,7 @@
         return true;
     }
     
+    // Funzione chiamata quando si cambia il toggle
     async function toggleInfoVisibility() {
         const toggle = document.getElementById('infoVisibilityToggle');
         const visibile = toggle.checked;
@@ -4791,77 +4889,10 @@
         await salvaVisibilitaInfoBox(visibile);
         aggiornaStatoVisibilitaInfo();
         
+        // Aggiorna la visibilità per gli utenti (admin vede sempre)
         if (!isAdmin) {
             document.getElementById('infoBox').style.display = visibile ? 'block' : 'none';
         }
-    }
-
-    // ===== FUNZIONI PER IL CONTROLLO DELL'IMMAGINE LATERALE =====
-    async function caricaStatoImmagineLaterale() {
-        const { data } = await _supabase
-            .from(T_CONF)
-            .select('*')
-            .eq('chiave', 'mostra_immagine_laterale');
-        
-        const toggle = document.getElementById('toggleSideImage');
-        const sideImage = document.querySelector('.side-logo');
-        
-        if (data && data.length > 0 && data[0].valore === 'true') {
-            if (toggle) toggle.checked = true;
-            if (sideImage) sideImage.classList.remove('hidden');
-        } else {
-            if (toggle) toggle.checked = false;
-            if (sideImage) sideImage.classList.add('hidden');
-        }
-    }
-
-    async function toggleSideImage() {
-        const toggle = document.getElementById('toggleSideImage');
-        const sideImage = document.querySelector('.side-logo');
-        const visibile = toggle.checked;
-        
-        const { error } = await _supabase
-            .from(T_CONF)
-            .upsert({ 
-                chiave: 'mostra_immagine_laterale', 
-                valore: visibile.toString() 
-            }, { onConflict: 'chiave' });
-        
-        if (error) {
-            console.error("Errore salvataggio stato immagine:", error);
-            showToast("Errore nel salvataggio");
-            return;
-        }
-        
-        if (visibile) {
-            sideImage.classList.remove('hidden');
-            showToast("Immagine laterale attivata");
-        } else {
-            sideImage.classList.add('hidden');
-            showToast("Immagine laterale disattivata");
-        }
-    }
-
-    async function resetSideImage() {
-        const toggle = document.getElementById('toggleSideImage');
-        const sideImage = document.querySelector('.side-logo');
-        
-        const { error } = await _supabase
-            .from(T_CONF)
-            .upsert({ 
-                chiave: 'mostra_immagine_laterale', 
-                valore: 'true' 
-            }, { onConflict: 'chiave' });
-        
-        if (error) {
-            console.error("Errore reset immagine:", error);
-            showToast("Errore nel reset");
-            return;
-        }
-        
-        toggle.checked = true;
-        sideImage.classList.remove('hidden');
-        showToast("Immagine laterale riattivata (default)");
     }
 
     init();
