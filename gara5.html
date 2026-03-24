@@ -517,7 +517,7 @@
             z-index: 2;
         }
 
-        /* Logo container con immagine laterale */
+        /* Logo container con immagine laterale - NASCOSTA DI DEFAULT */
         .logo-main-container {
             display: flex;
             align-items: center;
@@ -528,7 +528,12 @@
         }
         
         .side-image {
+            display: none;
             flex-shrink: 0;
+        }
+        
+        .side-image.visible {
+            display: block;
         }
         
         .side-image img {
@@ -683,7 +688,7 @@
 
         /* Responsive per l'immagine laterale */
         @media screen and (max-width: 992px) {
-            .side-image img {
+            .side-image.visible img {
                 width: 120px;
                 height: 120px;
             }
@@ -695,7 +700,7 @@
                 gap: 15px;
             }
             
-            .side-image img {
+            .side-image.visible img {
                 width: 80px;
                 height: 80px;
             }
@@ -2674,7 +2679,7 @@
 </div>
 
 <div class="container">
-    <!-- Logo con immagine laterale -->
+    <!-- Logo con immagine laterale - NASCOSTA DI DEFAULT -->
     <div class="logo-main-container">
         <div class="side-image" id="sideImageContainer">
             <img src="immagine.png" alt="Immagine laterale" id="sideImage" onerror="this.style.display='none'">
@@ -2690,7 +2695,7 @@
     
     <!-- Pulsante per attivare/disattivare l'immagine laterale (solo admin) -->
     <button id="toggleSideImageBtn" class="toggle-side-image-btn" style="display: none;" onclick="toggleSideImage()">
-        <i class="fas fa-image"></i> Nascondi Immagine Laterale
+        <i class="fas fa-image"></i> Mostra Immagine Laterale
     </button>
 
     <h2 id="mainTitle">Juvenilia Racing Team - Iscrizioni Gara 5</h2>
@@ -3006,7 +3011,7 @@
     let categoryTimers = [];
     let categoryTimerIntervals = {};
     
-    // Variabili per l'immagine laterale
+    // Variabili per l'immagine laterale - NASCOSTA DI DEFAULT
     let mostraImmagineLaterale = false;
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
@@ -3164,34 +3169,38 @@
         });
     });
 
-    // Funzioni per l'immagine laterale
-async function caricaStatoImmagineLaterale() {
-    const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'mostra_immagine_laterale');
-    if (data && data.length > 0 && data[0].valore) {
-        mostraImmagineLaterale = data[0].valore === 'true';
-    } else {
-        // Se non c'è un valore salvato, imposta a false (nascosto di default)
-        mostraImmagineLaterale = false;
-        // Opzionale: salva immediatamente questo stato di default nel database
-        await _supabase.from(T_CONF).upsert({
-            chiave: 'mostra_immagine_laterale',
-            valore: 'false'
-        }, { onConflict: 'chiave' });
+    // Funzioni per l'immagine laterale - NASCOSTA DI DEFAULT
+    async function caricaStatoImmagineLaterale() {
+        const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'mostra_immagine_laterale');
+        if (data && data.length > 0 && data[0].valore) {
+            mostraImmagineLaterale = data[0].valore === 'true';
+        } else {
+            // Se non c'è un valore salvato, rimane false (nascosto di default)
+            mostraImmagineLaterale = false;
+            // Opzionale: salva lo stato di default nel database
+            await _supabase.from(T_CONF).upsert({
+                chiave: 'mostra_immagine_laterale',
+                valore: 'false'
+            }, { onConflict: 'chiave' });
+        }
+        
+        const sideImageContainer = document.getElementById('sideImageContainer');
+        const toggleBtn = document.getElementById('toggleSideImageBtn');
+        
+        if (sideImageContainer) {
+            if (mostraImmagineLaterale) {
+                sideImageContainer.classList.add('visible');
+            } else {
+                sideImageContainer.classList.remove('visible');
+            }
+        }
+        
+        if (toggleBtn && isAdmin) {
+            toggleBtn.innerHTML = mostraImmagineLaterale ? 
+                '<i class="fas fa-image"></i> Nascondi Immagine Laterale' : 
+                '<i class="fas fa-image-slash"></i> Mostra Immagine Laterale';
+        }
     }
-    
-    const sideImageContainer = document.getElementById('sideImageContainer');
-    const toggleBtn = document.getElementById('toggleSideImageBtn');
-    
-    if (sideImageContainer) {
-        sideImageContainer.style.display = mostraImmagineLaterale ? 'block' : 'none';
-    }
-    
-    if (toggleBtn && isAdmin) {
-        toggleBtn.innerHTML = mostraImmagineLaterale ? 
-            '<i class="fas fa-image"></i> Nascondi Immagine Laterale' : 
-            '<i class="fas fa-image-slash"></i> Mostra Immagine Laterale';
-    }
-}
     
     async function toggleSideImage() {
         if (!isAdmin) return;
@@ -3202,7 +3211,11 @@ async function caricaStatoImmagineLaterale() {
         const toggleBtn = document.getElementById('toggleSideImageBtn');
         
         if (sideImageContainer) {
-            sideImageContainer.style.display = mostraImmagineLaterale ? 'block' : 'none';
+            if (mostraImmagineLaterale) {
+                sideImageContainer.classList.add('visible');
+            } else {
+                sideImageContainer.classList.remove('visible');
+            }
         }
         
         if (toggleBtn) {
@@ -4096,12 +4109,14 @@ async function caricaStatoImmagineLaterale() {
             document.getElementById('infoToggleContainer').style.display = 'flex';
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
             
-        // Mostra il pulsante per l'immagine laterale
-        const toggleSideBtn = document.getElementById('toggleSideImageBtn');
-        if (toggleSideBtn) {
-            toggleSideBtn.style.display = 'flex';
-            // Il testo viene già impostato da caricaStatoImmagineLaterale()
-        }
+            // Mostra il pulsante per l'immagine laterale
+            const toggleSideBtn = document.getElementById('toggleSideImageBtn');
+            if (toggleSideBtn) {
+                toggleSideBtn.style.display = 'flex';
+                toggleSideBtn.innerHTML = mostraImmagineLaterale ? 
+                    '<i class="fas fa-image"></i> Nascondi Immagine Laterale' : 
+                    '<i class="fas fa-image-slash"></i> Mostra Immagine Laterale';
+            }
             
             caricaConfig(); 
             caricaTimers();
