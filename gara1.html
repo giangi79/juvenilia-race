@@ -3087,9 +3087,11 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('input', function(e) {
-    // Escludi gli URL dalla conversione in maiuscolo
-    if (e.target.id === 'docLink1_URL' || e.target.id === 'docLink2_URL') {
-        return; // Non fare nulla per i campi URL
+    // Lista dei campi che NON devono essere convertiti in maiuscolo
+    const excludeFields = ['docLink1_URL', 'docLink2_URL'];
+    
+    if (excludeFields.includes(e.target.id)) {
+        return; // Esci subito, non fare nulla
     }
     
     if (e.target.classList.contains('accompagnatore-input') || 
