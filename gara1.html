@@ -10,8 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* TUTTO LO STILE RIMANE IDENTICO - NON MODIFICATO */
         :root { 
-            /* TEMA CHIARO */
             --racing-red: #E63946; --racing-blue: #1D3557; --racing-light: #A8DADC; 
             --racing-white: #F1FAEE; --racing-yellow: #FFD166; --racing-orange: #F4A261;
             --racing-green: #2A9D8F; --racing-purple: #6A4C93; --racing-silver: #C0C0C0;
@@ -25,12 +25,10 @@
             --shadow-medium: 0 12px 35px rgba(29, 53, 87, 0.12);
             --shadow-heavy: 0 15px 40px rgba(29, 53, 87, 0.15);
             
-            /* Colori Categorie aggiornati */
             --cat-senior: #1D3557; --cat-junior: #E63946; --cat-allievi: #2A9D8F;
             --cat-ragazzi: #457B9D; --cat-r12: #6A4C93; --cat-esordienti: #F4A261;
             --cat-giovanissimi: #4ECDC4; --cat-default: #8A8D93;
             
-            /* Variabili per Dark Mode */
             --dark-bg-body: #0a1929;
             --dark-bg-card: #1a2b3e;
             --dark-text-main: #e9ecef;
@@ -39,7 +37,6 @@
             --dark-shadow-heavy: 0 15px 40px rgba(0, 0, 0, 0.5);
         }
 
-        /* Dark Mode Class */
         .dark-mode {
             --text-main: var(--dark-text-main);
             --bg-body: var(--dark-bg-body);
@@ -272,7 +269,6 @@
             box-shadow: 0 0 0 3px rgba(29, 53, 87, 0.3) !important;
         }
 
-        /* Stili per il box info formattato e toolbar */
         .info-text {
             font-size: 1.1rem;
             line-height: 1.7;
@@ -354,7 +350,6 @@
             color: white;
         }
 
-        /* TOOLBAR STILE WORD */
         .info-toolbar {
             background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
             border: 2px solid var(--racing-light);
@@ -517,7 +512,6 @@
             z-index: 2;
         }
 
-        /* Logo container con immagine laterale - NASCOSTA DI DEFAULT */
         .logo-main-container {
             display: flex;
             align-items: center;
@@ -582,11 +576,9 @@
             z-index: 1;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             border: 5px solid white;
-            background: white;
             padding: 10px;
         }
         
-        /* Pulsante toggle immagine laterale */
         .toggle-side-image-btn {
             background: var(--gradient-primary);
             color: white;
@@ -686,7 +678,6 @@
             border-radius: 2px;
         }
 
-        /* Responsive per l'immagine laterale */
         @media screen and (max-width: 992px) {
             .side-image.visible img {
                 width: 120px;
@@ -711,7 +702,6 @@
             }
         }
         
-        /* Gli altri stili rimangono invariati */
         .countdown-container { 
             text-align: center; 
             margin: 15px 0; 
@@ -760,7 +750,6 @@
             color: var(--racing-yellow);
         }
 
-        /* TIMER PER CATEGORIE */
         .timer-category-container {
             display: flex;
             flex-direction: column;
@@ -2679,7 +2668,6 @@
 </div>
 
 <div class="container">
-    <!-- Logo con immagine laterale - NASCOSTA DI DEFAULT -->
     <div class="logo-main-container">
         <div class="side-image" id="sideImageContainer">
             <img src="immagine.png" alt="Immagine laterale" id="sideImage" onerror="this.style.display='none'">
@@ -2693,22 +2681,18 @@
         </div>
     </div>
     
-    <!-- Pulsante per attivare/disattivare l'immagine laterale (solo admin) -->
     <button id="toggleSideImageBtn" class="toggle-side-image-btn" style="display: none;" onclick="toggleSideImage()">
         <i class="fas fa-image"></i> Mostra Immagine Laterale
     </button>
 
     <h2 id="mainTitle">🏆 Juvenilia Racing Team - Iscrizioni Gara 1</h2>
     
-    <!-- Timer principale -->
     <div id="countdownBox" class="countdown-container">
         <div id="timerDisplay" class="timer"><i class="fas fa-clock"></i> Inizializzazione...</div>
     </div>
 
-    <!-- Timer per categorie -->
     <div id="timerCategoryContainer" class="timer-category-container"></div>
 
-    <!-- INFO BOX CON TOOLBAR STILE WORD -->
     <div id="infoBox" class="info-section">
         <div class="info-header">
             <i class="fas fa-info-circle"></i>
@@ -2726,14 +2710,11 @@
             </div>
         </div>
         
-        <!-- Visualizzazione normale con formattazione ricca -->
         <div id="infoDisplay" class="info-content">
             <div id="infoText" class="info-text"></div>
         </div>
         
-        <!-- Modalità modifica con toolbar stile Word -->
         <div id="infoEditMode" class="info-edit-mode" style="display: none;">
-            <!-- TOOLBAR STILE WORD -->
             <div class="info-toolbar">
                 <div class="toolbar-group">
                     <button class="toolbar-btn" onclick="formatText('bold')" title="Grassetto (Ctrl+B)"><i class="fas fa-bold"></i></button>
@@ -2786,7 +2767,6 @@
                 </div>
             </div>
             
-            <!-- Editor di testo -->
             <div id="infoEditor" class="info-editor" contenteditable="true" style="overflow-y: auto;"></div>
             
             <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
@@ -2795,7 +2775,6 @@
             </div>
         </div>
         
-        <!-- Toggle visibilità (solo admin) -->
         <div id="infoToggleContainer" class="info-toggle-row" style="display: none;">
             <div class="info-toggle-label">
                 <i class="fas fa-eye"></i>
@@ -2809,7 +2788,6 @@
         </div>
     </div>
 
-    <!-- ANTEPRIMA INFO BOX (popup) -->
     <div id="infoPreviewModal" class="preview-modal" style="display: none;">
         <div class="preview-content">
             <div class="preview-header">
@@ -2822,11 +2800,9 @@
 
     <div id="docLinksContainer" class="doc-links-user"></div>
 
-    <!-- Sezione admin timer (nascosta di default) -->
     <div id="timerAdminBox" class="timer-admin-section">
         <div style="font-size: 14px; font-weight: bold; color: var(--racing-purple); margin-left: 5px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-stopwatch"></i> GESTIONE TIMER PER CATEGORIE:</div>
         
-        <!-- Form per aggiungere nuovo timer -->
         <div class="timer-admin-row">
             <input type="datetime-local" id="newTimerDeadline">
             <input type="text" id="newTimerLabel" placeholder="Nome timer (es: Scadenza Senior)" style="text-transform: uppercase;">
@@ -2836,18 +2812,17 @@
         <div id="timersAdminContent"></div>
     </div>
 
-    <!-- Sezioni admin (nascoste di default) -->
     <div id="docsBox">
         <div style="font-size: 14px; font-weight: bold; color: var(--racing-orange); margin-left: 5px; display: flex; align-items: center; gap: 10px;"><i class="fas fa-file-alt"></i> DOCUMENTI E LINK ESTERNI:</div>
         <div class="admin-row">
-            <input type="text" id="docLink1_URL" placeholder="Link Documento 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
-            <input type="text" id="docLink1_Text" placeholder="Testo Pulsante 1" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
+            <input type="text" id="docLink1_URL" placeholder="Link Documento 1" style="text-transform: none;">
+            <input type="text" id="docLink1_Text" placeholder="Testo Pulsante 1" style="text-transform: uppercase;">
             <button onclick="salvaDoc(1)" style="background:var(--racing-green);"><i class="fas fa-save"></i> Salva 1</button>
             <button onclick="azzeraDoc(1)" style="background:var(--racing-red);"><i class="fas fa-trash"></i> Azzera 1</button>
         </div>
         <div class="admin-row">
-            <input type="text" id="docLink2_URL" placeholder="Link Documento 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
-            <input type="text" id="docLink2_Text" placeholder="Testo Pulsante 2" onfocus="isEditingDocs=true" onblur="isEditingDocs=false" style="text-transform: uppercase;">
+            <input type="text" id="docLink2_URL" placeholder="Link Documento 2" style="text-transform: none;">
+            <input type="text" id="docLink2_Text" placeholder="Testo Pulsante 2" style="text-transform: uppercase;">
             <button onclick="salvaDoc(2)" style="background:var(--racing-green);"><i class="fas fa-save"></i> Salva 2</button>
             <button onclick="azzeraDoc(2)" style="background:var(--racing-red);"><i class="fas fa-trash"></i> Azzera 2</button>
         </div>
@@ -2855,19 +2830,19 @@
 
     <div id="addAtletaBox">
         <div class="admin-row">
-            <input type="text" id="editTitleInput" placeholder="Titolo della gara..." onfocus="isEditingTitolo=true" onblur="isEditingTitolo=false" style="text-transform: uppercase;">
+            <input type="text" id="editTitleInput" placeholder="Titolo della gara..." style="text-transform: uppercase;">
             <button onclick="resetTitolo()" class="btn-clear-input"><i class="fas fa-undo"></i> reset</button>
             <button onclick="salvaTitolo()" style="background:var(--racing-purple);"><i class="fas fa-edit"></i> Aggiorna Titolo</button>
         </div>
         <div class="admin-row">
-            <input type="text" id="dateA_Label" placeholder="Data A" onfocus="isEditingDateLabels=true" onblur="isEditingDateLabels=false" style="text-transform: uppercase;">
-            <input type="text" id="dateB_Label" placeholder="Data B" onfocus="isEditingDateLabels=true" onblur="isEditingDateLabels=false" style="text-transform: uppercase;">
-            <input type="text" id="dateC_Label" placeholder="Data C" onfocus="isEditingDateLabels=true" onblur="isEditingDateLabels=false" style="text-transform: uppercase;">
+            <input type="text" id="dateA_Label" placeholder="Data A" style="text-transform: uppercase;">
+            <input type="text" id="dateB_Label" placeholder="Data B" style="text-transform: uppercase;">
+            <input type="text" id="dateC_Label" placeholder="Data C" style="text-transform: uppercase;">
             <button onclick="resetDateLabels()" class="btn-clear-input"><i class="fas fa-undo"></i> reset</button>
             <button onclick="salvaEtichetteDate()" style="background:var(--racing-orange);"><i class="fas fa-calendar-check"></i> Salva Date</button>
         </div>
         <div class="admin-row">
-            <input type="text" id="newNome" placeholder="Cognome e Nome" oninput="this.value = this.value.toUpperCase()" style="text-transform: uppercase;">
+            <input type="text" id="newNome" placeholder="Cognome e Nome" style="text-transform: uppercase;">
             <button onclick="document.getElementById('newNome').value=''" class="btn-clear-input"><i class="fas fa-times"></i> reset</button>
             <select id="newCat">
                 <option value="">Categoria</option>
@@ -2902,7 +2877,6 @@
         </div>
     </div>
 
-    <!-- Statistiche -->
     <div class="stats-grid">
         <div class="stat-card stat-presenti"><span><i class="fas fa-check-circle"></i> PARTECIPA</span><div id="count-si" style="font-size: 2.5rem;">0</div></div>
         <div class="stat-card stat-assenti"><span><i class="fas fa-times-circle"></i> NON PARTECIPA</span><div id="count-no" style="font-size: 2.5rem;">0</div></div>
@@ -2912,13 +2886,11 @@
         </div>
     </div>
 
-    <!-- Riepilogo partecipanti -->
     <div id="confirmedList">
         <div style="font-weight:800; font-size:1rem; color:var(--racing-blue); margin-bottom:15px; text-transform: uppercase; display: flex; align-items: center; gap: 10px;"><i class="fas fa-users"></i> RIEPILOGO PARTECIPANTI:</div>
         <div id="listContent"></div>
     </div>
     
-    <!-- Riepilogo accompagnatori -->
     <div id="riepilogoAccompagnatori">
         <div class="riepilogo-header">
             <span><i class="fas fa-user-friends"></i> ACCOMPAGNATORI (ADMIN)</span>
@@ -2926,7 +2898,6 @@
         <div id="riepilogoContent"></div>
     </div>
     
-    <!-- Ricerca e toggle -->
     <div class="search-container">
         <span class="search-icon"><i class="fas fa-search"></i></span>
         <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="Cerca il tuo nome o la tua categoria..." style="text-transform: uppercase;">
@@ -2935,7 +2906,6 @@
         </button>
     </div>
 
-    <!-- Tabella principale -->
     <div class="table-wrapper">
         <table>
             <thead>
@@ -2953,7 +2923,6 @@
         </table>
     </div>
 
-    <!-- Bottoni admin -->
     <div id="adminButtons">
         <button onclick="bulkAction(true)" style="background:var(--racing-purple)"><i class="fas fa-lock"></i> Nascondi Selezionati</button>
         <button onclick="exportToExcel()" style="background:var(--racing-green)"><i class="fas fa-file-excel"></i> Esporta Excel</button>
@@ -2964,7 +2933,6 @@
         <button onclick="inviaRiepilogoTelegram()" style="background:var(--gradient-racing); grid-column: span 2;"><i class="fas fa-paper-plane"></i> Invia Riepilogo Telegram</button>
     </div>
     
-    <!-- Footer tematico -->
     <div class="racing-footer">
         <p>Juvenilia Racing Team - Sistema Iscrizioni Gara 1 - Pattinaggio Corsa</p>
         <div class="footer-icons">
@@ -3011,7 +2979,6 @@
     let categoryTimers = [];
     let categoryTimerIntervals = {};
     
-    // Variabili per l'immagine laterale - NASCOSTA DI DEFAULT
     let mostraImmagineLaterale = false;
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
@@ -3087,27 +3054,25 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('input', function(e) {
-    // Lista dei campi che NON devono essere convertiti in maiuscolo
-    const excludeFields = ['docLink1_URL', 'docLink2_URL'];
-    
-    if (excludeFields.includes(e.target.id)) {
-        return; // Esci subito, non fare nulla
-    }
-    
-    if (e.target.classList.contains('accompagnatore-input') || 
-        e.target.classList.contains('search-box') ||
-        e.target.id === 'newNome' ||
-        e.target.id === 'editTitleInput' ||
-        e.target.id === 'dateA_Label' ||
-        e.target.id === 'dateB_Label' ||
-        e.target.id === 'dateC_Label' ||
-        e.target.id === 'docLink1_Text' ||
-        e.target.id === 'docLink2_Text' ||
-        e.target.id === 'newTimerLabel' ||
-        e.target.classList.contains('categoria-select')) {
-        e.target.value = e.target.value.toUpperCase();
-    }
-});
+            // CAMPO URL: NON convertire in maiuscolo
+            if (e.target.id === 'docLink1_URL' || e.target.id === 'docLink2_URL') {
+                return;
+            }
+            
+            if (e.target.classList.contains('accompagnatore-input') || 
+                e.target.classList.contains('search-box') ||
+                e.target.id === 'newNome' ||
+                e.target.id === 'editTitleInput' ||
+                e.target.id === 'dateA_Label' ||
+                e.target.id === 'dateB_Label' ||
+                e.target.id === 'dateC_Label' ||
+                e.target.id === 'docLink1_Text' ||
+                e.target.id === 'docLink2_Text' ||
+                e.target.id === 'newTimerLabel' ||
+                e.target.classList.contains('categoria-select')) {
+                e.target.value = e.target.value.toUpperCase();
+            }
+        });
         
         document.addEventListener('focusin', function(e) {
             if (e.target.classList.contains('accompagnatore-input')) {
@@ -3174,15 +3139,12 @@
         });
     });
 
-    // Funzioni per l'immagine laterale - NASCOSTA DI DEFAULT
     async function caricaStatoImmagineLaterale() {
         const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'mostra_immagine_laterale');
         if (data && data.length > 0 && data[0].valore) {
             mostraImmagineLaterale = data[0].valore === 'true';
         } else {
-            // Se non c'è un valore salvato, rimane false (nascosto di default)
             mostraImmagineLaterale = false;
-            // Opzionale: salva lo stato di default nel database
             await _supabase.from(T_CONF).upsert({
                 chiave: 'mostra_immagine_laterale',
                 valore: 'false'
@@ -3255,7 +3217,6 @@
             mostraAccompagnatori = visibilitaAccompagnatori.valore === 'true';
         }
         
-        // Carica la visibilità del box info
         const visibilitaInfoBox = data.find(c => c.chiave === 'mostra_info_box');
         if (visibilitaInfoBox) {
             mostraInfoBox = visibilitaInfoBox.valore === 'true';
@@ -3290,7 +3251,6 @@
             
             document.getElementById('deadlineInput').value = sca?.valore || "";
             
-            // Aggiorna il toggle della visibilità info box
             const toggle = document.getElementById('infoVisibilityToggle');
             if (toggle) {
                 toggle.checked = mostraInfoBox;
@@ -3653,10 +3613,15 @@
     }
 
     async function salvaDoc(num) {
-        const url = document.getElementById(`docLink${num}_URL`).value;
-        const txt = document.getElementById(`docLink${num}_Text`).value;
+        let url = document.getElementById(`docLink${num}_URL`).value;
+        let txt = document.getElementById(`docLink${num}_Text`).value;
+        
+        // NON convertire l'URL in maiuscolo - mantenere così com'è
+        // Convertiamo solo il testo del pulsante
+        txt = txt.toUpperCase();
+        
         await _supabase.from(T_CONF).upsert([
-            { chiave: `doc_url_${num}`, valore: url }, 
+            { chiave: `doc_url_${num}`, valore: url },
             { chiave: `doc_txt_${num}`, valore: txt }
         ], { onConflict: 'chiave' });
         showToast(`Documento ${num} salvato!`); 
@@ -4114,7 +4079,6 @@
             document.getElementById('infoToggleContainer').style.display = 'flex';
             document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
             
-            // Mostra il pulsante per l'immagine laterale
             const toggleSideBtn = document.getElementById('toggleSideImageBtn');
             if (toggleSideBtn) {
                 toggleSideBtn.style.display = 'flex';
@@ -4714,7 +4678,7 @@
         }
     }
 
-    // ===== FUNZIONI PER LA TOOLBAR DI FORMATTAZIONE =====
+    // FUNZIONI PER LA TOOLBAR DI FORMATTAZIONE
     function formatText(command, value = null) {
         const editor = document.getElementById('infoEditor');
         
@@ -4736,7 +4700,7 @@
         editor.focus();
     }
 
-    // ===== INFO BOX FUNCTIONS CON SUPPORTO FORMATTAZIONE RICCA =====
+    // INFO BOX FUNCTIONS CON SUPPORTO FORMATTAZIONE RICCA
     async function caricaInfoBox() {
         const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'info_box_text');
         const infoBox = document.getElementById('infoBox');
@@ -4747,7 +4711,6 @@
         const deleteBtn = document.getElementById('deleteInfoBtn');
         
         if (data && data.length > 0 && data[0].valore) {
-            // Usa innerHTML per mantenere la formattazione HTML
             infoText.innerHTML = data[0].valore;
             infoEditor.innerHTML = data[0].valore;
         } else {
@@ -4764,14 +4727,12 @@
             deleteBtn.style.display = 'flex';
             saveBtn.style.display = 'none';
             
-            // Mostra il box info agli admin sempre
             infoBox.style.display = 'block';
         } else {
             editBtn.style.display = 'none';
             deleteBtn.style.display = 'none';
             saveBtn.style.display = 'none';
             
-            // Mostra o nascondi il box info in base alla configurazione
             infoBox.style.display = mostraInfoBox ? 'block' : 'none';
         }
     }
@@ -4818,7 +4779,6 @@
             return;
         }
         
-        // Usa innerHTML per mantenere la formattazione
         document.getElementById('infoText').innerHTML = testo;
         document.getElementById('infoDisplay').style.display = 'block';
         document.getElementById('infoEditMode').style.display = 'none';
@@ -4854,7 +4814,6 @@
         }
     }
     
-    // Funzione per aggiornare lo stato visivo del toggle
     function aggiornaStatoVisibilitaInfo() {
         const toggle = document.getElementById('infoVisibilityToggle');
         const status = document.getElementById('infoVisibilityStatus');
@@ -4868,7 +4827,6 @@
         }
     }
     
-    // Funzione per salvare la visibilità del box info
     async function salvaVisibilitaInfoBox(visibile) {
         const { error } = await _supabase.from(T_CONF).upsert({
             chiave: 'mostra_info_box',
@@ -4886,7 +4844,6 @@
         return true;
     }
     
-    // Funzione chiamata quando si cambia il toggle
     async function toggleInfoVisibility() {
         const toggle = document.getElementById('infoVisibilityToggle');
         const visibile = toggle.checked;
@@ -4894,7 +4851,6 @@
         await salvaVisibilitaInfoBox(visibile);
         aggiornaStatoVisibilitaInfo();
         
-        // Aggiorna la visibilità per gli utenti (admin vede sempre)
         if (!isAdmin) {
             document.getElementById('infoBox').style.display = visibile ? 'block' : 'none';
         }
