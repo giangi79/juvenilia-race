@@ -3087,22 +3087,25 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('input', function(e) {
-            if (e.target.classList.contains('accompagnatore-input') || 
-                e.target.classList.contains('search-box') ||
-                e.target.id === 'newNome' ||
-                e.target.id === 'editTitleInput' ||
-                e.target.id === 'dateA_Label' ||
-                e.target.id === 'dateB_Label' ||
-                e.target.id === 'dateC_Label' ||
-                e.target.id === 'docLink1_URL' ||
-                e.target.id === 'docLink1_Text' ||
-                e.target.id === 'docLink2_URL' ||
-                e.target.id === 'docLink2_Text' ||
-                e.target.id === 'newTimerLabel' ||
-                e.target.classList.contains('categoria-select')) {
-                e.target.value = e.target.value.toUpperCase();
-            }
-        });
+    // Escludi gli URL dalla conversione in maiuscolo
+    if (e.target.id === 'docLink1_URL' || e.target.id === 'docLink2_URL') {
+        return; // Non fare nulla per i campi URL
+    }
+    
+    if (e.target.classList.contains('accompagnatore-input') || 
+        e.target.classList.contains('search-box') ||
+        e.target.id === 'newNome' ||
+        e.target.id === 'editTitleInput' ||
+        e.target.id === 'dateA_Label' ||
+        e.target.id === 'dateB_Label' ||
+        e.target.id === 'dateC_Label' ||
+        e.target.id === 'docLink1_Text' ||
+        e.target.id === 'docLink2_Text' ||
+        e.target.id === 'newTimerLabel' ||
+        e.target.classList.contains('categoria-select')) {
+        e.target.value = e.target.value.toUpperCase();
+    }
+});
         
         document.addEventListener('focusin', function(e) {
             if (e.target.classList.contains('accompagnatore-input')) {
