@@ -2887,7 +2887,7 @@
         </div>
     </div>
 
-    <!-- NUOVO BOX: DATI PAGAMENTO -->
+    <!-- BOX DATI PAGAMENTO CON EMAIL -->
     <div id="paymentDetailsBox">
         <div style="font-size: 14px; font-weight: bold; color: var(--racing-green); margin-left: 5px; display: flex; align-items: center; gap: 10px;">
             <i class="fas fa-credit-card"></i> DATI PAGAMENTO
@@ -2896,6 +2896,7 @@
             <input type="text" id="ibanField" placeholder="IBAN" style="text-transform: uppercase;">
             <input type="text" id="causaleField" placeholder="CAUSALE PAGAMENTO">
             <input type="text" id="ragioneSocialeField" placeholder="RAGIONE SOCIALE / INTESTATARIO">
+            <input type="email" id="emailField" placeholder="EMAIL PER DISTINTA PAGAMENTO">
         </div>
         <div class="admin-row">
             <button onclick="salvaDettagliPagamento()" style="background:var(--racing-green);"><i class="fas fa-save"></i> Salva Dettagli Pagamento</button>
@@ -2903,7 +2904,7 @@
         </div>
     </div>
 
-    <!-- NUOVO BOX: TOGGLE TELEGRAM AUTOMATICO E INVIO SCADENZA -->
+    <!-- BOX TOGGLE TELEGRAM -->
     <div id="telegramToggleBox">
         <div style="font-size: 14px; font-weight: bold; color: var(--racing-red); margin-left: 5px; display: flex; align-items: center; gap: 10px;">
             <i class="fab fa-telegram"></i> INVIO AUTOMATICO TELEGRAM
@@ -3037,11 +3038,12 @@
     
     let mostraImmagineLaterale = false;
 
-    // NUOVE VARIABILI
+    // VARIABILI DETTAGLI PAGAMENTO CON EMAIL
     let dettagliPagamento = {
         iban: "",
         causale: "",
-        ragioneSociale: ""
+        ragioneSociale: "",
+        email: ""
     };
     let invioTelegramAuto = false;
     let invioAutomaticoScadenza = false;
@@ -3358,14 +3360,15 @@
         if(isAdmin && !isEditingCosti) renderCostiInputs();
     }
 
-    // FUNZIONI PER DETTAGLI PAGAMENTO
+    // FUNZIONI PER DETTAGLI PAGAMENTO CON EMAIL
     async function caricaDettagliPagamento() {
-        const { data } = await _supabase.from(T_CONF).select('*').in('chiave', ['iban', 'causale', 'ragione_sociale']);
+        const { data } = await _supabase.from(T_CONF).select('*').in('chiave', ['iban', 'causale', 'ragione_sociale', 'email_pagamento']);
         if (data && data.length > 0) {
             data.forEach(item => {
                 if (item.chiave === 'iban') dettagliPagamento.iban = item.valore || "";
                 if (item.chiave === 'causale') dettagliPagamento.causale = item.valore || "";
                 if (item.chiave === 'ragione_sociale') dettagliPagamento.ragioneSociale = item.valore || "";
+                if (item.chiave === 'email_pagamento') dettagliPagamento.email = item.valore || "";
             });
         }
         
@@ -3373,6 +3376,7 @@
             document.getElementById('ibanField').value = dettagliPagamento.iban;
             document.getElementById('causaleField').value = dettagliPagamento.causale;
             document.getElementById('ragioneSocialeField').value = dettagliPagamento.ragioneSociale;
+            document.getElementById('emailField').value = dettagliPagamento.email;
         }
     }
 
@@ -3380,14 +3384,16 @@
         const iban = document.getElementById('ibanField').value.toUpperCase();
         const causale = document.getElementById('causaleField').value;
         const ragioneSociale = document.getElementById('ragioneSocialeField').value;
+        const email = document.getElementById('emailField').value;
         
         await _supabase.from(T_CONF).upsert([
             { chiave: 'iban', valore: iban },
             { chiave: 'causale', valore: causale },
-            { chiave: 'ragione_sociale', valore: ragioneSociale }
+            { chiave: 'ragione_sociale', valore: ragioneSociale },
+            { chiave: 'email_pagamento', valore: email }
         ], { onConflict: 'chiave' });
         
-        dettagliPagamento = { iban, causale, ragioneSociale };
+        dettagliPagamento = { iban, causale, ragioneSociale, email };
         showToast("Dettagli pagamento salvati!");
     }
 
@@ -3396,15 +3402,17 @@
             await _supabase.from(T_CONF).upsert([
                 { chiave: 'iban', valore: "" },
                 { chiave: 'causale', valore: "" },
-                { chiave: 'ragione_sociale', valore: "" }
+                { chiave: 'ragione_sociale', valore: "" },
+                { chiave: 'email_pagamento', valore: "" }
             ], { onConflict: 'chiave' });
             
-            dettagliPagamento = { iban: "", causale: "", ragioneSociale: "" };
+            dettagliPagamento = { iban: "", causale: "", ragioneSociale: "", email: "" };
             
             if (isAdmin) {
                 document.getElementById('ibanField').value = "";
                 document.getElementById('causaleField').value = "";
                 document.getElementById('ragioneSocialeField').value = "";
+                document.getElementById('emailField').value = "";
             }
             
             showToast("Dettagli pagamento azzerati!");
@@ -3497,7 +3505,7 @@
         showToast(`Invio automatico riepilogo alla scadenza ${invioAutomaticoScadenza ? 'attivato' : 'disabilitato'}`);
     }
 
-    // FUNZIONE PER GENERARE RIEPILOGO QUOTE COMPLETO
+    // FUNZIONE PER GENERARE RIEPILOGO QUOTE COMPLETO CON EMAIL
     function generaRiepilogoQuoteMessage() {
         let quoteAtleti = [];
         let totaleGenerale = 0;
@@ -3569,11 +3577,13 @@
         messaggio += `\n*💰 TOTALE QUOTE DA PAGARE:* ${totaleQuota.toFixed(2)}€\n`;
         messaggio += `*👥 TOTALE PARTECIPANTI:* ${quoteAtleti.length}\n`;
         
-        if (dettagliPagamento.iban || dettagliPagamento.causale || dettagliPagamento.ragioneSociale) {
+        // AGGIUNGI DETTAGLI PAGAMENTO CON EMAIL
+        if (dettagliPagamento.iban || dettagliPagamento.causale || dettagliPagamento.ragioneSociale || dettagliPagamento.email) {
             messaggio += `\n*💳 DATI PAGAMENTO:*\n`;
             if (dettagliPagamento.ragioneSociale) messaggio += `📌 Intestato a: ${dettagliPagamento.ragioneSociale}\n`;
             if (dettagliPagamento.iban) messaggio += `🏦 IBAN: ${dettagliPagamento.iban}\n`;
             if (dettagliPagamento.causale) messaggio += `📝 Causale: ${dettagliPagamento.causale}\n`;
+            if (dettagliPagamento.email) messaggio += `📧 Email per distinta: ${dettagliPagamento.email}\n`;
         }
         
         messaggio += `\n🛼 *Pronti per la gara!*`;
@@ -4305,11 +4315,13 @@
         messaggio += `🏆 *Evento:* ${document.getElementById('mainTitle').innerText}\n`;
         messaggio += `📅 *Data generazione:* ${new Date().toLocaleDateString('it-IT')}\n\n`;
         
-        if (dettagliPagamento.iban || dettagliPagamento.causale || dettagliPagamento.ragioneSociale) {
+        // AGGIUNGI DETTAGLI PAGAMENTO CON EMAIL
+        if (dettagliPagamento.iban || dettagliPagamento.causale || dettagliPagamento.ragioneSociale || dettagliPagamento.email) {
             messaggio += `*💳 DATI PAGAMENTO:*\n`;
             if (dettagliPagamento.ragioneSociale) messaggio += `📌 *Intestato a:* ${dettagliPagamento.ragioneSociale}\n`;
             if (dettagliPagamento.iban) messaggio += `🏦 *IBAN:* ${dettagliPagamento.iban}\n`;
             if (dettagliPagamento.causale) messaggio += `📝 *Causale:* ${dettagliPagamento.causale}\n`;
+            if (dettagliPagamento.email) messaggio += `📧 *Email per distinta:* ${dettagliPagamento.email}\n`;
             messaggio += `\n`;
         }
         
@@ -5035,7 +5047,7 @@
         editor.focus();
     }
 
-    // INFO BOX FUNCTIONS CON SUPPORTO FORMATTAZIONE RICCA
+    // INFO BOX FUNCTIONS
     async function caricaInfoBox() {
         const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'info_box_text');
         const infoBox = document.getElementById('infoBox');
