@@ -115,6 +115,8 @@
         .dark-mode #addAtletaBox,
         .dark-mode #costiBox,
         .dark-mode #docsBox,
+        .dark-mode #paymentDetailsBox,
+        .dark-mode #telegramToggleBox,
         .dark-mode .timer-admin-section {
             background: rgba(42, 59, 78, 0.5);
             border-color: #3a4b5e;
@@ -1062,7 +1064,7 @@
             box-shadow: var(--shadow-light);
         }
         
-        #addAtletaBox, #costiBox, #docsBox { 
+        #addAtletaBox, #costiBox, #docsBox, #paymentDetailsBox, #telegramToggleBox { 
             background: rgba(168, 218, 220, 0.1); 
             border: 2px solid var(--racing-light); 
             border-radius: 20px; 
@@ -1082,6 +1084,14 @@
         #docsBox { 
             background: rgba(255, 209, 102, 0.05); 
             border-color: var(--racing-yellow); 
+        }
+        #paymentDetailsBox {
+            background: rgba(42, 157, 143, 0.05);
+            border-color: var(--racing-green);
+        }
+        #telegramToggleBox {
+            background: rgba(230, 57, 70, 0.05);
+            border-color: var(--racing-red);
         }
 
         .admin-row { 
@@ -2877,6 +2887,52 @@
         </div>
     </div>
 
+    <!-- NUOVO BOX: DATI PAGAMENTO -->
+    <div id="paymentDetailsBox">
+        <div style="font-size: 14px; font-weight: bold; color: var(--racing-green); margin-left: 5px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-credit-card"></i> DATI PAGAMENTO
+        </div>
+        <div class="admin-row">
+            <input type="text" id="ibanField" placeholder="IBAN" style="text-transform: uppercase;">
+            <input type="text" id="causaleField" placeholder="CAUSALE PAGAMENTO">
+            <input type="text" id="ragioneSocialeField" placeholder="RAGIONE SOCIALE / INTESTATARIO">
+        </div>
+        <div class="admin-row">
+            <button onclick="salvaDettagliPagamento()" style="background:var(--racing-green);"><i class="fas fa-save"></i> Salva Dettagli Pagamento</button>
+            <button onclick="azzeraDettagliPagamento()" style="background:var(--racing-red);"><i class="fas fa-trash"></i> Azzera Dettagli</button>
+        </div>
+    </div>
+
+    <!-- NUOVO BOX: TOGGLE TELEGRAM AUTOMATICO E INVIO SCADENZA -->
+    <div id="telegramToggleBox">
+        <div style="font-size: 14px; font-weight: bold; color: var(--racing-red); margin-left: 5px; display: flex; align-items: center; gap: 10px;">
+            <i class="fab fa-telegram"></i> INVIO AUTOMATICO TELEGRAM
+        </div>
+        <div class="admin-row" style="justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span>Invia notifiche automatiche su Telegram quando un utente si iscrive:</span>
+                <label class="info-toggle-switch" style="margin-left: 0;">
+                    <input type="checkbox" id="telegramAutoToggle" onchange="salvaTelegramAuto()">
+                    <span class="info-toggle-slider"></span>
+                </label>
+                <span id="telegramAutoStatus" class="info-toggle-status off">DISABILITATO</span>
+            </div>
+            <button onclick="testTelegram()" style="background:var(--gradient-primary); padding: 10px 20px; border-radius: 10px;">
+                <i class="fab fa-telegram"></i> Test Invia Messaggio
+            </button>
+        </div>
+        <div class="admin-row" style="justify-content: space-between; margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 15px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span><i class="fas fa-hourglass-end"></i> Invia automaticamente il riepilogo quote quando scade un timer:</span>
+                <label class="info-toggle-switch" style="margin-left: 0;">
+                    <input type="checkbox" id="scadenzaAutoToggle" onchange="salvaInvioAutomaticoScadenza()">
+                    <span class="info-toggle-slider"></span>
+                </label>
+                <span id="scadenzaAutoStatus" class="info-toggle-status off">DISABILITATO</span>
+            </div>
+        </div>
+    </div>
+
     <div class="stats-grid">
         <div class="stat-card stat-presenti"><span><i class="fas fa-check-circle"></i> PARTECIPA</span><div id="count-si" style="font-size: 2.5rem;">0</div></div>
         <div class="stat-card stat-assenti"><span><i class="fas fa-times-circle"></i> NON PARTECIPA</span><div id="count-no" style="font-size: 2.5rem;">0</div></div>
@@ -2981,6 +3037,16 @@
     
     let mostraImmagineLaterale = false;
 
+    // NUOVE VARIABILI
+    let dettagliPagamento = {
+        iban: "",
+        causale: "",
+        ragioneSociale: ""
+    };
+    let invioTelegramAuto = false;
+    let invioAutomaticoScadenza = false;
+    let riepilogoScadenzaInviato = {};
+
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
     function checkTimeForDarkMode() {
@@ -3009,6 +3075,9 @@
         await fullLoad(); 
         await caricaInfoBox();
         await caricaStatoImmagineLaterale();
+        await caricaDettagliPagamento();
+        await caricaTelegramAuto();
+        await caricaInvioAutomaticoScadenza();
         refreshInterval = setInterval(checkAndRefresh, 15000);
     }
 
@@ -3289,6 +3358,256 @@
         if(isAdmin && !isEditingCosti) renderCostiInputs();
     }
 
+    // FUNZIONI PER DETTAGLI PAGAMENTO
+    async function caricaDettagliPagamento() {
+        const { data } = await _supabase.from(T_CONF).select('*').in('chiave', ['iban', 'causale', 'ragione_sociale']);
+        if (data && data.length > 0) {
+            data.forEach(item => {
+                if (item.chiave === 'iban') dettagliPagamento.iban = item.valore || "";
+                if (item.chiave === 'causale') dettagliPagamento.causale = item.valore || "";
+                if (item.chiave === 'ragione_sociale') dettagliPagamento.ragioneSociale = item.valore || "";
+            });
+        }
+        
+        if (isAdmin) {
+            document.getElementById('ibanField').value = dettagliPagamento.iban;
+            document.getElementById('causaleField').value = dettagliPagamento.causale;
+            document.getElementById('ragioneSocialeField').value = dettagliPagamento.ragioneSociale;
+        }
+    }
+
+    async function salvaDettagliPagamento() {
+        const iban = document.getElementById('ibanField').value.toUpperCase();
+        const causale = document.getElementById('causaleField').value;
+        const ragioneSociale = document.getElementById('ragioneSocialeField').value;
+        
+        await _supabase.from(T_CONF).upsert([
+            { chiave: 'iban', valore: iban },
+            { chiave: 'causale', valore: causale },
+            { chiave: 'ragione_sociale', valore: ragioneSociale }
+        ], { onConflict: 'chiave' });
+        
+        dettagliPagamento = { iban, causale, ragioneSociale };
+        showToast("Dettagli pagamento salvati!");
+    }
+
+    async function azzeraDettagliPagamento() {
+        if (confirm("Cancellare tutti i dettagli di pagamento?")) {
+            await _supabase.from(T_CONF).upsert([
+                { chiave: 'iban', valore: "" },
+                { chiave: 'causale', valore: "" },
+                { chiave: 'ragione_sociale', valore: "" }
+            ], { onConflict: 'chiave' });
+            
+            dettagliPagamento = { iban: "", causale: "", ragioneSociale: "" };
+            
+            if (isAdmin) {
+                document.getElementById('ibanField').value = "";
+                document.getElementById('causaleField').value = "";
+                document.getElementById('ragioneSocialeField').value = "";
+            }
+            
+            showToast("Dettagli pagamento azzerati!");
+        }
+    }
+
+    // FUNZIONI PER TOGGLE TELEGRAM AUTOMATICO
+    async function caricaTelegramAuto() {
+        const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'telegram_auto_invio');
+        if (data && data.length > 0) {
+            invioTelegramAuto = data[0].valore === 'true';
+        } else {
+            invioTelegramAuto = false;
+        }
+        
+        if (isAdmin) {
+            const toggle = document.getElementById('telegramAutoToggle');
+            const status = document.getElementById('telegramAutoStatus');
+            if (toggle) {
+                toggle.checked = invioTelegramAuto;
+                status.innerHTML = invioTelegramAuto ? 'ATTIVATO' : 'DISABILITATO';
+                status.className = invioTelegramAuto ? 'info-toggle-status on' : 'info-toggle-status off';
+            }
+        }
+    }
+
+    async function salvaTelegramAuto() {
+        const toggle = document.getElementById('telegramAutoToggle');
+        invioTelegramAuto = toggle.checked;
+        
+        await _supabase.from(T_CONF).upsert({
+            chiave: 'telegram_auto_invio',
+            valore: invioTelegramAuto.toString()
+        }, { onConflict: 'chiave' });
+        
+        const status = document.getElementById('telegramAutoStatus');
+        status.innerHTML = invioTelegramAuto ? 'ATTIVATO' : 'DISABILITATO';
+        status.className = invioTelegramAuto ? 'info-toggle-status on' : 'info-toggle-status off';
+        
+        showToast(`Invio automatico Telegram ${invioTelegramAuto ? 'attivato' : 'disabilitato'}`);
+    }
+
+    async function testTelegram() {
+        const testo = `🔔 *TEST NOTIFICHE TELEGRAM*\n\nIl sistema di notifiche automatiche è ${invioTelegramAuto ? 'ATTIVO' : 'DISATTIVO'}.\n\nQuesto è un messaggio di test.`;
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                chat_id: TELEGRAM_CHAT_ID, 
+                text: testo, 
+                parse_mode: 'Markdown' 
+            })
+        });
+        showToast("Messaggio di test inviato a Telegram!");
+    }
+
+    // FUNZIONI PER INVIO AUTOMATICO ALLA SCADENZA
+    async function caricaInvioAutomaticoScadenza() {
+        const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'invio_automatico_scadenza');
+        if (data && data.length > 0) {
+            invioAutomaticoScadenza = data[0].valore === 'true';
+        } else {
+            invioAutomaticoScadenza = false;
+        }
+        
+        if (isAdmin) {
+            const toggle = document.getElementById('scadenzaAutoToggle');
+            const status = document.getElementById('scadenzaAutoStatus');
+            if (toggle) {
+                toggle.checked = invioAutomaticoScadenza;
+                status.innerHTML = invioAutomaticoScadenza ? 'ATTIVATO' : 'DISABILITATO';
+                status.className = invioAutomaticoScadenza ? 'info-toggle-status on' : 'info-toggle-status off';
+            }
+        }
+    }
+
+    async function salvaInvioAutomaticoScadenza() {
+        const toggle = document.getElementById('scadenzaAutoToggle');
+        invioAutomaticoScadenza = toggle.checked;
+        
+        await _supabase.from(T_CONF).upsert({
+            chiave: 'invio_automatico_scadenza',
+            valore: invioAutomaticoScadenza.toString()
+        }, { onConflict: 'chiave' });
+        
+        const status = document.getElementById('scadenzaAutoStatus');
+        status.innerHTML = invioAutomaticoScadenza ? 'ATTIVATO' : 'DISABILITATO';
+        status.className = invioAutomaticoScadenza ? 'info-toggle-status on' : 'info-toggle-status off';
+        
+        showToast(`Invio automatico riepilogo alla scadenza ${invioAutomaticoScadenza ? 'attivato' : 'disabilitato'}`);
+    }
+
+    // FUNZIONE PER GENERARE RIEPILOGO QUOTE COMPLETO
+    function generaRiepilogoQuoteMessage() {
+        let quoteAtleti = [];
+        let totaleGenerale = 0;
+        
+        currentData.forEach(atleta => {
+            if (atleta.stato === 'si') {
+                const categoria = atleta.categoria.toUpperCase();
+                const quota = costiCategorie[categoria] || 0;
+                
+                if (quota > 0) {
+                    totaleGenerale += quota;
+                    quoteAtleti.push({
+                        nome: atleta.nome,
+                        categoria: categoria,
+                        quota: quota,
+                        accompagnatore: atleta.accompagnatore || ""
+                    });
+                } else if (quota === 0 && !isAdmin) {
+                    quoteAtleti.push({
+                        nome: atleta.nome,
+                        categoria: categoria,
+                        quota: 0,
+                        accompagnatore: atleta.accompagnatore || ""
+                    });
+                }
+            }
+        });
+        
+        if (quoteAtleti.length === 0) {
+            return null;
+        }
+        
+        quoteAtleti.sort((a, b) => {
+            const catOrderA = customCatOrder[a.categoria] || 999;
+            const catOrderB = customCatOrder[b.categoria] || 999;
+            if (catOrderA !== catOrderB) return catOrderA - catOrderB;
+            return a.nome.localeCompare(b.nome);
+        });
+        
+        let messaggio = `🛼 *JUVENILIA RACING TEAM - RIEPILOGO ISCRIZIONI GARA 5*\n`;
+        messaggio += `🏆 *Evento:* ${document.getElementById('mainTitle').innerText}\n`;
+        messaggio += `📅 *Data generazione:* ${new Date().toLocaleDateString('it-IT')}\n`;
+        messaggio += `🕐 *Ora:* ${new Date().toLocaleTimeString('it-IT')}\n\n`;
+        
+        messaggio += `*📋 RIEPILOGO PARTECIPANTI:*\n`;
+        
+        let categoriaCorrente = '';
+        let totaleQuota = 0;
+        
+        quoteAtleti.forEach(item => {
+            if (item.categoria !== categoriaCorrente) {
+                categoriaCorrente = item.categoria;
+                messaggio += `\n*${categoriaCorrente}*\n`;
+            }
+            
+            let riga = `• ${item.nome}`;
+            if (item.quota > 0) {
+                riga += `: ${item.quota.toFixed(2)}€`;
+                totaleQuota += item.quota;
+            } else {
+                riga += `: GRATUITO`;
+            }
+            if (item.accompagnatore) {
+                riga += ` (acc: ${item.accompagnatore})`;
+            }
+            messaggio += riga + '\n';
+        });
+        
+        messaggio += `\n*💰 TOTALE QUOTE DA PAGARE:* ${totaleQuota.toFixed(2)}€\n`;
+        messaggio += `*👥 TOTALE PARTECIPANTI:* ${quoteAtleti.length}\n`;
+        
+        if (dettagliPagamento.iban || dettagliPagamento.causale || dettagliPagamento.ragioneSociale) {
+            messaggio += `\n*💳 DATI PAGAMENTO:*\n`;
+            if (dettagliPagamento.ragioneSociale) messaggio += `📌 Intestato a: ${dettagliPagamento.ragioneSociale}\n`;
+            if (dettagliPagamento.iban) messaggio += `🏦 IBAN: ${dettagliPagamento.iban}\n`;
+            if (dettagliPagamento.causale) messaggio += `📝 Causale: ${dettagliPagamento.causale}\n`;
+        }
+        
+        messaggio += `\n🛼 *Pronti per la gara!*`;
+        
+        return messaggio;
+    }
+
+    async function inviaRiepilogoQuoteTelegram() {
+        const messaggio = generaRiepilogoQuoteMessage();
+        
+        if (!messaggio) {
+            showToast("Nessun partecipante da segnalare!");
+            return false;
+        }
+        
+        try {
+            await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: messaggio,
+                    parse_mode: 'Markdown'
+                })
+            });
+            showToast("Riepilogo quote inviato a Telegram!");
+            return true;
+        } catch (error) {
+            console.error("Errore invio Telegram:", error);
+            showToast("Errore nell'invio del riepilogo");
+            return false;
+        }
+    }
+
     async function caricaTimers() {
         const { data } = await _supabase.from(T_TIMERS).select('*');
         if(data) {
@@ -3546,7 +3865,7 @@
         function updateCountdown() {
             const distance = new Date(endTime).getTime() - new Date().getTime();
             
-            if (distance <= 0) { 
+            if (distance <= 0) {
                 displayElement.innerHTML = `<i class="fas fa-hourglass-end"></i> SCADUTO`;
                 displayElement.style.color = "var(--racing-red)";
                 
@@ -3555,10 +3874,18 @@
                     if (timer) {
                         const categories = timer.categories ? JSON.parse(timer.categories) : [];
                         disabilitaCategorieScadute(categories);
+                        
+                        // INVIO AUTOMATICO RIEPILOGO ALLA SCADENZA
+                        if (invioAutomaticoScadenza && !riepilogoScadenzaInviato[timerId]) {
+                            riepilogoScadenzaInviato[timerId] = true;
+                            setTimeout(() => {
+                                inviaRiepilogoQuoteTelegram();
+                            }, 1000);
+                        }
                     }
                 }
                 
-                return; 
+                return;
             }
             
             const d = Math.floor(distance/86400000);
@@ -3568,6 +3895,11 @@
             
             displayElement.innerHTML = `<i class="fas fa-hourglass-half"></i> ${d}g ${h}h ${m}m ${s}s`;
             displayElement.style.color = "var(--racing-white)";
+            
+            // Reset flag quando il timer non è scaduto
+            if (timerId && riepilogoScadenzaInviato[timerId]) {
+                riepilogoScadenzaInviato[timerId] = false;
+            }
         }
         
         updateCountdown();
@@ -3616,8 +3948,6 @@
         let url = document.getElementById(`docLink${num}_URL`).value;
         let txt = document.getElementById(`docLink${num}_Text`).value;
         
-        // NON convertire l'URL in maiuscolo - mantenere così com'è
-        // Convertiamo solo il testo del pulsante
         txt = txt.toUpperCase();
         
         await _supabase.from(T_CONF).upsert([
@@ -3922,6 +4252,8 @@
     }
 
     async function inviaTelegram(nome, scelta, gara, dataGara) {
+        if (!invioTelegramAuto) return;
+        
         const scTxt = scelta === 'si' ? 'PARTECIPA' : 'NON PARTECIPA';
         const dataTxt = dataGara ? `\n📅 *Data:* ${dataGara}` : "";
         const testo = `🏆 *Juvenilia Racing Team*\n*Evento:* ${gara}\n👤 *Atleta:* ${nome}${dataTxt}\n📝 *Scelta:* ${scTxt}\n🛼 *Pronto per la gara!*`;
@@ -3972,6 +4304,15 @@
         let messaggio = `*JUVENILIA RACING TEAM - RIEPILOGO QUOTE GARA 5*\n\n`;
         messaggio += `🏆 *Evento:* ${document.getElementById('mainTitle').innerText}\n`;
         messaggio += `📅 *Data generazione:* ${new Date().toLocaleDateString('it-IT')}\n\n`;
+        
+        if (dettagliPagamento.iban || dettagliPagamento.causale || dettagliPagamento.ragioneSociale) {
+            messaggio += `*💳 DATI PAGAMENTO:*\n`;
+            if (dettagliPagamento.ragioneSociale) messaggio += `📌 *Intestato a:* ${dettagliPagamento.ragioneSociale}\n`;
+            if (dettagliPagamento.iban) messaggio += `🏦 *IBAN:* ${dettagliPagamento.iban}\n`;
+            if (dettagliPagamento.causale) messaggio += `📝 *Causale:* ${dettagliPagamento.causale}\n`;
+            messaggio += `\n`;
+        }
+        
         messaggio += `*📋 RIEPILOGO QUOTE:*\n`;
         
         let categoriaCorrente = '';
@@ -3983,65 +4324,54 @@
             
             let riga = `• ${item.nome}: ${item.quota.toFixed(2)}€`;
             if (item.accompagnatore) {
-                riga += ` (+ accompagnatore: ${item.accompagnatore})`;
+                riga += ` (+ acc: ${item.accompagnatore})`;
             }
             messaggio += riga + '\n';
         });
         
         messaggio += `\n*💰 TOTALE GENERALE:* ${totaleGenerale.toFixed(2)}€\n\n`;
+        messaggio += `_Per confermare l'iscrizione effettuare il pagamento entro la scadenza indicata._`;
         
         const messaggioCodificato = encodeURIComponent(messaggio);
         const linkWhatsApp = `https://wa.me/${WHATSAPP_NUMBER}?text=${messaggioCodificato}`;
         
-        if (confirm(`Vuoi inviare il riepilogo quote a WhatsApp?\n\nTotale atleti: ${quoteAtleti.length}\nImporto totale: ${totaleGenerale.toFixed(2)}€\n\nIl messaggio verrà aperto in WhatsApp per l'invio.`)) {
+        if (confirm(`Vuoi inviare il riepilogo quote a WhatsApp?\n\nAtleti: ${quoteAtleti.length}\nTotale: ${totaleGenerale.toFixed(2)}€\n\nIl messaggio verrà aperto in WhatsApp per l'invio.`)) {
             window.open(linkWhatsApp, '_blank');
             showToast(`Riepilogo quote pronto per WhatsApp! Totale: ${totaleGenerale.toFixed(2)}€`);
             
-            const telegramMsg = `📊 *RIEPILOGO QUOTE GENERATO*\nAtleti: ${quoteAtleti.length}\nTotale: ${totaleGenerale.toFixed(2)}€\nGenerato da admin`;
-            fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    chat_id: TELEGRAM_CHAT_ID, 
-                    text: telegramMsg, 
-                    parse_mode: 'Markdown' 
-                })
-            });
+            if (invioTelegramAuto) {
+                const telegramMsg = `📊 *RIEPILOGO QUOTE GENERATO*\nAtleti: ${quoteAtleti.length}\nTotale: ${totaleGenerale.toFixed(2)}€\nGenerato da admin`;
+                fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        chat_id: TELEGRAM_CHAT_ID, 
+                        text: telegramMsg, 
+                        parse_mode: 'Markdown' 
+                    })
+                });
+            }
         }
     }
 
     async function inviaRiepilogoTelegram() {
-        const gara = document.getElementById('mainTitle').innerText;
-        let pCat = {};
-        currentData.forEach(p => { 
-            if(p.stato === 'si') { 
-                if(!pCat[p.categoria]) pCat[p.categoria] = { M: [], F: [], U: [] }; 
-                let note = p.note || "";
-                let d = note.includes('B') ? labelB : (note.includes('C') ? labelC : labelA);
-                let g = note.includes('F') ? 'F' : (note.includes('M') ? 'M' : '');
-                let info = `${p.nome}${d ? ' ['+d+']' : ''}${p.accompagnatore ? ' (+' + p.accompagnatore + ')' : ''}`;
-                if(g === 'M') pCat[p.categoria].M.push(info); else if(g === 'F') pCat[p.categoria].F.push(info); else pCat[p.categoria].U.push(info);
-            } 
+        const messaggio = generaRiepilogoQuoteMessage();
+        
+        if (!messaggio) {
+            showToast("Nessun partecipante da segnalare!");
+            return;
+        }
+        
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: messaggio,
+                parse_mode: 'Markdown'
+            })
         });
-        let msg = `🛼 *JUVENILIA RACING TEAM - RIEPILOGO ISCRIZIONI GARA 5*\n🏆 *Evento:* ${gara}\n\n`;
-        Object.keys(pCat).sort((a,b) => (customCatOrder[a.toUpperCase()] || 999) - (customCatOrder[b.toUpperCase()] || 999)).forEach(c => {
-            msg += `*${c.toUpperCase()}*\n`;
-            if(pCat[c].M.length > 0) { pCat[c].M.sort(); msg += `♂️ Maschi: ${pCat[c].M.join(', ')}\n`; }
-            if(pCat[c].F.length > 0) { pCat[c].F.sort(); msg += `♀️ Femmine: ${pCat[c].F.join(', ')}\n`; }
-            if(pCat[c].U.length > 0) { pCat[c].U.sort(); msg += `? Altri: ${pCat[c].U.join(', ')}\n`; }
-            msg += `\n`;
-        });
-        msg += `🛼 *Pronti per la gara!*`;
-        fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, { 
-            method: 'POST', 
-            headers: { 'Content-Type': 'application/json' }, 
-            body: JSON.stringify({ 
-                chat_id: TELEGRAM_CHAT_ID, 
-                text: msg, 
-                parse_mode: 'Markdown' 
-            }) 
-        });
-        showToast("Riepilogo inviato al team!");
+        showToast("Riepilogo completo inviato al team!");
     }
 
     async function exportToExcel() {
@@ -4071,6 +4401,8 @@
             document.getElementById('addAtletaBox').style.display = 'flex';
             document.getElementById('costiBox').style.display = 'flex';
             document.getElementById('docsBox').style.display = 'flex';
+            document.getElementById('paymentDetailsBox').style.display = 'flex';
+            document.getElementById('telegramToggleBox').style.display = 'flex';
             document.getElementById('timerAdminBox').style.display = 'flex';
             document.getElementById('adminTotalBox').style.display = 'block';
             document.getElementById('adminButtons').style.display = 'grid';
@@ -4089,6 +4421,9 @@
             
             caricaConfig(); 
             caricaTimers();
+            caricaDettagliPagamento();
+            caricaTelegramAuto();
+            caricaInvioAutomaticoScadenza();
             renderData(); 
             caricaInfoBox();
             caricaStatoImmagineLaterale();
