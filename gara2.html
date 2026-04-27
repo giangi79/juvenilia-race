@@ -2695,7 +2695,7 @@
         <i class="fas fa-image"></i> Mostra Immagine Laterale
     </button>
 
-    <h2 id="mainTitle">Juvenilia Racing Team - Iscrizioni Gara 2</h2>
+    <h2 id="mainTitle">🏆 Juvenilia Racing Team - Iscrizioni Gara 2</h2>
     
     <div id="countdownBox" class="countdown-container">
         <div id="timerDisplay" class="timer"><i class="fas fa-clock"></i> Inizializzazione...</div>
@@ -3048,6 +3048,7 @@
     let invioTelegramAuto = false;
     let invioAutomaticoScadenza = false;
     let riepilogoScadenzaInviato = {};
+    let riepilogoScadenzaGeneraleInviato = false;  // NUOVO FLAG PER TIMER GENERALE
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
@@ -3545,7 +3546,7 @@
             return a.nome.localeCompare(b.nome);
         });
         
-        let messaggio = `🛼 *JUVENILIA RACING TEAM - RIEPILOGO ISCRIZIONI GARA 2*\n`;
+        let messaggio = `🛼 *JUVENILIA RACING TEAM - RIEPILOGO ISCRIZIONI GARA 1*\n`;
         messaggio += `🏆 *Evento:* ${document.getElementById('mainTitle').innerText}\n`;
         messaggio += `📅 *Data generazione:* ${new Date().toLocaleDateString('it-IT')}\n`;
         messaggio += `🕐 *Ora:* ${new Date().toLocaleTimeString('it-IT')}\n\n`;
@@ -3595,7 +3596,7 @@
         const messaggio = generaRiepilogoQuoteMessage();
         
         if (!messaggio) {
-            showToast("Nessun partecipante da segnalare!");
+            console.log("Nessun partecipante da segnalare");
             return false;
         }
         
@@ -3609,11 +3610,10 @@
                     parse_mode: 'Markdown'
                 })
             });
-            showToast("Riepilogo quote inviato a Telegram!");
+            console.log("Riepilogo inviato a Telegram");
             return true;
         } catch (error) {
             console.error("Errore invio Telegram:", error);
-            showToast("Errore nell'invio del riepilogo");
             return false;
         }
     }
@@ -3885,7 +3885,7 @@
                         const categories = timer.categories ? JSON.parse(timer.categories) : [];
                         disabilitaCategorieScadute(categories);
                         
-                        // INVIO AUTOMATICO RIEPILOGO ALLA SCADENZA
+                        // INVIO AUTOMATICO RIEPILOGO ALLA SCADENZA PER TIMER CATEGORIA
                         if (invioAutomaticoScadenza && !riepilogoScadenzaInviato[timerId]) {
                             riepilogoScadenzaInviato[timerId] = true;
                             setTimeout(() => {
@@ -4311,7 +4311,7 @@
             return a.nome.localeCompare(b.nome);
         });
         
-        let messaggio = `*JUVENILIA RACING TEAM - RIEPILOGO QUOTE GARA 2*\n\n`;
+        let messaggio = `*JUVENILIA RACING TEAM - RIEPILOGO QUOTE GARA 1*\n\n`;
         messaggio += `🏆 *Evento:* ${document.getElementById('mainTitle').innerText}\n`;
         messaggio += `📅 *Data generazione:* ${new Date().toLocaleDateString('it-IT')}\n\n`;
         
@@ -4448,7 +4448,15 @@
     function mostraTimerChiuso() { 
         const d = document.getElementById('timerDisplay'); 
         d.innerHTML = `<i class="fas fa-hourglass-end"></i> ISCRIZIONI CHIUSE`; 
-        d.style.color = "var(--racing-red)"; 
+        d.style.color = "var(--racing-red)";
+        
+        // INVIO AUTOMATICO RIEPILOGO ALLA SCADENZA DEL TIMER GENERALE
+        if (invioAutomaticoScadenza && !riepilogoScadenzaGeneraleInviato) {
+            riepilogoScadenzaGeneraleInviato = true;
+            setTimeout(() => {
+                inviaRiepilogoQuoteTelegram();
+            }, 1000);
+        }
     }
     
     async function salvaTitolo() { 
@@ -4464,6 +4472,7 @@
         if(v) {
             await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: v }, { onConflict: 'chiave' });
             showToast("Scadenza confermata!");
+            riepilogoScadenzaGeneraleInviato = false;  // RESET FLAG TIMER GENERALE
         }
         caricaConfig(); 
     }
@@ -4471,6 +4480,7 @@
     async function resetScadenzaDB() { 
         await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: "" }, { onConflict: 'chiave' }); 
         showToast("Scadenza resettata!");
+        riepilogoScadenzaGeneraleInviato = false;  // RESET FLAG TIMER GENERALE
         caricaConfig(); 
     }
     
