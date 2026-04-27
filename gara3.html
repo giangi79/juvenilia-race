@@ -2981,6 +2981,9 @@
     </div>
 
     <div id="adminButtons">
+        <button onclick="resetAllToDefault()" style="background:var(--gradient-warning); color:white; border:2px solid var(--racing-red);">
+            <i class="fas fa-database"></i> ⚠️ RESET COMPLETO DEFAULTS
+        </button>
         <button onclick="bulkAction(true)" style="background:var(--racing-purple)"><i class="fas fa-lock"></i> Nascondi Selezionati</button>
         <button onclick="exportToExcel()" style="background:var(--racing-green)"><i class="fas fa-file-excel"></i> Esporta Excel</button>
         <button onclick="inviaWhatsAppQuote()" style="background:#25D366; color:white;"><i class="fab fa-whatsapp"></i> WhatsApp Quote</button>
@@ -3048,7 +3051,7 @@
     let invioTelegramAuto = false;
     let invioAutomaticoScadenza = false;
     let riepilogoScadenzaInviato = {};
-    let riepilogoScadenzaGeneraleInviato = false;  // NUOVO FLAG PER TIMER GENERALE
+    let riepilogoScadenzaGeneraleInviato = false;
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
@@ -5210,6 +5213,168 @@
         
         if (!isAdmin) {
             document.getElementById('infoBox').style.display = visibile ? 'block' : 'none';
+        }
+    }
+
+    // ==================== FUNZIONE RESET COMPLETO DEFAULTS ====================
+    async function resetAllToDefault() {
+        if (!isAdmin) {
+            showToast("Solo l'amministratore può eseguire questa operazione!");
+            return;
+        }
+        
+        const conferma = confirm("⚠️ ATTENZIONE: Questa operazione resetta TUTTO il sistema ai valori di default!\n\nVerranno resettati:\n- Titolo della gara\n- Scadenze timer\n- Tutti i documenti e link\n- Tutti i costi delle categorie\n- Tutte le iscrizioni degli atleti\n- Tutti gli accompagnatori\n- Il box informazioni\n- Le etichette date\n\nSei assolutamente sicuro?");
+        
+        if (!conferma) return;
+        
+        const conferma2 = confirm("ULTIMA CONFERMA: Vuoi davvero resettare TUTTO il sistema ai valori predefiniti? Questa operazione NON può essere annullata!");
+        
+        if (!conferma2) return;
+        
+        showToast("Reset completo in corso...");
+        
+        try {
+            // 1. Resetta tutte le iscrizioni degli atleti
+            await _supabase.from(T_DATA).update({ 
+                stato: 'vuoto', 
+                accompagnatore: "" 
+            }).neq('id', 0);
+            
+            // 2. Resetta configurazioni generali
+            const defaultConfigs = [
+                { chiave: 'titolo_gara', valore: "Juvenilia Racing Team - Iscrizioni Gara 3" },
+                { chiave: 'scadenza_adesioni', valore: "" },
+                { chiave: 'data_label_a', valore: "" },
+                { chiave: 'data_label_b', valore: "" },
+                { chiave: 'data_label_c', valore: "" },
+                { chiave: 'doc_url_1', valore: "" },
+                { chiave: 'doc_txt_1', valore: "" },
+                { chiave: 'doc_url_2', valore: "" },
+                { chiave: 'doc_txt_2', valore: "" },
+                { chiave: 'mostra_accompagnatori', valore: "true" },
+                { chiave: 'mostra_info_box', valore: "false" },
+                { chiave: 'mostra_immagine_laterale', valore: "false" },
+                { chiave: 'telegram_auto_invio', valore: "false" },
+                { chiave: 'invio_automatico_scadenza', valore: "false" },
+                { chiave: 'iban', valore: "" },
+                { chiave: 'causale', valore: "" },
+                { chiave: 'ragione_sociale', valore: "" },
+                { chiave: 'email_pagamento', valore: "" }
+            ];
+            
+            for (const cfg of defaultConfigs) {
+                await _supabase.from(T_CONF).upsert(cfg, { onConflict: 'chiave' });
+            }
+            
+            // 3. Resetta tutti i costi delle categorie a 0
+            const cats = ["SENIOR", "JUNIOR", "ALLIEVI", "RAGAZZI", "R12", "ESORDIENTI", "GIOVANISSIMI"];
+            for (const cat of cats) {
+                await _supabase.from(T_CONF).upsert({ 
+                    chiave: `costo_${cat}`, 
+                    valore: "0" 
+                }, { onConflict: 'chiave' });
+            }
+            
+            // 4. Cancella tutti i timer
+            await _supabase.from(T_TIMERS).delete().neq('id', 0);
+            
+            // 5. Resetta il box info al testo default
+            const defaultInfoText = "<strong>📢 Juvenilia Racing Team</strong> - Benvenuti al sistema di iscrizioni Gara 3! 🛼<br><br>" +
+                                  "• Seleziona <strong style='color: var(--racing-green);'>PARTECIPA</strong> o <strong style='color: var(--racing-red);'>NON PARTECIPA</strong> per ogni atleta<br>" +
+                                  "• Per i <u>minorenni</u> è obbligatorio indicare un accompagnatore<br>" +
+                                  "• Le scadenze per categoria sono indicate dai <em>timer colorati</em>";
+            
+            await _supabase.from(T_CONF).upsert({ 
+                chiave: 'info_box_text', 
+                valore: defaultInfoText 
+            }, { onConflict: 'chiave' });
+            
+            // 6. Reset variabili globali
+            isExpired = false;
+            mostraAccompagnatori = true;
+            mostraInfoBox = false;
+            mostraImmagineLaterale = false;
+            costiCategorie = {};
+            categoryTimers = [];
+            riepilogoScadenzaInviato = {};
+            riepilogoScadenzaGeneraleInviato = false;
+            
+            // 7. Reset campi input admin se presenti
+            if (document.getElementById('editTitleInput')) 
+                document.getElementById('editTitleInput').value = "";
+            if (document.getElementById('dateA_Label')) 
+                document.getElementById('dateA_Label').value = "";
+            if (document.getElementById('dateB_Label')) 
+                document.getElementById('dateB_Label').value = "";
+            if (document.getElementById('dateC_Label')) 
+                document.getElementById('dateC_Label').value = "";
+            if (document.getElementById('deadlineInput')) 
+                document.getElementById('deadlineInput').value = "";
+            if (document.getElementById('docLink1_URL')) 
+                document.getElementById('docLink1_URL').value = "";
+            if (document.getElementById('docLink1_Text')) 
+                document.getElementById('docLink1_Text').value = "";
+            if (document.getElementById('docLink2_URL')) 
+                document.getElementById('docLink2_URL').value = "";
+            if (document.getElementById('docLink2_Text')) 
+                document.getElementById('docLink2_Text').value = "";
+            if (document.getElementById('ibanField')) 
+                document.getElementById('ibanField').value = "";
+            if (document.getElementById('causaleField')) 
+                document.getElementById('causaleField').value = "";
+            if (document.getElementById('ragioneSocialeField')) 
+                document.getElementById('ragioneSocialeField').value = "";
+            if (document.getElementById('emailField')) 
+                document.getElementById('emailField').value = "";
+            
+            // 8. Reset checkbox Telegram
+            const telegramToggle = document.getElementById('telegramAutoToggle');
+            if (telegramToggle) telegramToggle.checked = false;
+            const scadenzaToggle = document.getElementById('scadenzaAutoToggle');
+            if (scadenzaToggle) scadenzaToggle.checked = false;
+            const infoVisibilityToggle = document.getElementById('infoVisibilityToggle');
+            if (infoVisibilityToggle) infoVisibilityToggle.checked = false;
+            
+            // 9. Aggiorna stati visibilità
+            aggiornaStatoVisibilitaInfo();
+            if (document.getElementById('telegramAutoStatus')) {
+                document.getElementById('telegramAutoStatus').innerHTML = 'DISABILITATO';
+                document.getElementById('telegramAutoStatus').className = 'info-toggle-status off';
+            }
+            if (document.getElementById('scadenzaAutoStatus')) {
+                document.getElementById('scadenzaAutoStatus').innerHTML = 'DISABILITATO';
+                document.getElementById('scadenzaAutoStatus').className = 'info-toggle-status off';
+            }
+            
+            // 10. Rimuovi immagine laterale
+            const sideImageContainer = document.getElementById('sideImageContainer');
+            if (sideImageContainer) sideImageContainer.classList.remove('visible');
+            
+            // 11. Ricarica tutto
+            await caricaConfig();
+            await caricaTimers();
+            await caricaTabella();
+            await caricaInfoBox();
+            await caricaDettagliPagamento();
+            await caricaTelegramAuto();
+            await caricaInvioAutomaticoScadenza();
+            await caricaStatoImmagineLaterale();
+            
+            // 12. Renderizza costi inputs
+            if (isAdmin) renderCostiInputs();
+            
+            // 13. Interrompi tutti i timer attivi
+            if (timerInterval) clearInterval(timerInterval);
+            Object.keys(categoryTimerIntervals).forEach(timerId => {
+                clearInterval(categoryTimerIntervals[timerId]);
+            });
+            categoryTimerIntervals = {};
+            
+            showToast("✅ RESET COMPLETO ESEGUITO! Tutto è tornato ai valori di default.");
+            
+        } catch (error) {
+            console.error("Errore durante il reset:", error);
+            showToast("❌ Errore durante il reset! Controlla la console.");
         }
     }
 
