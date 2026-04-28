@@ -2959,7 +2959,7 @@
         <span class="search-icon"><i class="fas fa-search"></i></span>
         <input type="text" id="searchInput" class="search-box" onkeyup="filterTable()" placeholder="Cerca il tuo nome o la tua categoria..." style="text-transform: uppercase;">
         <button id="toggleAccompagnatoriBtn" onclick="toggleVisibilitaAccompagnatori()">
-            <i class="fas fa-eye"></i> Nascondi Box Accompagnatori
+            <i class="fas fa-eye"></i> Mostra Box Accompagnatori
         </button>
     </div>
 
@@ -3031,7 +3031,7 @@
     let costiCategorie = {};
     let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false, isEditingCategoria = false;
     let selectedIds = new Set();
-    let mostraAccompagnatori = true;
+    let mostraAccompagnatori = false;  // DEFAULT: NASCOSTO
     let mostraInfoBox = false;
     let tempAccompagnatoriValues = {};
     let isTypingInAccompagnatore = false;
@@ -3129,7 +3129,6 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('input', function(e) {
-            // CAMPO URL: NON convertire in maiuscolo
             if (e.target.id === 'docLink1_URL' || e.target.id === 'docLink2_URL') {
                 return;
             }
@@ -3581,7 +3580,6 @@
         messaggio += `\n*💰 TOTALE QUOTE DA PAGARE:* ${totaleQuota.toFixed(2)}€\n`;
         messaggio += `*👥 TOTALE PARTECIPANTI:* ${quoteAtleti.length}\n`;
         
-        // AGGIUNGI DETTAGLI PAGAMENTO CON EMAIL
         if (dettagliPagamento.iban || dettagliPagamento.causale || dettagliPagamento.ragioneSociale || dettagliPagamento.email) {
             messaggio += `\n*💳 DATI PAGAMENTO:*\n`;
             if (dettagliPagamento.ragioneSociale) messaggio += `📌 Intestato a: ${dettagliPagamento.ragioneSociale}\n`;
@@ -3888,7 +3886,6 @@
                         const categories = timer.categories ? JSON.parse(timer.categories) : [];
                         disabilitaCategorieScadute(categories);
                         
-                        // INVIO AUTOMATICO RIEPILOGO ALLA SCADENZA PER TIMER CATEGORIA
                         if (invioAutomaticoScadenza && !riepilogoScadenzaInviato[timerId]) {
                             riepilogoScadenzaInviato[timerId] = true;
                             setTimeout(() => {
@@ -3909,7 +3906,6 @@
             displayElement.innerHTML = `<i class="fas fa-hourglass-half"></i> ${d}g ${h}h ${m}m ${s}s`;
             displayElement.style.color = "var(--racing-white)";
             
-            // Reset flag quando il timer non è scaduto
             if (timerId && riepilogoScadenzaInviato[timerId]) {
                 riepilogoScadenzaInviato[timerId] = false;
             }
@@ -4318,7 +4314,6 @@
         messaggio += `🏆 *Evento:* ${document.getElementById('mainTitle').innerText}\n`;
         messaggio += `📅 *Data generazione:* ${new Date().toLocaleDateString('it-IT')}\n\n`;
         
-        // AGGIUNGI DETTAGLI PAGAMENTO CON EMAIL
         if (dettagliPagamento.iban || dettagliPagamento.causale || dettagliPagamento.ragioneSociale || dettagliPagamento.email) {
             messaggio += `*💳 DATI PAGAMENTO:*\n`;
             if (dettagliPagamento.ragioneSociale) messaggio += `📌 *Intestato a:* ${dettagliPagamento.ragioneSociale}\n`;
@@ -4453,7 +4448,6 @@
         d.innerHTML = `<i class="fas fa-hourglass-end"></i> ISCRIZIONI CHIUSE`; 
         d.style.color = "var(--racing-red)";
         
-        // INVIO AUTOMATICO RIEPILOGO ALLA SCADENZA DEL TIMER GENERALE
         if (invioAutomaticoScadenza && !riepilogoScadenzaGeneraleInviato) {
             riepilogoScadenzaGeneraleInviato = true;
             setTimeout(() => {
@@ -4475,7 +4469,7 @@
         if(v) {
             await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: v }, { onConflict: 'chiave' });
             showToast("Scadenza confermata!");
-            riepilogoScadenzaGeneraleInviato = false;  // RESET FLAG TIMER GENERALE
+            riepilogoScadenzaGeneraleInviato = false;
         }
         caricaConfig(); 
     }
@@ -4483,7 +4477,7 @@
     async function resetScadenzaDB() { 
         await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: "" }, { onConflict: 'chiave' }); 
         showToast("Scadenza resettata!");
-        riepilogoScadenzaGeneraleInviato = false;  // RESET FLAG TIMER GENERALE
+        riepilogoScadenzaGeneraleInviato = false;
         caricaConfig(); 
     }
     
@@ -5038,7 +5032,6 @@
         }
     }
 
-    // FUNZIONI PER LA TOOLBAR DI FORMATTAZIONE
     function formatText(command, value = null) {
         const editor = document.getElementById('infoEditor');
         
@@ -5060,7 +5053,6 @@
         editor.focus();
     }
 
-    // INFO BOX FUNCTIONS
     async function caricaInfoBox() {
         const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'info_box_text');
         const infoBox = document.getElementById('infoBox');
@@ -5223,7 +5215,7 @@
             return;
         }
         
-        const conferma = confirm("⚠️ ATTENZIONE: Questa operazione resetta TUTTO il sistema ai valori di default!\n\nVerranno resettati:\n- Titolo della gara\n- Scadenze timer\n- Tutti i documenti e link\n- Tutti i costi delle categorie\n- Tutte le iscrizioni degli atleti\n- Tutti gli accompagnatori\n- Il box informazioni\n- Le etichette date\n\nSei assolutamente sicuro?");
+        const conferma = confirm("⚠️ ATTENZIONE: Questa operazione resetta TUTTO il sistema ai valori di default!\n\nVerranno resettati:\n- Titolo della gara\n- Scadenze timer\n- Tutti i documenti e link\n- Tutti i costi delle categorie\n- Tutte le iscrizioni degli atleti\n- Tutti gli accompagnatori\n- Il box informazioni\n- Le etichette date\n- TUTTI gli atleti verranno SBLOCATI\n\nSei assolutamente sicuro?");
         
         if (!conferma) return;
         
@@ -5234,10 +5226,11 @@
         showToast("Reset completo in corso...");
         
         try {
-            // 1. Resetta tutte le iscrizioni degli atleti
+            // 1. Resetta tutte le iscrizioni degli atleti e SBLOCA TUTTI
             await _supabase.from(T_DATA).update({ 
                 stato: 'vuoto', 
-                accompagnatore: "" 
+                accompagnatore: "",
+                bloccato: false
             }).neq('id', 0);
             
             // 2. Resetta configurazioni generali
@@ -5251,7 +5244,7 @@
                 { chiave: 'doc_txt_1', valore: "" },
                 { chiave: 'doc_url_2', valore: "" },
                 { chiave: 'doc_txt_2', valore: "" },
-                { chiave: 'mostra_accompagnatori', valore: "true" },
+                { chiave: 'mostra_accompagnatori', valore: "false" },
                 { chiave: 'mostra_info_box', valore: "false" },
                 { chiave: 'mostra_immagine_laterale', valore: "false" },
                 { chiave: 'telegram_auto_invio', valore: "false" },
@@ -5291,7 +5284,7 @@
             
             // 6. Reset variabili globali
             isExpired = false;
-            mostraAccompagnatori = true;
+            mostraAccompagnatori = false;
             mostraInfoBox = false;
             mostraImmagineLaterale = false;
             costiCategorie = {};
@@ -5369,6 +5362,12 @@
                 clearInterval(categoryTimerIntervals[timerId]);
             });
             categoryTimerIntervals = {};
+            
+            // 14. Aggiorna il testo del pulsante accompagnatori
+            const toggleAccompBtn = document.getElementById('toggleAccompagnatoriBtn');
+            if (toggleAccompBtn && isAdmin) {
+                toggleAccompBtn.innerHTML = '<i class="fas fa-eye"></i> Mostra Box Accompagnatori';
+            }
             
             showToast("✅ RESET COMPLETO ESEGUITO! Tutto è tornato ai valori di default.");
             
