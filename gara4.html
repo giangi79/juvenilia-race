@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* TUTTO LO STILE RIMANE IDENTICO - NON MODIFICATO */
+        /* TUTTO LO STILE RIMANE IDENTICO */
         :root { 
             --racing-red: #E63946; --racing-blue: #1D3557; --racing-light: #A8DADC; 
             --racing-white: #F1FAEE; --racing-yellow: #FFD166; --racing-orange: #F4A261;
@@ -2984,6 +2984,9 @@
         <button onclick="resetAllToDefault()" style="background:var(--gradient-warning); color:white; border:2px solid var(--racing-red);">
             <i class="fas fa-database"></i> ⚠️ RESET COMPLETO DEFAULTS
         </button>
+        <button onclick="resetRiepilogoFlag()" style="background:var(--racing-orange);">
+            <i class="fas fa-bell-slash"></i> Reset Notifiche Scadenza
+        </button>
         <button onclick="bulkAction(true)" style="background:var(--racing-purple)"><i class="fas fa-lock"></i> Nascondi Selezionati</button>
         <button onclick="exportToExcel()" style="background:var(--racing-green)"><i class="fas fa-file-excel"></i> Esporta Excel</button>
         <button onclick="inviaWhatsAppQuote()" style="background:#25D366; color:white;"><i class="fab fa-whatsapp"></i> WhatsApp Quote</button>
@@ -3031,7 +3034,7 @@
     let costiCategorie = {};
     let isEditingCosti = false, isEditingDocs = false, isEditingTitolo = false, isEditingDateLabels = false, isEditingTimers = false, isEditingCategoria = false;
     let selectedIds = new Set();
-    let mostraAccompagnatori = false;  // DEFAULT: NASCOSTO
+    let mostraAccompagnatori = false;
     let mostraInfoBox = false;
     let tempAccompagnatoriValues = {};
     let isTypingInAccompagnatore = false;
@@ -3052,9 +3055,531 @@
     let invioAutomaticoScadenza = false;
     let riepilogoScadenzaInviato = {};
     let riepilogoScadenzaGeneraleInviato = false;
+    let lastInvioRiepilogo = 0;
 
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
+    // ==================== FUNZIONI PER STATO INVIO SCADENZE ====================
+    async function caricaStatoInvioScadenze() {
+        const salvato = localStorage.getItem('riepilogoScadenzaGeneraleInviato');
+        if (salvato === 'true') {
+            riepilogoScadenzaGeneraleInviato = true;
+            console.log("Stato riepilogo caricato da localStorage: già inviato");
+        } else {
+            const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'riepilogo_scadenza_inviato');
+            if (data && data.length > 0 && data[0].valore === 'true') {
+                riepilogoScadenzaGeneraleInviato = true;
+                localStorage.setItem('riepilogoScadenzaGeneraleInviato', 'true');
+                console.log("Stato riepilogo dal DB: già inviato");
+            } else {
+                riepilogoScadenzaGeneraleInviato = false;
+                console.log("Stato riepilogo: non ancora inviato");
+            }
+        }
+    }
+
+    async function salvaStatoInvioScadenzaDB() {
+        await _supabase.from(T_CONF).upsert({
+            chiave: 'riepilogo_scadenza_inviato',
+            valore: riepilogoScadenzaGeneraleInviato.toString()
+        }, { onConflict: 'chiave' });
+        localStorage.setItem('riepilogoScadenzaGeneraleInviato', riepilogoScadenzaGeneraleInviato.toString());
+    }
+
+    async function resetRiepilogoFlag() {
+        if (!isAdmin) {
+            showToast("Solo l'amministratore può eseguire questa operazione!");
+            return;
+        }
+        
+        if (confirm("Resettare il flag delle notifiche di scadenza? Questo permetterà di inviare nuovamente il riepilogo quando la scadenza sarà raggiunta.")) {
+            riepilogoScadenzaGeneraleInviato = false;
+            riepilogoScadenzaInviato = {};
+            await salvaStatoInvioScadenzaDB();
+            localStorage.removeItem('riepilogoScadenzaGeneraleInviato');
+            showToast("✅ Flag notifiche resettato!");
+            console.log("Flag riepilogo resettato manualmente");
+        }
+    }
+
+    // ==================== FUNZIONI GENERAZIONE RIEPILOGO ====================
+    function generaRiepilogoQuoteMessage() {
+        let quoteAtleti = [];
+        let totaleGenerale = 0;
+        
+        currentData.forEach(atleta => {
+            if (atleta.stato === 'si') {
+                const categoria = atleta.categoria.toUpperCase();
+                const quota = costiCategorie[categoria] || 0;
+                
+                if (quota > 0) {
+                    totaleGenerale += quota;
+                    quoteAtleti.push({
+                        nome: atleta.nome,
+                        categoria: categoria,
+                        quota: quota,
+                        accompagnatore: atleta.accompagnatore || ""
+                    });
+                } else if (quota === 0 && !isAdmin) {
+                    quoteAtleti.push({
+                        nome: atleta.nome,
+                        categoria: categoria,
+                        quota: 0,
+                        accompagnatore: atleta.accompagnatore || ""
+                    });
+                }
+            }
+        });
+        
+        if (quoteAtleti.length === 0) {
+            return null;
+        }
+        
+        quoteAtleti.sort((a, b) => {
+            const catOrderA = customCatOrder[a.categoria] || 999;
+            const catOrderB = customCatOrder[b.categoria] || 999;
+            if (catOrderA !== catOrderB) return catOrderA - catOrderB;
+            return a.nome.localeCompare(b.nome);
+        });
+        
+        let messaggio = `🛼 *JUVENILIA RACING TEAM - RIEPILOGO ISCRIZIONI GARA 1*\n`;
+        messaggio += `🏆 *Evento:* ${document.getElementById('mainTitle').innerText}\n`;
+        messaggio += `📅 *Data generazione:* ${new Date().toLocaleDateString('it-IT')}\n`;
+        messaggio += `🕐 *Ora:* ${new Date().toLocaleTimeString('it-IT')}\n\n`;
+        
+        messaggio += `*📋 RIEPILOGO PARTECIPANTI:*\n`;
+        
+        let categoriaCorrente = '';
+        let totaleQuota = 0;
+        
+        quoteAtleti.forEach(item => {
+            if (item.categoria !== categoriaCorrente) {
+                categoriaCorrente = item.categoria;
+                messaggio += `\n*${categoriaCorrente}*\n`;
+            }
+            
+            let riga = `• ${item.nome}`;
+            if (item.quota > 0) {
+                riga += `: ${item.quota.toFixed(2)}€`;
+                totaleQuota += item.quota;
+            } else {
+                riga += `: GRATUITO`;
+            }
+            if (item.accompagnatore) {
+                riga += ` (acc: ${item.accompagnatore})`;
+            }
+            messaggio += riga + '\n';
+        });
+        
+        messaggio += `\n*💰 TOTALE QUOTE DA PAGARE:* ${totaleQuota.toFixed(2)}€\n`;
+        messaggio += `*👥 TOTALE PARTECIPANTI:* ${quoteAtleti.length}\n`;
+        
+        if (dettagliPagamento.iban || dettagliPagamento.causale || dettagliPagamento.ragioneSociale || dettagliPagamento.email) {
+            messaggio += `\n*💳 DATI PAGAMENTO:*\n`;
+            if (dettagliPagamento.ragioneSociale) messaggio += `📌 Intestato a: ${dettagliPagamento.ragioneSociale}\n`;
+            if (dettagliPagamento.iban) messaggio += `🏦 IBAN: ${dettagliPagamento.iban}\n`;
+            if (dettagliPagamento.causale) messaggio += `📝 Causale: ${dettagliPagamento.causale}\n`;
+            if (dettagliPagamento.email) messaggio += `📧 Email per distinta: ${dettagliPagamento.email}\n`;
+        }
+        
+        messaggio += `\n🛼 *Pronti per la gara!*`;
+        
+        return messaggio;
+    }
+
+    async function inviaRiepilogoQuoteTelegram() {
+        const messaggio = generaRiepilogoQuoteMessage();
+        
+        if (!messaggio) {
+            console.log("Nessun partecipante da segnalare");
+            return false;
+        }
+        
+        // Evita invii multipli in rapida successione (10 secondi)
+        if (lastInvioRiepilogo && (Date.now() - lastInvioRiepilogo) < 10000) {
+            console.log("Invio troppo recente, saltato per evitare duplicati");
+            return false;
+        }
+        
+        lastInvioRiepilogo = Date.now();
+        
+        try {
+            await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: messaggio,
+                    parse_mode: 'Markdown'
+                })
+            });
+            console.log("Riepilogo inviato a Telegram");
+            return true;
+        } catch (error) {
+            console.error("Errore invio Telegram:", error);
+            return false;
+        }
+    }
+
+    async function inviaRiepilogoTelegram() {
+        const messaggio = generaRiepilogoQuoteMessage();
+        
+        if (!messaggio) {
+            showToast("Nessun partecipante da segnalare!");
+            return;
+        }
+        
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: messaggio,
+                parse_mode: 'Markdown'
+            })
+        });
+        showToast("Riepilogo completo inviato al team!");
+    }
+
+    // ==================== FUNZIONI TIMER E SCADENZE ====================
+    function mostraTimerChiuso() { 
+        const d = document.getElementById('timerDisplay'); 
+        d.innerHTML = `<i class="fas fa-hourglass-end"></i> ISCRIZIONI CHIUSE`; 
+        d.style.color = "var(--racing-red)";
+        
+        // INVIO AUTOMATICO UNA SOLA VOLTA
+        if (invioAutomaticoScadenza && !riepilogoScadenzaGeneraleInviato) {
+            riepilogoScadenzaGeneraleInviato = true;
+            salvaStatoInvioScadenzaDB();
+            console.log("Timer scaduto - Invio unico riepilogo in corso...");
+            setTimeout(() => {
+                inviaRiepilogoQuoteTelegram();
+            }, 1000);
+        } else if (riepilogoScadenzaGeneraleInviato) {
+            console.log("Riepilogo già inviato in precedenza, nessun nuovo invio");
+        }
+    }
+
+    function startCountdown(endTime, displayId, timerId = null) {
+        if (timerId && categoryTimerIntervals[timerId]) {
+            clearInterval(categoryTimerIntervals[timerId]);
+        }
+        
+        const displayElement = document.getElementById(displayId);
+        if (!displayElement) return;
+        
+        function updateCountdown() {
+            const distance = new Date(endTime).getTime() - new Date().getTime();
+            
+            if (distance <= 0) {
+                displayElement.innerHTML = `<i class="fas fa-hourglass-end"></i> SCADUTO`;
+                displayElement.style.color = "var(--racing-red)";
+                
+                if (timerId) {
+                    const timer = categoryTimers.find(t => t.id === timerId);
+                    if (timer) {
+                        const categories = timer.categories ? JSON.parse(timer.categories) : [];
+                        disabilitaCategorieScadute(categories);
+                        
+                        if (invioAutomaticoScadenza && !riepilogoScadenzaInviato[timerId]) {
+                            riepilogoScadenzaInviato[timerId] = true;
+                            setTimeout(() => {
+                                inviaRiepilogoQuoteTelegram();
+                            }, 1000);
+                        }
+                    }
+                }
+                
+                return;
+            }
+            
+            const d = Math.floor(distance/86400000);
+            const h = Math.floor((distance%86400000)/3600000);
+            const m = Math.floor((distance%3600000)/60000);
+            const s = Math.floor((distance%60000)/1000);
+            
+            displayElement.innerHTML = `<i class="fas fa-hourglass-half"></i> ${d}g ${h}h ${m}m ${s}s`;
+            displayElement.style.color = "var(--racing-white)";
+            
+            if (timerId && riepilogoScadenzaInviato[timerId]) {
+                riepilogoScadenzaInviato[timerId] = false;
+            }
+        }
+        
+        updateCountdown();
+        
+        const interval = setInterval(updateCountdown, 1000);
+        if (timerId) {
+            categoryTimerIntervals[timerId] = interval;
+        } else {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = interval;
+        }
+    }
+
+    // ==================== FUNZIONI SCADENZA DB ====================
+    async function confermaScadenzaDB() { 
+        const v = document.getElementById('deadlineInput').value; 
+        if(v) {
+            const nuovaScadenza = new Date(v).getTime();
+            const oraAttuale = new Date().getTime();
+            
+            await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: v }, { onConflict: 'chiave' });
+            showToast("Scadenza confermata!");
+            
+            // RESET FLAG SOLO SE LA NUOVA SCADENZA È NEL FUTURO
+            if (nuovaScadenza > oraAttuale) {
+                riepilogoScadenzaGeneraleInviato = false;
+                await salvaStatoInvioScadenzaDB();
+                console.log("Flag riepilogo resettato - nuova scadenza futura");
+            } else {
+                console.log("Scadenza già passata, flag non resettato");
+            }
+        }
+        caricaConfig(); 
+    }
+    
+    async function resetScadenzaDB() { 
+        await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: "" }, { onConflict: 'chiave' }); 
+        showToast("Scadenza resettata!");
+        
+        riepilogoScadenzaGeneraleInviato = false;
+        await salvaStatoInvioScadenzaDB();
+        
+        caricaConfig(); 
+    }
+
+    // ==================== RESET COMPLETO ====================
+    async function resetAllToDefault() {
+        if (!isAdmin) {
+            showToast("Solo l'amministratore può eseguire questa operazione!");
+            return;
+        }
+        
+        const conferma = confirm("⚠️ ATTENZIONE: Questa operazione resetta TUTTO il sistema ai valori di default!\n\nVerranno resettati:\n- Titolo della gara\n- Scadenze timer\n- Tutti i documenti e link\n- Tutti i costi delle categorie\n- Tutte le iscrizioni degli atleti\n- Tutti gli accompagnatori\n- Il box informazioni\n- Le etichette date\n- TUTTI gli atleti verranno SBLOCATI\n\nSei assolutamente sicuro?");
+        
+        if (!conferma) return;
+        
+        const conferma2 = confirm("ULTIMA CONFERMA: Vuoi davvero resettare TUTTO il sistema ai valori predefiniti? Questa operazione NON può essere annullata!");
+        
+        if (!conferma2) return;
+        
+        showToast("Reset completo in corso...");
+        
+        try {
+            // 1. Resetta tutte le iscrizioni degli atleti e SBLOCA TUTTI
+            await _supabase.from(T_DATA).update({ 
+                stato: 'vuoto', 
+                accompagnatore: "",
+                bloccato: false
+            }).neq('id', 0);
+            
+            // 2. Resetta configurazioni generali
+            const defaultConfigs = [
+                { chiave: 'titolo_gara', valore: "Juvenilia Racing Team - Iscrizioni Gara 4" },
+                { chiave: 'scadenza_adesioni', valore: "" },
+                { chiave: 'data_label_a', valore: "" },
+                { chiave: 'data_label_b', valore: "" },
+                { chiave: 'data_label_c', valore: "" },
+                { chiave: 'doc_url_1', valore: "" },
+                { chiave: 'doc_txt_1', valore: "" },
+                { chiave: 'doc_url_2', valore: "" },
+                { chiave: 'doc_txt_2', valore: "" },
+                { chiave: 'mostra_accompagnatori', valore: "false" },
+                { chiave: 'mostra_info_box', valore: "false" },
+                { chiave: 'mostra_immagine_laterale', valore: "false" },
+                { chiave: 'telegram_auto_invio', valore: "false" },
+                { chiave: 'invio_automatico_scadenza', valore: "false" },
+                { chiave: 'iban', valore: "" },
+                { chiave: 'causale', valore: "" },
+                { chiave: 'ragione_sociale', valore: "" },
+                { chiave: 'email_pagamento', valore: "" }
+            ];
+            
+            for (const cfg of defaultConfigs) {
+                await _supabase.from(T_CONF).upsert(cfg, { onConflict: 'chiave' });
+            }
+            
+            // 3. Resetta tutti i costi delle categorie a 0
+            const cats = ["SENIOR", "JUNIOR", "ALLIEVI", "RAGAZZI", "R12", "ESORDIENTI", "GIOVANISSIMI"];
+            for (const cat of cats) {
+                await _supabase.from(T_CONF).upsert({ 
+                    chiave: `costo_${cat}`, 
+                    valore: "0" 
+                }, { onConflict: 'chiave' });
+            }
+            
+            // 4. Cancella tutti i timer
+            await _supabase.from(T_TIMERS).delete().neq('id', 0);
+            
+            // 5. Resetta il box info al testo default
+            const defaultInfoText = "<strong>📢 Juvenilia Racing Team</strong> - Benvenuti al sistema di iscrizioni Gara 4! 🛼<br><br>" +
+                                  "• Seleziona <strong style='color: var(--racing-green);'>PARTECIPA</strong> o <strong style='color: var(--racing-red);'>NON PARTECIPA</strong> per ogni atleta<br>" +
+                                  "• Per i <u>minorenni</u> è obbligatorio indicare un accompagnatore<br>" +
+                                  "• Le scadenze per categoria sono indicate dai <em>timer colorati</em>";
+            
+            await _supabase.from(T_CONF).upsert({ 
+                chiave: 'info_box_text', 
+                valore: defaultInfoText 
+            }, { onConflict: 'chiave' });
+            
+            // 6. Reset variabili globali
+            isExpired = false;
+            mostraAccompagnatori = false;
+            mostraInfoBox = false;
+            mostraImmagineLaterale = false;
+            costiCategorie = {};
+            categoryTimers = [];
+            riepilogoScadenzaInviato = {};
+            riepilogoScadenzaGeneraleInviato = false;
+            lastInvioRiepilogo = 0;
+            
+            // 7. Salva stato flag
+            await salvaStatoInvioScadenzaDB();
+            
+            // 8. Reset campi input admin se presenti
+            if (document.getElementById('editTitleInput')) 
+                document.getElementById('editTitleInput').value = "";
+            if (document.getElementById('dateA_Label')) 
+                document.getElementById('dateA_Label').value = "";
+            if (document.getElementById('dateB_Label')) 
+                document.getElementById('dateB_Label').value = "";
+            if (document.getElementById('dateC_Label')) 
+                document.getElementById('dateC_Label').value = "";
+            if (document.getElementById('deadlineInput')) 
+                document.getElementById('deadlineInput').value = "";
+            if (document.getElementById('docLink1_URL')) 
+                document.getElementById('docLink1_URL').value = "";
+            if (document.getElementById('docLink1_Text')) 
+                document.getElementById('docLink1_Text').value = "";
+            if (document.getElementById('docLink2_URL')) 
+                document.getElementById('docLink2_URL').value = "";
+            if (document.getElementById('docLink2_Text')) 
+                document.getElementById('docLink2_Text').value = "";
+            if (document.getElementById('ibanField')) 
+                document.getElementById('ibanField').value = "";
+            if (document.getElementById('causaleField')) 
+                document.getElementById('causaleField').value = "";
+            if (document.getElementById('ragioneSocialeField')) 
+                document.getElementById('ragioneSocialeField').value = "";
+            if (document.getElementById('emailField')) 
+                document.getElementById('emailField').value = "";
+            
+            // 9. Reset checkbox Telegram
+            const telegramToggle = document.getElementById('telegramAutoToggle');
+            if (telegramToggle) telegramToggle.checked = false;
+            const scadenzaToggle = document.getElementById('scadenzaAutoToggle');
+            if (scadenzaToggle) scadenzaToggle.checked = false;
+            const infoVisibilityToggle = document.getElementById('infoVisibilityToggle');
+            if (infoVisibilityToggle) infoVisibilityToggle.checked = false;
+            
+            // 10. Aggiorna stati visibilità
+            aggiornaStatoVisibilitaInfo();
+            if (document.getElementById('telegramAutoStatus')) {
+                document.getElementById('telegramAutoStatus').innerHTML = 'DISABILITATO';
+                document.getElementById('telegramAutoStatus').className = 'info-toggle-status off';
+            }
+            if (document.getElementById('scadenzaAutoStatus')) {
+                document.getElementById('scadenzaAutoStatus').innerHTML = 'DISABILITATO';
+                document.getElementById('scadenzaAutoStatus').className = 'info-toggle-status off';
+            }
+            
+            // 11. Rimuovi immagine laterale
+            const sideImageContainer = document.getElementById('sideImageContainer');
+            if (sideImageContainer) sideImageContainer.classList.remove('visible');
+            
+            // 12. Ricarica tutto
+            await caricaConfig();
+            await caricaTimers();
+            await caricaTabella();
+            await caricaInfoBox();
+            await caricaDettagliPagamento();
+            await caricaTelegramAuto();
+            await caricaInvioAutomaticoScadenza();
+            await caricaStatoImmagineLaterale();
+            
+            // 13. Renderizza costi inputs
+            if (isAdmin) renderCostiInputs();
+            
+            // 14. Interrompi tutti i timer attivi
+            if (timerInterval) clearInterval(timerInterval);
+            Object.keys(categoryTimerIntervals).forEach(timerId => {
+                clearInterval(categoryTimerIntervals[timerId]);
+            });
+            categoryTimerIntervals = {};
+            
+            // 15. Aggiorna il testo del pulsante accompagnatori
+            const toggleAccompBtn = document.getElementById('toggleAccompagnatoriBtn');
+            if (toggleAccompBtn && isAdmin) {
+                toggleAccompBtn.innerHTML = '<i class="fas fa-eye"></i> Mostra Box Accompagnatori';
+            }
+            
+            showToast("✅ RESET COMPLETO ESEGUITO! Tutto è tornato ai valori di default.");
+            
+        } catch (error) {
+            console.error("Errore durante il reset:", error);
+            showToast("❌ Errore durante il reset! Controlla la console.");
+        }
+    }
+
+    // ==================== INIT ====================
+    async function init() { 
+        startTimeCheck();
+        await caricaStatoInvioScadenze();
+        await fullLoad(); 
+        await caricaInfoBox();
+        await caricaStatoImmagineLaterale();
+        await caricaDettagliPagamento();
+        await caricaTelegramAuto();
+        await caricaInvioAutomaticoScadenza();
+        refreshInterval = setInterval(checkAndRefresh, 15000);
+    }
+
+    // ==================== TOGGLE ADMIN ====================
+    function toggleAdmin() {
+        const pass = prompt("Password amministratore:");
+        if (!pass) return;
+        
+        if (btoa(pass) === O_P) {
+            isAdmin = true;
+            document.getElementById('adminIcon').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'block';
+            document.getElementById('addAtletaBox').style.display = 'flex';
+            document.getElementById('costiBox').style.display = 'flex';
+            document.getElementById('docsBox').style.display = 'flex';
+            document.getElementById('paymentDetailsBox').style.display = 'flex';
+            document.getElementById('telegramToggleBox').style.display = 'flex';
+            document.getElementById('timerAdminBox').style.display = 'flex';
+            document.getElementById('adminTotalBox').style.display = 'block';
+            document.getElementById('adminButtons').style.display = 'grid';
+            document.getElementById('riepilogoAccompagnatori').style.display = 'block';
+            document.getElementById('toggleAccompagnatoriBtn').style.display = 'inline-block';
+            document.getElementById('infoToggleContainer').style.display = 'flex';
+            document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
+            
+            const toggleSideBtn = document.getElementById('toggleSideImageBtn');
+            if (toggleSideBtn) {
+                toggleSideBtn.style.display = 'flex';
+                toggleSideBtn.innerHTML = mostraImmagineLaterale ? 
+                    '<i class="fas fa-image"></i> Nascondi Immagine Laterale' : 
+                    '<i class="fas fa-image-slash"></i> Mostra Immagine Laterale';
+            }
+            
+            caricaConfig(); 
+            caricaTimers();
+            caricaDettagliPagamento();
+            caricaTelegramAuto();
+            caricaInvioAutomaticoScadenza();
+            renderData(); 
+            caricaInfoBox();
+            caricaStatoImmagineLaterale();
+            showToast("Modalità Admin Attiva");
+        } else { 
+            alert("Password Errata"); 
+        }
+    }
+
+    // ==================== FUNZIONI BASE ====================
     function checkTimeForDarkMode() {
         const now = new Date();
         const hour = now.getHours();
@@ -3064,27 +3589,14 @@
         
         if (isNightTime && !body.classList.contains('dark-mode')) {
             body.classList.add('dark-mode');
-            console.log('Dark mode attivata (ore notturne)');
         } else if (!isNightTime && body.classList.contains('dark-mode')) {
             body.classList.remove('dark-mode');
-            console.log('Dark mode disattivata (ore diurne)');
         }
     }
 
     function startTimeCheck() {
         checkTimeForDarkMode();
         setInterval(checkTimeForDarkMode, 60000);
-    }
-
-    async function init() { 
-        startTimeCheck();
-        await fullLoad(); 
-        await caricaInfoBox();
-        await caricaStatoImmagineLaterale();
-        await caricaDettagliPagamento();
-        await caricaTelegramAuto();
-        await caricaInvioAutomaticoScadenza();
-        refreshInterval = setInterval(checkAndRefresh, 15000);
     }
 
     async function checkAndRefresh() {
@@ -3363,7 +3875,6 @@
         if(isAdmin && !isEditingCosti) renderCostiInputs();
     }
 
-    // FUNZIONI PER DETTAGLI PAGAMENTO CON EMAIL
     async function caricaDettagliPagamento() {
         const { data } = await _supabase.from(T_CONF).select('*').in('chiave', ['iban', 'causale', 'ragione_sociale', 'email_pagamento']);
         if (data && data.length > 0) {
@@ -3422,7 +3933,6 @@
         }
     }
 
-    // FUNZIONI PER TOGGLE TELEGRAM AUTOMATICO
     async function caricaTelegramAuto() {
         const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'telegram_auto_invio');
         if (data && data.length > 0) {
@@ -3472,7 +3982,6 @@
         showToast("Messaggio di test inviato a Telegram!");
     }
 
-    // FUNZIONI PER INVIO AUTOMATICO ALLA SCADENZA
     async function caricaInvioAutomaticoScadenza() {
         const { data } = await _supabase.from(T_CONF).select('*').eq('chiave', 'invio_automatico_scadenza');
         if (data && data.length > 0) {
@@ -3506,117 +4015,6 @@
         status.className = invioAutomaticoScadenza ? 'info-toggle-status on' : 'info-toggle-status off';
         
         showToast(`Invio automatico riepilogo alla scadenza ${invioAutomaticoScadenza ? 'attivato' : 'disabilitato'}`);
-    }
-
-    // FUNZIONE PER GENERARE RIEPILOGO QUOTE COMPLETO CON EMAIL
-    function generaRiepilogoQuoteMessage() {
-        let quoteAtleti = [];
-        let totaleGenerale = 0;
-        
-        currentData.forEach(atleta => {
-            if (atleta.stato === 'si') {
-                const categoria = atleta.categoria.toUpperCase();
-                const quota = costiCategorie[categoria] || 0;
-                
-                if (quota > 0) {
-                    totaleGenerale += quota;
-                    quoteAtleti.push({
-                        nome: atleta.nome,
-                        categoria: categoria,
-                        quota: quota,
-                        accompagnatore: atleta.accompagnatore || ""
-                    });
-                } else if (quota === 0 && !isAdmin) {
-                    quoteAtleti.push({
-                        nome: atleta.nome,
-                        categoria: categoria,
-                        quota: 0,
-                        accompagnatore: atleta.accompagnatore || ""
-                    });
-                }
-            }
-        });
-        
-        if (quoteAtleti.length === 0) {
-            return null;
-        }
-        
-        quoteAtleti.sort((a, b) => {
-            const catOrderA = customCatOrder[a.categoria] || 999;
-            const catOrderB = customCatOrder[b.categoria] || 999;
-            if (catOrderA !== catOrderB) return catOrderA - catOrderB;
-            return a.nome.localeCompare(b.nome);
-        });
-        
-        let messaggio = `🛼 *JUVENILIA RACING TEAM - RIEPILOGO ISCRIZIONI GARA 1*\n`;
-        messaggio += `🏆 *Evento:* ${document.getElementById('mainTitle').innerText}\n`;
-        messaggio += `📅 *Data generazione:* ${new Date().toLocaleDateString('it-IT')}\n`;
-        messaggio += `🕐 *Ora:* ${new Date().toLocaleTimeString('it-IT')}\n\n`;
-        
-        messaggio += `*📋 RIEPILOGO PARTECIPANTI:*\n`;
-        
-        let categoriaCorrente = '';
-        let totaleQuota = 0;
-        
-        quoteAtleti.forEach(item => {
-            if (item.categoria !== categoriaCorrente) {
-                categoriaCorrente = item.categoria;
-                messaggio += `\n*${categoriaCorrente}*\n`;
-            }
-            
-            let riga = `• ${item.nome}`;
-            if (item.quota > 0) {
-                riga += `: ${item.quota.toFixed(2)}€`;
-                totaleQuota += item.quota;
-            } else {
-                riga += `: GRATUITO`;
-            }
-            if (item.accompagnatore) {
-                riga += ` (acc: ${item.accompagnatore})`;
-            }
-            messaggio += riga + '\n';
-        });
-        
-        messaggio += `\n*💰 TOTALE QUOTE DA PAGARE:* ${totaleQuota.toFixed(2)}€\n`;
-        messaggio += `*👥 TOTALE PARTECIPANTI:* ${quoteAtleti.length}\n`;
-        
-        if (dettagliPagamento.iban || dettagliPagamento.causale || dettagliPagamento.ragioneSociale || dettagliPagamento.email) {
-            messaggio += `\n*💳 DATI PAGAMENTO:*\n`;
-            if (dettagliPagamento.ragioneSociale) messaggio += `📌 Intestato a: ${dettagliPagamento.ragioneSociale}\n`;
-            if (dettagliPagamento.iban) messaggio += `🏦 IBAN: ${dettagliPagamento.iban}\n`;
-            if (dettagliPagamento.causale) messaggio += `📝 Causale: ${dettagliPagamento.causale}\n`;
-            if (dettagliPagamento.email) messaggio += `📧 Email per distinta: ${dettagliPagamento.email}\n`;
-        }
-        
-        messaggio += `\n🛼 *Pronti per la gara!*`;
-        
-        return messaggio;
-    }
-
-    async function inviaRiepilogoQuoteTelegram() {
-        const messaggio = generaRiepilogoQuoteMessage();
-        
-        if (!messaggio) {
-            console.log("Nessun partecipante da segnalare");
-            return false;
-        }
-        
-        try {
-            await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: messaggio,
-                    parse_mode: 'Markdown'
-                })
-            });
-            console.log("Riepilogo inviato a Telegram");
-            return true;
-        } catch (error) {
-            console.error("Errore invio Telegram:", error);
-            return false;
-        }
     }
 
     async function caricaTimers() {
@@ -3863,63 +4261,6 @@
         }
         
         await caricaTimers();
-    }
-
-    function startCountdown(endTime, displayId, timerId = null) {
-        if (timerId && categoryTimerIntervals[timerId]) {
-            clearInterval(categoryTimerIntervals[timerId]);
-        }
-        
-        const displayElement = document.getElementById(displayId);
-        if (!displayElement) return;
-        
-        function updateCountdown() {
-            const distance = new Date(endTime).getTime() - new Date().getTime();
-            
-            if (distance <= 0) {
-                displayElement.innerHTML = `<i class="fas fa-hourglass-end"></i> SCADUTO`;
-                displayElement.style.color = "var(--racing-red)";
-                
-                if (timerId) {
-                    const timer = categoryTimers.find(t => t.id === timerId);
-                    if (timer) {
-                        const categories = timer.categories ? JSON.parse(timer.categories) : [];
-                        disabilitaCategorieScadute(categories);
-                        
-                        if (invioAutomaticoScadenza && !riepilogoScadenzaInviato[timerId]) {
-                            riepilogoScadenzaInviato[timerId] = true;
-                            setTimeout(() => {
-                                inviaRiepilogoQuoteTelegram();
-                            }, 1000);
-                        }
-                    }
-                }
-                
-                return;
-            }
-            
-            const d = Math.floor(distance/86400000);
-            const h = Math.floor((distance%86400000)/3600000);
-            const m = Math.floor((distance%3600000)/60000);
-            const s = Math.floor((distance%60000)/1000);
-            
-            displayElement.innerHTML = `<i class="fas fa-hourglass-half"></i> ${d}g ${h}h ${m}m ${s}s`;
-            displayElement.style.color = "var(--racing-white)";
-            
-            if (timerId && riepilogoScadenzaInviato[timerId]) {
-                riepilogoScadenzaInviato[timerId] = false;
-            }
-        }
-        
-        updateCountdown();
-        
-        const interval = setInterval(updateCountdown, 1000);
-        if (timerId) {
-            categoryTimerIntervals[timerId] = interval;
-        } else {
-            if (timerInterval) clearInterval(timerInterval);
-            timerInterval = interval;
-        }
     }
 
     function disabilitaCategorieScadute(categories) {
@@ -4364,26 +4705,6 @@
         }
     }
 
-    async function inviaRiepilogoTelegram() {
-        const messaggio = generaRiepilogoQuoteMessage();
-        
-        if (!messaggio) {
-            showToast("Nessun partecipante da segnalare!");
-            return;
-        }
-        
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: TELEGRAM_CHAT_ID,
-                text: messaggio,
-                parse_mode: 'Markdown'
-            })
-        });
-        showToast("Riepilogo completo inviato al team!");
-    }
-
     async function exportToExcel() {
         const dataExp = currentData.map(p => ({ 
             Atleta: p.nome, 
@@ -4400,84 +4721,11 @@
         showToast("Excel esportato!");
     }
 
-    function toggleAdmin() {
-        const pass = prompt("Password amministratore:");
-        if (!pass) return;
-        
-        if (btoa(pass) === O_P) {
-            isAdmin = true;
-            document.getElementById('adminIcon').style.display = 'none';
-            document.getElementById('logoutBtn').style.display = 'block';
-            document.getElementById('addAtletaBox').style.display = 'flex';
-            document.getElementById('costiBox').style.display = 'flex';
-            document.getElementById('docsBox').style.display = 'flex';
-            document.getElementById('paymentDetailsBox').style.display = 'flex';
-            document.getElementById('telegramToggleBox').style.display = 'flex';
-            document.getElementById('timerAdminBox').style.display = 'flex';
-            document.getElementById('adminTotalBox').style.display = 'block';
-            document.getElementById('adminButtons').style.display = 'grid';
-            document.getElementById('riepilogoAccompagnatori').style.display = 'block';
-            document.getElementById('toggleAccompagnatoriBtn').style.display = 'inline-block';
-            document.getElementById('infoToggleContainer').style.display = 'flex';
-            document.querySelectorAll('.col-admin').forEach(el => el.style.display = 'table-cell');
-            
-            const toggleSideBtn = document.getElementById('toggleSideImageBtn');
-            if (toggleSideBtn) {
-                toggleSideBtn.style.display = 'flex';
-                toggleSideBtn.innerHTML = mostraImmagineLaterale ? 
-                    '<i class="fas fa-image"></i> Nascondi Immagine Laterale' : 
-                    '<i class="fas fa-image-slash"></i> Mostra Immagine Laterale';
-            }
-            
-            caricaConfig(); 
-            caricaTimers();
-            caricaDettagliPagamento();
-            caricaTelegramAuto();
-            caricaInvioAutomaticoScadenza();
-            renderData(); 
-            caricaInfoBox();
-            caricaStatoImmagineLaterale();
-            showToast("Modalità Admin Attiva");
-        } else { 
-            alert("Password Errata"); 
-        }
-    }
-
-    function mostraTimerChiuso() { 
-        const d = document.getElementById('timerDisplay'); 
-        d.innerHTML = `<i class="fas fa-hourglass-end"></i> ISCRIZIONI CHIUSE`; 
-        d.style.color = "var(--racing-red)";
-        
-        if (invioAutomaticoScadenza && !riepilogoScadenzaGeneraleInviato) {
-            riepilogoScadenzaGeneraleInviato = true;
-            setTimeout(() => {
-                inviaRiepilogoQuoteTelegram();
-            }, 1000);
-        }
-    }
-    
     async function salvaTitolo() { 
         const t = document.getElementById('editTitleInput').value; 
         await _supabase.from(T_CONF).upsert({ chiave: 'titolo_gara', valore: t }, { onConflict: 'chiave' }); 
         showToast("Titolo Salvato!"); 
         isEditingTitolo = false; 
-        caricaConfig(); 
-    }
-    
-    async function confermaScadenzaDB() { 
-        const v = document.getElementById('deadlineInput').value; 
-        if(v) {
-            await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: v }, { onConflict: 'chiave' });
-            showToast("Scadenza confermata!");
-            riepilogoScadenzaGeneraleInviato = false;
-        }
-        caricaConfig(); 
-    }
-    
-    async function resetScadenzaDB() { 
-        await _supabase.from(T_CONF).upsert({ chiave: 'scadenza_adesioni', valore: "" }, { onConflict: 'chiave' }); 
-        showToast("Scadenza resettata!");
-        riepilogoScadenzaGeneraleInviato = false;
         caricaConfig(); 
     }
     
@@ -5205,175 +5453,6 @@
         
         if (!isAdmin) {
             document.getElementById('infoBox').style.display = visibile ? 'block' : 'none';
-        }
-    }
-
-    // ==================== FUNZIONE RESET COMPLETO DEFAULTS ====================
-    async function resetAllToDefault() {
-        if (!isAdmin) {
-            showToast("Solo l'amministratore può eseguire questa operazione!");
-            return;
-        }
-        
-        const conferma = confirm("⚠️ ATTENZIONE: Questa operazione resetta TUTTO il sistema ai valori di default!\n\nVerranno resettati:\n- Titolo della gara\n- Scadenze timer\n- Tutti i documenti e link\n- Tutti i costi delle categorie\n- Tutte le iscrizioni degli atleti\n- Tutti gli accompagnatori\n- Il box informazioni\n- Le etichette date\n- TUTTI gli atleti verranno SBLOCATI\n\nSei assolutamente sicuro?");
-        
-        if (!conferma) return;
-        
-        const conferma2 = confirm("ULTIMA CONFERMA: Vuoi davvero resettare TUTTO il sistema ai valori predefiniti? Questa operazione NON può essere annullata!");
-        
-        if (!conferma2) return;
-        
-        showToast("Reset completo in corso...");
-        
-        try {
-            // 1. Resetta tutte le iscrizioni degli atleti e SBLOCA TUTTI
-            await _supabase.from(T_DATA).update({ 
-                stato: 'vuoto', 
-                accompagnatore: "",
-                bloccato: false
-            }).neq('id', 0);
-            
-            // 2. Resetta configurazioni generali
-            const defaultConfigs = [
-                { chiave: 'titolo_gara', valore: "Juvenilia Racing Team - Iscrizioni Gara 4" },
-                { chiave: 'scadenza_adesioni', valore: "" },
-                { chiave: 'data_label_a', valore: "" },
-                { chiave: 'data_label_b', valore: "" },
-                { chiave: 'data_label_c', valore: "" },
-                { chiave: 'doc_url_1', valore: "" },
-                { chiave: 'doc_txt_1', valore: "" },
-                { chiave: 'doc_url_2', valore: "" },
-                { chiave: 'doc_txt_2', valore: "" },
-                { chiave: 'mostra_accompagnatori', valore: "false" },
-                { chiave: 'mostra_info_box', valore: "false" },
-                { chiave: 'mostra_immagine_laterale', valore: "false" },
-                { chiave: 'telegram_auto_invio', valore: "false" },
-                { chiave: 'invio_automatico_scadenza', valore: "false" },
-                { chiave: 'iban', valore: "" },
-                { chiave: 'causale', valore: "" },
-                { chiave: 'ragione_sociale', valore: "" },
-                { chiave: 'email_pagamento', valore: "" }
-            ];
-            
-            for (const cfg of defaultConfigs) {
-                await _supabase.from(T_CONF).upsert(cfg, { onConflict: 'chiave' });
-            }
-            
-            // 3. Resetta tutti i costi delle categorie a 0
-            const cats = ["SENIOR", "JUNIOR", "ALLIEVI", "RAGAZZI", "R12", "ESORDIENTI", "GIOVANISSIMI"];
-            for (const cat of cats) {
-                await _supabase.from(T_CONF).upsert({ 
-                    chiave: `costo_${cat}`, 
-                    valore: "0" 
-                }, { onConflict: 'chiave' });
-            }
-            
-            // 4. Cancella tutti i timer
-            await _supabase.from(T_TIMERS).delete().neq('id', 0);
-            
-            // 5. Resetta il box info al testo default
-            const defaultInfoText = "<strong>📢 Juvenilia Racing Team</strong> - Benvenuti al sistema di iscrizioni Gara 4! 🛼<br><br>" +
-                                  "• Seleziona <strong style='color: var(--racing-green);'>PARTECIPA</strong> o <strong style='color: var(--racing-red);'>NON PARTECIPA</strong> per ogni atleta<br>" +
-                                  "• Per i <u>minorenni</u> è obbligatorio indicare un accompagnatore<br>" +
-                                  "• Le scadenze per categoria sono indicate dai <em>timer colorati</em>";
-            
-            await _supabase.from(T_CONF).upsert({ 
-                chiave: 'info_box_text', 
-                valore: defaultInfoText 
-            }, { onConflict: 'chiave' });
-            
-            // 6. Reset variabili globali
-            isExpired = false;
-            mostraAccompagnatori = false;
-            mostraInfoBox = false;
-            mostraImmagineLaterale = false;
-            costiCategorie = {};
-            categoryTimers = [];
-            riepilogoScadenzaInviato = {};
-            riepilogoScadenzaGeneraleInviato = false;
-            
-            // 7. Reset campi input admin se presenti
-            if (document.getElementById('editTitleInput')) 
-                document.getElementById('editTitleInput').value = "";
-            if (document.getElementById('dateA_Label')) 
-                document.getElementById('dateA_Label').value = "";
-            if (document.getElementById('dateB_Label')) 
-                document.getElementById('dateB_Label').value = "";
-            if (document.getElementById('dateC_Label')) 
-                document.getElementById('dateC_Label').value = "";
-            if (document.getElementById('deadlineInput')) 
-                document.getElementById('deadlineInput').value = "";
-            if (document.getElementById('docLink1_URL')) 
-                document.getElementById('docLink1_URL').value = "";
-            if (document.getElementById('docLink1_Text')) 
-                document.getElementById('docLink1_Text').value = "";
-            if (document.getElementById('docLink2_URL')) 
-                document.getElementById('docLink2_URL').value = "";
-            if (document.getElementById('docLink2_Text')) 
-                document.getElementById('docLink2_Text').value = "";
-            if (document.getElementById('ibanField')) 
-                document.getElementById('ibanField').value = "";
-            if (document.getElementById('causaleField')) 
-                document.getElementById('causaleField').value = "";
-            if (document.getElementById('ragioneSocialeField')) 
-                document.getElementById('ragioneSocialeField').value = "";
-            if (document.getElementById('emailField')) 
-                document.getElementById('emailField').value = "";
-            
-            // 8. Reset checkbox Telegram
-            const telegramToggle = document.getElementById('telegramAutoToggle');
-            if (telegramToggle) telegramToggle.checked = false;
-            const scadenzaToggle = document.getElementById('scadenzaAutoToggle');
-            if (scadenzaToggle) scadenzaToggle.checked = false;
-            const infoVisibilityToggle = document.getElementById('infoVisibilityToggle');
-            if (infoVisibilityToggle) infoVisibilityToggle.checked = false;
-            
-            // 9. Aggiorna stati visibilità
-            aggiornaStatoVisibilitaInfo();
-            if (document.getElementById('telegramAutoStatus')) {
-                document.getElementById('telegramAutoStatus').innerHTML = 'DISABILITATO';
-                document.getElementById('telegramAutoStatus').className = 'info-toggle-status off';
-            }
-            if (document.getElementById('scadenzaAutoStatus')) {
-                document.getElementById('scadenzaAutoStatus').innerHTML = 'DISABILITATO';
-                document.getElementById('scadenzaAutoStatus').className = 'info-toggle-status off';
-            }
-            
-            // 10. Rimuovi immagine laterale
-            const sideImageContainer = document.getElementById('sideImageContainer');
-            if (sideImageContainer) sideImageContainer.classList.remove('visible');
-            
-            // 11. Ricarica tutto
-            await caricaConfig();
-            await caricaTimers();
-            await caricaTabella();
-            await caricaInfoBox();
-            await caricaDettagliPagamento();
-            await caricaTelegramAuto();
-            await caricaInvioAutomaticoScadenza();
-            await caricaStatoImmagineLaterale();
-            
-            // 12. Renderizza costi inputs
-            if (isAdmin) renderCostiInputs();
-            
-            // 13. Interrompi tutti i timer attivi
-            if (timerInterval) clearInterval(timerInterval);
-            Object.keys(categoryTimerIntervals).forEach(timerId => {
-                clearInterval(categoryTimerIntervals[timerId]);
-            });
-            categoryTimerIntervals = {};
-            
-            // 14. Aggiorna il testo del pulsante accompagnatori
-            const toggleAccompBtn = document.getElementById('toggleAccompagnatoriBtn');
-            if (toggleAccompBtn && isAdmin) {
-                toggleAccompBtn.innerHTML = '<i class="fas fa-eye"></i> Mostra Box Accompagnatori';
-            }
-            
-            showToast("✅ RESET COMPLETO ESEGUITO! Tutto è tornato ai valori di default.");
-            
-        } catch (error) {
-            console.error("Errore durante il reset:", error);
-            showToast("❌ Errore durante il reset! Controlla la console.");
         }
     }
 
