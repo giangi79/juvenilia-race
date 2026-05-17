@@ -3820,41 +3820,41 @@
         showToast("Excel esportato!");
     }
     
-    async function addNewTimer() {
-        const deadline = document.getElementById('newTimerDeadline').value;
-        const label = document.getElementById('newTimerLabel').value.trim().toUpperCase();
-        
-        if (!deadline) {
-            showToast("Inserisci una data di scadenza");
-            return;
-        }
-        
-        if (!label) {
-            showToast("Inserisci un nome per il timer");
-            return;
-        }
-        
-        const { error } = await _supabase.from(T_TIMERS).insert([{
-            gara: currentGara,
-            deadline: deadline,
-            label: label,
-            categories: JSON.stringify([]),
-            created_at: new Date().toISOString()
-        }]);
-        
-        if (error) {
-            console.error("Errore aggiunta timer:", error);
-            showToast("Errore nell'aggiunta del timer");
-            return;
-        }
-        
-        showToast("Timer aggiunto!");
-        
-        document.getElementById('newTimerDeadline').value = '';
-        document.getElementById('newTimerLabel').value = '';
-        
-        await caricaTimers();
+    
+    const deadline = document.getElementById('newTimerDeadline').value;
+    const label = document.getElementById('newTimerLabel').value.trim().toUpperCase();
+    
+    if (!deadline) {
+        showToast("Inserisci una data di scadenza");
+        return;
     }
+    
+    if (!label) {
+        showToast("Inserisci un nome per il timer");
+        return;
+    }
+    
+    const { error } = await _supabase.from(T_TIMERS).insert([{
+        gara: currentGara,
+        deadline: deadline,
+        label: label,
+        categories: JSON.stringify([]),  // Stringa JSON
+        created_at: new Date().toISOString()
+    }]);
+    
+    if (error) {
+        console.error("Errore aggiunta timer:", error);
+        showToast("Errore nell'aggiunta del timer");
+        return;
+    }
+    
+    showToast("Timer aggiunto!");
+    
+    document.getElementById('newTimerDeadline').value = '';
+    document.getElementById('newTimerLabel').value = '';
+    
+    await caricaTimers();
+}
     
     async function salvaTimer(timerId) {
         const deadlineInput = document.querySelector(`.timer-cat-input[data-timer-id="${timerId}"][type="datetime-local"]`);
@@ -4384,57 +4384,70 @@
     }
     
     function renderCategoryTimers() {
-        const container = document.getElementById('timerCategoryContainer');
-        const adminContainer = document.getElementById('timersAdminContent');
+    const container = document.getElementById('timerCategoryContainer');
+    const adminContainer = document.getElementById('timersAdminContent');
+    
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    Object.keys(categoryTimerIntervals).forEach(timerId => {
+        clearInterval(categoryTimerIntervals[timerId]);
+    });
+    categoryTimerIntervals = {};
+    
+    const activeTimers = categoryTimers.filter(timer => {
+        const deadline = new Date(timer.deadline).getTime();
+        const now = new Date().getTime();
+        return deadline > now - (24 * 60 * 60 * 1000);
+    });
+    
+    if (activeTimers.length === 0) {
+        container.style.display = 'none';
+    } else {
+        container.style.display = 'flex';
+        activeTimers.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
         
-        if (!container) return;
-        
-        container.innerHTML = '';
-        
-        Object.keys(categoryTimerIntervals).forEach(timerId => {
-            clearInterval(categoryTimerIntervals[timerId]);
-        });
-        categoryTimerIntervals = {};
-        
-        const activeTimers = categoryTimers.filter(timer => {
-            const deadline = new Date(timer.deadline).getTime();
-            const now = new Date().getTime();
-            return deadline > now - (24 * 60 * 60 * 1000);
-        });
-        
-        if (activeTimers.length === 0) {
-            container.style.display = 'none';
-        } else {
-            container.style.display = 'flex';
-            activeTimers.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+        activeTimers.forEach(timer => {
+            const timerDiv = document.createElement('div');
+            timerDiv.className = 'category-timer';
+            timerDiv.id = `categoryTimer_${timer.id}`;
             
-            activeTimers.forEach(timer => {
-                const timerDiv = document.createElement('div');
-                timerDiv.className = 'category-timer';
-                timerDiv.id = `categoryTimer_${timer.id}`;
-                
-                const categories = timer.categories ? JSON.parse(timer.categories) : [];
-                const categoryLabels = categories.map(cat => 
-                    `<span class="categoria-badge cat-${cat.toLowerCase()}">${cat}</span>`
-                ).join(' ');
-                
-                timerDiv.innerHTML = `
-                    <div class="category-timer-header">
-                        <i class="fas fa-hourglass-half"></i>
-                        ${timer.label || 'Scadenza'} (Gara ${currentGara}):
-                        ${categoryLabels}
-                    </div>
-                    <div class="timer" id="categoryTimerDisplay_${timer.id}">
-                        <i class="fas fa-clock"></i> Calcolo...
-                    </div>
-                `;
-                
-                container.appendChild(timerDiv);
-                timerDiv.style.display = 'flex';
-                
-                startCountdown(timer.deadline, `categoryTimerDisplay_${timer.id}`, timer.id);
-            });
-        }
+            // Gestione categories sia come stringa JSON che come array
+            let categories = [];
+            if (timer.categories) {
+                if (typeof timer.categories === 'string') {
+                    try {
+                        categories = JSON.parse(timer.categories);
+                    } catch(e) {
+                        categories = [];
+                    }
+                } else if (Array.isArray(timer.categories)) {
+                    categories = timer.categories;
+                }
+            }
+            
+            const categoryLabels = categories.map(cat => 
+                `<span class="categoria-badge cat-${cat.toLowerCase()}">${cat}</span>`
+            ).join(' ');
+            
+            timerDiv.innerHTML = `
+                <div class="category-timer-header">
+                    <i class="fas fa-hourglass-half"></i>
+                    ${timer.label || 'Scadenza'} (Gara ${currentGara}):
+                    ${categoryLabels}
+                </div>
+                <div class="timer" id="categoryTimerDisplay_${timer.id}">
+                    <i class="fas fa-clock"></i> Calcolo...
+                </div>
+            `;
+            
+            container.appendChild(timerDiv);
+            timerDiv.style.display = 'flex';
+            
+            startCountdown(timer.deadline, `categoryTimerDisplay_${timer.id}`, timer.id);
+        });
+    }
         
         if (isAdmin && adminContainer && !isEditingTimers) {
             adminContainer.innerHTML = '';
