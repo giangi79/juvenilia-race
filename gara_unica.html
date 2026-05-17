@@ -3100,18 +3100,10 @@ function cambiaGara(garaId) {
         }
     }
     
-    // Aggiorna il titolo - con controllo di sicurezza
-    const garaTitleSpan = document.getElementById('garaTitle');
-    if (garaTitleSpan) {
-        garaTitleSpan.innerText = `Gara ${garaId}`;
-    } else {
-        console.warn("Elemento #garaTitle non trovato, aggiorno direttamente il titolo");
-        const mainTitle = document.getElementById('mainTitle');
-        if (mainTitle) {
-            const currentText = mainTitle.innerText;
-            const newText = currentText.replace(/Gara \d+/, `Gara ${garaId}`);
-            mainTitle.innerText = newText;
-        }
+    // Aggiorna il titolo direttamente senza span
+    const mainTitle = document.getElementById('mainTitle');
+    if (mainTitle) {
+        mainTitle.innerHTML = `🏆 Juvenilia Racing Team - Iscrizioni Gara ${garaId}`;
     }
     
     // Resetta gli stati della nuova gara
