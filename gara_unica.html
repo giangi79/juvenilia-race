@@ -3079,47 +3079,57 @@
     const customCatOrder = { "SENIOR": 1, "JUNIOR": 2, "ALLIEVI": 3, "RAGAZZI": 4, "R12": 5, "ESORDIENTI": 6, "GIOVANISSIMI": 7 };
 
     // ==================== FUNZIONE PER CAMBIARE GARA ====================
-    function cambiaGara(garaId) {
-        if (!isAdmin && confirm(`Cambiare alla Gara ${garaId}? Le modifiche non salvate potrebbero andare perse.`)) {
-            // continua
-        } else if (!isAdmin) {
-            return;
-        }
-        
-        GARA_ATTIVA = garaId;
-        
-        // Aggiorna l'aspetto dei bottoni
-        for(let i = 1; i <= 5; i++) {
-            const btn = document.getElementById(`gara${i}Btn`);
-            if(btn) {
-                if(i === garaId) {
-                    btn.style.background = "var(--racing-yellow)";
-                    btn.style.color = "var(--racing-blue)";
-                } else {
-                    btn.style.background = "var(--racing-light)";
-                    btn.style.color = "var(--racing-blue)";
-                }
+function cambiaGara(garaId) {
+    if (!isAdmin && !confirm(`Cambiare alla Gara ${garaId}?`)) {
+        return;
+    }
+    
+    GARA_ATTIVA = garaId;
+    
+    // Aggiorna l'aspetto dei bottoni
+    for(let i = 1; i <= 5; i++) {
+        const btn = document.getElementById(`gara${i}Btn`);
+        if(btn) {
+            if(i === garaId) {
+                btn.style.background = "var(--racing-yellow)";
+                btn.style.color = "var(--racing-blue)";
+            } else {
+                btn.style.background = "var(--racing-light)";
+                btn.style.color = "var(--racing-blue)";
             }
         }
-        
-        document.getElementById('garaTitle').innerText = `Gara ${garaId}`;
-        
-        // Resetta gli stati della nuova gara
-        riepilogoScadenzaInviato = {};
-        riepilogoScadenzaGeneraleInviato = false;
-        lastInvioRiepilogo = 0;
-        
-        // Ferma tutti i timer
-        if(timerInterval) clearInterval(timerInterval);
-        Object.keys(categoryTimerIntervals).forEach(timerId => {
-            clearInterval(categoryTimerIntervals[timerId]);
-        });
-        categoryTimerIntervals = {};
-        
-        // Ricarica TUTTI i dati per la nuova gara
-        fullLoad();
-        showToast(`✅ Passato a Gara ${garaId}`);
     }
+    
+    // Aggiorna il titolo - con controllo di sicurezza
+    const garaTitleSpan = document.getElementById('garaTitle');
+    if (garaTitleSpan) {
+        garaTitleSpan.innerText = `Gara ${garaId}`;
+    } else {
+        console.warn("Elemento #garaTitle non trovato, aggiorno direttamente il titolo");
+        const mainTitle = document.getElementById('mainTitle');
+        if (mainTitle) {
+            const currentText = mainTitle.innerText;
+            const newText = currentText.replace(/Gara \d+/, `Gara ${garaId}`);
+            mainTitle.innerText = newText;
+        }
+    }
+    
+    // Resetta gli stati della nuova gara
+    riepilogoScadenzaInviato = {};
+    riepilogoScadenzaGeneraleInviato = false;
+    lastInvioRiepilogo = 0;
+    
+    // Ferma tutti i timer
+    if(timerInterval) clearInterval(timerInterval);
+    Object.keys(categoryTimerIntervals).forEach(timerId => {
+        clearInterval(categoryTimerIntervals[timerId]);
+    });
+    categoryTimerIntervals = {};
+    
+    // Ricarica TUTTI i dati per la nuova gara
+    fullLoad();
+    showToast(`✅ Passato a Gara ${garaId}`);
+}
 
     // ==================== FUNZIONI PER STATO INVIO SCADENZE ====================
     async function caricaStatoInvioScadenze() {
