@@ -3646,21 +3646,22 @@ function cambiaGara(garaId) {
     }
 
     async function fullLoad() {
-        saveTempAccompagnatoriValues();
-        
-        document.querySelectorAll('.bulk-cb:checked').forEach(cb => selectedIds.add(cb.value));
-        document.querySelectorAll('.bulk-cb:not(:checked)').forEach(cb => selectedIds.delete(cb.value));
-        
-        if (isTypingInAccompagnatore) {
-            return;
-        }
-        
-        await caricaConfig(); 
-        await caricaTimers();
-        await caricaTabella();
-        
-        restoreTempAccompagnatoriValues();
+    saveTempAccompagnatoriValues();
+    
+    document.querySelectorAll('.bulk-cb:checked').forEach(cb => selectedIds.add(cb.value));
+    document.querySelectorAll('.bulk-cb:not(:checked)').forEach(cb => selectedIds.delete(cb.value));
+    
+    if (isTypingInAccompagnatore) {
+        return;
     }
+    
+    await caricaConfig(); 
+    await caricaTimers();
+    await caricaTabella();
+    await caricaInfoBox();  // <-- DEVE ESSERE CHIAMATA QUI!
+    
+    restoreTempAccompagnatoriValues();
+}
 
     function saveTempAccompagnatoriValues() {
         tempAccompagnatoriValues = {};
@@ -5336,40 +5337,45 @@ function cambiaGara(garaId) {
     }
 
     async function caricaInfoBox() {
-        const { data } = await _supabase.from(T_CONF).select('*').eq('gara_id', GARA_ATTIVA).eq('chiave', 'info_box_text');
-        const infoBox = document.getElementById('infoBox');
-        const infoText = document.getElementById('infoText');
-        const infoEditor = document.getElementById('infoEditor');
-        const editBtn = document.getElementById('editInfoBtn');
-        const saveBtn = document.getElementById('saveInfoBtn');
-        const deleteBtn = document.getElementById('deleteInfoBtn');
-        
-        if (data && data.length > 0 && data[0].valore) {
-            infoText.innerHTML = data[0].valore;
-            infoEditor.innerHTML = data[0].valore;
-        } else {
-            const defaultText = `<strong>📢 Juvenilia Racing Team</strong> - Benvenuti al sistema di iscrizioni Gara ${GARA_ATTIVA}! 🛼<br><br>` +
-                              "• Seleziona <strong style='color: var(--racing-green);'>PARTECIPA</strong> o <strong style='color: var(--racing-red);'>NON PARTECIPA</strong> per ogni atleta<br>" +
-                              "• Per i <u>minorenni</u> è obbligatorio indicare un accompagnatore<br>" +
-                              "• Le scadenze per categoria sono indicate dai <em>timer colorati</em>";
-            infoText.innerHTML = defaultText;
-            infoEditor.innerHTML = defaultText;
-        }
-        
-        if (isAdmin) {
-            editBtn.style.display = 'flex';
-            deleteBtn.style.display = 'flex';
-            saveBtn.style.display = 'none';
-            
-            infoBox.style.display = 'block';
-        } else {
-            editBtn.style.display = 'none';
-            deleteBtn.style.display = 'none';
-            saveBtn.style.display = 'none';
-            
-            infoBox.style.display = mostraInfoBox ? 'block' : 'none';
-        }
+    // IMPORTANTE: Deve filtrare per gara_id!
+    const { data } = await _supabase
+        .from(T_CONF)
+        .select('*')
+        .eq('gara_id', GARA_ATTIVA)   // <-- DEVE ESSERCI QUESTO FILTRO!
+        .eq('chiave', 'info_box_text');
+    
+    const infoBox = document.getElementById('infoBox');
+    const infoText = document.getElementById('infoText');
+    const infoEditor = document.getElementById('infoEditor');
+    const editBtn = document.getElementById('editInfoBtn');
+    const saveBtn = document.getElementById('saveInfoBtn');
+    const deleteBtn = document.getElementById('deleteInfoBtn');
+    
+    if (data && data.length > 0 && data[0].valore) {
+        infoText.innerHTML = data[0].valore;
+        infoEditor.innerHTML = data[0].valore;
+    } else {
+        // Testo di default per questa gara
+        const defaultText = `<strong>📢 Juvenilia Racing Team</strong> - Benvenuti al sistema di iscrizioni Gara ${GARA_ATTIVA}! 🛼<br><br>` +
+                          "• Seleziona <strong style='color: var(--racing-green);'>PARTECIPA</strong> o <strong style='color: var(--racing-red);'>NON PARTECIPA</strong> per ogni atleta<br>" +
+                          "• Per i <u>minorenni</u> è obbligatorio indicare un accompagnatore<br>" +
+                          "• Le scadenze per categoria sono indicate dai <em>timer colorati</em>";
+        infoText.innerHTML = defaultText;
+        infoEditor.innerHTML = defaultText;
     }
+    
+    if (isAdmin) {
+        editBtn.style.display = 'flex';
+        deleteBtn.style.display = 'flex';
+        saveBtn.style.display = 'none';
+        infoBox.style.display = 'block';
+    } else {
+        editBtn.style.display = 'none';
+        deleteBtn.style.display = 'none';
+        saveBtn.style.display = 'none';
+        infoBox.style.display = mostraInfoBox ? 'block' : 'none';
+    }
+}
     
     function toggleEditInfo() {
         document.getElementById('infoDisplay').style.display = 'none';
